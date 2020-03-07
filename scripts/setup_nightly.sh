@@ -23,6 +23,7 @@ MOUNT_POINT=$1
 cd ${MOUNT_POINT}/code/ && \
 git fetch && \
 git checkout roberta-tpu && \
-conda activate torch-xla-nightly && \
+conda info --envs && \
+conda activate pytorch && \
 pip install --editable . && \
 pip install pyarrow

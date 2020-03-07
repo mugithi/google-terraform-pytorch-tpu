@@ -3,6 +3,31 @@
 
 # TODO Replace remote-builder with custom workers currently in (alpha)[https://cloud.google.com/cloud-build/docs/custom-worker-pool] 
 steps:
+- id: terraform-apply-tpu-filestore
+  name: hashicorp/terraform:0.12.9
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - | 
+      if [ -d "modules/terraform-google-filestore-tpu/" ]; then
+        cd modules/terraform-google-filestore-tpu
+        terraform init .
+        terraform plan
+        terraform apply -auto-approve
+      else
+        for dir in modules/*/
+        do 
+          cd ${dir}   
+          env=${dir%*/}
+          env=${env#*/}  
+          echo ""
+          echo "*************** TERRAFOM PLAN ******************"
+          echo "******* At environment: ${env} ********"
+          echo "*************************************************"
+          terraform plan || exit 1
+          cd ../../
+        done
+      fi 
 - name: gcr.io/$PROJECT_ID/remote-builder
   waitFor: ["-"]
   timeout: 1200s
@@ -22,7 +47,7 @@ steps:
     # TODO Manual docker registry to address issues related to docker-credential-gcr not working properly
     - COMMAND7=sudo docker login -u oauth2accesstoken -p "$(sudo gcloud auth print-access-token)" https://gcr.io
     # Run the container : Copy files from GCS, clone the taylan@ roberta repo. Push the container to repo with a tag 
-    - COMMAND8=cd /home/${_USERNAME}/workspace/ && docker run -d -v ${_SHARED_FS}:${_MOUNT_POINT} gcr.io/$PROJECT_ID/xla:$BUILD_ID ./setup_nightly.sh ${_MOUNT_POINT} && sudo docker push gcr.io/$PROJECT_ID/xla:$BUILD_ID
+    - COMMAND8=cd /home/${_USERNAME}/workspace/ && docker run -t -v ${_SHARED_FS}:${_MOUNT_POINT} gcr.io/$PROJECT_ID/xla:$BUILD_ID ./setup_nightly.sh ${_MOUNT_POINT} && sudo docker push gcr.io/$PROJECT_ID/xla:$BUILD_ID
     - ZONE=${_ZONE}
     # TODO: Service account.  Add service account so that you can set nessaary on permissions from terraform
     - INSTANCE_ARGS=--image-project ubuntu-os-cloud --image-family ubuntu-1804-lts --boot-disk-type=pd-ssd --machine-type n1-standard-16 --boot-disk-size=200 --scopes=storage-rw,logging-write,monitoring,service-management,pubsub,service-control,trace
@@ -33,7 +58,7 @@ substitutions:
     # _SERVICE_ACCOUNT: 509537169428@cloudbuild.gserviceaccount.com
     _MOUNT_POINT: /mnt/common 
     _SHARED_FS: nytpushare
-    _NFS_IP: 10.241.173.146
+    _NFS_IP: 10.102.168.106
     _ZONE: europe-west4-a
     _IMAGE_NIGHTLY: ""
     _GCS_DATASET: gs://tpu-demo-eu/dataset/*
@@ -41,29 +66,9 @@ substitutions:
 timeout: 1500s
 
 ## TODO Cloud Build TF, Build NFS, TPU, save enviroment in workspace, load those in preceeding module
-- id: 'tf create tpu & NFS share'
-  name: 'hashicorp/terraform:0.12.20'
-  entrypoint: 'sh'
-  args: 
-  - '-c'
-  - | 
-      if [ -d "modules/terraform-google-filestore-tpu/" ]; then
-        cd modules/terraform-google-filestore-tpu
-        terraform plan
-      else
-        for dir in modules/*/
-        do 
-          cd ${dir}   
-          env=${dir%*/}
-          env=${env#*/}  
-          echo ""
-          echo "*************** TERRAFOM PLAN ******************"
-          echo "******* At environment: ${env} ********"
-          echo "*************************************************"
-          terraform plan || exit 1
-          cd ../../
-        done
-      fi 
+
+
+
 
 
 # TODO Cloud Build TF to build worker instances
