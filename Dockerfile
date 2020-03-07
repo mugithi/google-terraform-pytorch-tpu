@@ -8,11 +8,11 @@ ARG SHARED_FS=""
 ARG IMAGE_NIGHTLY=""
 
 ## Copy the enviromental file and set permissions
-COPY setup_nightly.sh .
+COPY scripts/setup_nightly.sh .
 RUN chmod a+x setup_nightly.sh
 
 # Define entrypoint and cmd
-COPY docker-entrypoint.sh /usr/local/bin
+COPY scripts/docker-entrypoint.sh /usr/local/bin
 RUN chmod a+x /usr/local/bin/docker-entrypoint.sh
 # Use conda environment on startup or when running scripts.
 ENV PATH /root/anaconda3/envs/pytorch/bin/:$PATH
