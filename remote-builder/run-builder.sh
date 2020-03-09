@@ -36,7 +36,6 @@ cat > ssh-keys <<EOF
 ${USERNAME}:$(cat ${KEYNAME}.pub)
 EOF
 
-
 ${GCLOUD} compute instances create \
        ${INSTANCE_ARGS} ${INSTANCE_NAME} \
        --metadata block-project-ssh-keys=TRUE \
@@ -62,8 +61,6 @@ done
 ${GCLOUD} compute scp --compress --recurse --verbosity=debug --force-key-file-overwrite --strict-host-key-checking=no \
        $(pwd) ${USERNAME}@${INSTANCE_NAME}:${REMOTE_WORKSPACE} \
        --ssh-key-file=${KEYNAME}  
-
-ls -alR /builder/home/
 
 ## ability to an orbitary number of commands formated as COMMAND1, COMMAND2 in remote-builder
 for ((i=1; i<20; i++))

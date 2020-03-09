@@ -22,6 +22,7 @@ steps:
             echo "exit 0" > /workspace/vars/exit_status.vars
           else
             echo "exit 1" > /workspace/vars/exit_status.vars
+            echo "exit 1" > /workspace/vars/exit_status_nfs_tpu.vars
             exit 0
           fi
       }
@@ -240,7 +241,3 @@ timeout: 1500s
 ## -  Githbu instances 
 
 # TODO CLoud build TF to turn off enviroment and save data to GCS bucket, watch github page. 
-
-
-
-## TODO, terraform-google-gcs add exit 2 if tf is created, add the check in second in tpu-docker-images-seed-nfs to delete if option 2 found
