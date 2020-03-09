@@ -64,8 +64,6 @@ ${GCLOUD} compute scp --compress --recurse --verbosity=debug --force-key-file-ov
        --ssh-key-file=${KEYNAME}  
 
 ls -alR /builder/home/
-ls -alR ${REMOTE_WORKSPACE}
-
 
 ## ability to an orbitary number of commands formated as COMMAND1, COMMAND2 in remote-builder
 for ((i=1; i<20; i++))
