@@ -89,8 +89,8 @@ steps:
       
   # Load data to gcs
 - id: load-scripts-to-gcs
-  # waitFor: 
-  # - terraform-google-filestore-tpu
+  waitFor: 
+  - terraform-google-filestore-tpu
   name: gcr.io/cloud-builders/gsutil
   entrypoint: /bin/bash
   args:
@@ -199,8 +199,8 @@ steps:
 
  # Load data to gcs
 - id: clean-up-gcs
-  # waitFor: 
-  # - terraform-google-filestore-tpu
+  waitFor: 
+  - terraform-google-filestore-tpu
   name: gcr.io/cloud-builders/gsutil
   entrypoint: /bin/bash
   args:
@@ -214,7 +214,7 @@ steps:
           exit 0
         fi
 substitutions:
-    _USERNAME: me # default value
+    _USERNAME: ${USERNAME}
     # TODO: Service account.  Add service account to replace the default sv account 
     _MOUNT_POINT: /mnt/common 
     _SHARED_FS: nytpushare
@@ -223,7 +223,7 @@ substitutions:
     _PROJECT_ID: fair-test-project
     _IMAGE_NIGHTLY: ""
     _GCS_DATASET: gs://tpu-demo-eu/dataset/*
-    _NFS_IP: $(cat /workspace/vars/nfs_ip.vars)
+    _NFS_IP: $(cat vars/nfs_ip.vars) # variable file in the GCE builder instance
     _CODE_REPO: https://github.com/taylanbil/fairseq.git 
     _ACCELERATOR_TYPE: v3-8
     _PYTORCH_PROJ_NAME: ${PYTORCH_PROJ_NAME}
@@ -232,8 +232,8 @@ substitutions:
     _MACHINE_TYPE: n1-standard-8
 options: 
     env:
-      'PYTORCH_PROJ_NAME=nyc'
-
+      - 'PYTORCH_PROJ_NAME=nyc'
+      - 'USERNAME=me'
 timeout: 1500s
 
 # TODO Cloud build to refresh instances based on changes to github
