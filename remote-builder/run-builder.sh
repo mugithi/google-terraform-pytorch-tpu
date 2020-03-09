@@ -7,7 +7,7 @@ ZONE=${ZONE:-us-central1-f}
 INSTANCE_ARGS=${INSTANCE_ARGS:---boot-disk-auto-delete}
 GCLOUD=${GCLOUD:-gcloud}
 
-# check if previous steps succeeded, if not exit
+# check if previous cloud build steps succeeded, if not exit
 if [ "$(cat /workspace/vars/exit_status.vars)" != "exit 0" ]
 then
     exit 0
@@ -20,6 +20,7 @@ function cleanup {
     exit 0
 }
 
+# fix issues related to google_compute_known_hosts permissions error
 mkdir /builder/home/.ssh/ && touch /builder/home/.ssh/google_compute_known_hosts && chmod 644 /builder/home/.ssh/google_compute_known_hosts
 ls -al /builder/home/.ssh/google_compute_known_hosts
 
