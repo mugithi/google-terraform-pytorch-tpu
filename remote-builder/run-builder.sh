@@ -1,16 +1,28 @@
 #!/bin/bash -xe
 
-# Always delete instance after attempting build
-function cleanup {
-    ${GCLOUD} compute instances delete ${INSTANCE_NAME} --quiet
-}
-
 USERNAME=${USERNAME:-admin}
-REMOTE_WORKSPACE=${REMOTE_WORKSPACE:-/home/${USERNAME}/workspace/}
+REMOTE_WORKSPACE=${REMOTE_WORKSPACE:-/home/${USERNAME}/workspace}
 INSTANCE_NAME=${INSTANCE_NAME:-builder-$(cat /proc/sys/kernel/random/uuid)}
 ZONE=${ZONE:-us-central1-f}
 INSTANCE_ARGS=${INSTANCE_ARGS:---boot-disk-auto-delete}
 GCLOUD=${GCLOUD:-gcloud}
+
+# check if previous steps succeeded, if not exit
+if [ "$(cat /workspace/vars/exit_status.vars)" != "exit 0" ]
+then
+    exit 0
+fi
+
+# Always delete instance after attempting build
+function cleanup {
+    echo "exit 1" > /workspace/vars/exit_status.vars 
+    ${GCLOUD} compute instances delete ${INSTANCE_NAME} --quiet
+    exit 0
+}
+
+mkdir /builder/home/.ssh/ && touch /builder/home/.ssh/google_compute_known_hosts && chmod 644 /builder/home/.ssh/google_compute_known_hosts
+ls -al /builder/home/.ssh/google_compute_known_hosts
+
 
 ${GCLOUD} config set compute/zone ${ZONE}
 
@@ -23,6 +35,7 @@ chmod 400 ${KEYNAME}*
 cat > ssh-keys <<EOF
 ${USERNAME}:$(cat ${KEYNAME}.pub)
 EOF
+
 
 ${GCLOUD} compute instances create \
        ${INSTANCE_ARGS} ${INSTANCE_NAME} \
@@ -41,7 +54,6 @@ until [ $(`ssh -q -o StrictHostKeyChecking=no ${USERNAME}@${NAT_IP} -i ./${KEYNA
       echo "Max attempts reached" 
       exit 1
     fi
-
     printf '.'
     attempt_counter=$(($attempt_counter+1))
     sleep 5
@@ -50,6 +62,10 @@ done
 ${GCLOUD} compute scp --compress --recurse --verbosity=debug --force-key-file-overwrite --strict-host-key-checking=no \
        $(pwd) ${USERNAME}@${INSTANCE_NAME}:${REMOTE_WORKSPACE} \
        --ssh-key-file=${KEYNAME}  
+
+ls -alR /builder/home/
+ls -alR ${REMOTE_WORKSPACE}
+
 
 ## ability to an orbitary number of commands formated as COMMAND1, COMMAND2 in remote-builder
 for ((i=1; i<20; i++))
@@ -63,6 +79,3 @@ do
         fi
 done
 
-${GCLOUD} compute scp --compress --recurse --verbosity=debug --force-key-file-overwrite --strict-host-key-checking=no \
-       ${USERNAME}@${INSTANCE_NAME}:${REMOTE_WORKSPACE}* $(pwd) \
-       --ssh-key-file=${KEYNAME}  

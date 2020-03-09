@@ -3,41 +3,74 @@
 
 steps:
 # Create GCS Buckets
-- id: terraform-google-filestore-tpu
+- id: terraform-google-gcs
   name: hashicorp/terraform:0.12.9
   entrypoint: 'sh'
   args: 
   - '-c'
   - |  
       set -xe
+      mkdir -p vars/
+      ls -al /workspace/
+      trap cleanup EXIT
+      function cleanup {
+          if [ "$?" == "0" ]
+          then 
+            echo "Success! Configuration applied"
+            echo $(terraform output backend_bucket_url) > /workspace/vars/backend_bucket_url.vars
+            echo $(terraform output script_bucket_url) > /workspace/vars/script_bucket_url.vars
+            echo "exit 0" > /workspace/vars/exit_status.vars
+          else
+            echo "exit 1" > /workspace/vars/exit_status.vars
+            exit 0
+          fi
+      }
       if [ -d "modules/terraform-google-gcs/" ]; then
-        cd modules/terraform-google-gcs
+        cd modules/terraform-google-gcs   
         terraform init 
         terraform validate
         terraform apply -auto-approve \
             -var="project_id=${_PROJECT_ID}" \
-            -var="pytorch_proj_name=${_PYTORCH_PROJ_NAME}"
+            -var="pytorch_proj_name=${_PYTORCH_PROJ_NAME}" \
+            -var="gcs_tf_backend=${_GCS_TF_BACKEND_URL}" \
+            -var="gcs_scripts=${_GCS_SCRIPT_URL}" 
       fi 
-      trap cleanup ERROR
-      mkdir -p /vars  
-      terraform output backend_bucket_url > /vars/backend_bucket_url.vars
-      terraform output script_bucket_url > /vars/script_bucket_url.vars
-      function cleanup {
-          trap terraform destroy -auto-approve
-      }
-
+      
 # Create TPU, Filestore 
 - id: terraform-google-filestore-tpu
   name: hashicorp/terraform:0.12.9
+  waitFor: 
+  - terraform-google-gcs
   entrypoint: 'sh'
   args: 
   - '-c'
   - |  
       set -xe
+      if [ "$(cat /workspace/vars/exit_status.vars)" != "exit 0" ]
+      then 
+        echo "exit 1" > /workspace/vars/exit_status.vars
+        exit 0
+      fi
+      function cleanup {
+        if [ "$?" == "0" ]
+        then 
+          echo "Success! Configuration applied"
+          terraform output nfs_ip > /workspace/vars/nfs_ip.vars
+          terraform output default_account > /workspace/vars/default_account.vars
+          terraform output tpu_name > /workspace/vars/tpu_name.vars
+          terraform output tpu_project > /workspace/vars/tpu_project.vars
+          terraform output tpu_zone > /workspace/vars/tpu_zone.vars
+        else
+          echo "exit 1" > /workspace/vars/exit_status.vars
+          terraform destroy -auto-approve
+          exit 0
+        fi
+      }
+      trap cleanup EXIT
       if [ -d "modules/terraform-google-filestore-tpu/" ]; then
         cd modules/terraform-google-filestore-tpu
         terraform init \
-            -backend-config="bucket=${_GCS_TF_BACKEND}" \
+            -backend-config="bucket=${_GCS_TF_BACKEND_URL}" \
             -backend-config="prefix=terraform-google-filestore-tpu"
         terraform validate
         terraform apply -auto-approve \
@@ -47,46 +80,68 @@ steps:
             -var="pytorch_proj_name=${_PYTORCH_PROJ_NAME}" \
             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
-            -var="machine_type=${_MACHINE_TYPE}"
+            -var="machine_type=${_MACHINE_TYPE}" \
+            -var="script_bucket_url=${_GCS_SCRIPT_URL}"
+        echo "exit 0" > /workspace/vars/exit_status_nfs_tpu.vars
       fi 
-      trap cleanup ERROR
-      terraform output nfs_ip > /vars/nfs_ip.vars
-      terraform output default_account > /vars/default_account.vars
-      function cleanup {
-          trap terraform destroy -auto-approve
-      }
+
+      
+  # Load data to gcs
+- id: load-scripts-to-gcs
+  # waitFor: 
+  # - terraform-google-filestore-tpu
+  name: gcr.io/cloud-builders/gsutil
+  entrypoint: /bin/bash
+  args:
+    - -c
+    - |
+        set -xe
+        if [ "$(cat /workspace/vars/exit_status.vars)" != "exit 0" ]
+        then 
+          exit 0
+        fi
+        trap cleanup EXIT
+        function cleanup {
+          if [ "$?" == "0" ]
+          then 
+            echo "Success! Configuration applied"
+            echo "exit 0" > /workspace/vars/exit_status.vars
+            exit 0
+          else
+            echo "exit 1" > /workspace/vars/exit_status.vars
+            exit 0
+          fi
+        }
+        gsutil -m cp -r scripts/* gs://${_GCS_SCRIPT_URL}
 
     # TODO Replace remote-builder with custom workers currently in (alpha)[https://cloud.google.com/cloud-build/docs/custom-worker-pool] 
 - id: tpu-docker-images-seed-nfs
   name: gcr.io/$PROJECT_ID/remote-builder
   waitFor: 
-  - terraform-google-filestore-tpu
+  - load-scripts-to-gcs
   timeout: 1200s
   env:
-    # Copy files to gcs bucket 
-    - COMMAND1=gsutil -m cp -r scripts/ ${_GCS_SCRIPT_URL}
     # Install nfs, docker in worker host
-    - COMMAND2=sudo apt-get -y install nfs-common curl && sudo curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh && sudo usermod -aG docker ${_USERNAME}
+    - COMMAND1=sudo apt-get -y install nfs-common curl && sudo curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh && sudo usermod -aG docker ${_USERNAME}
     # Mount the NFS share to workspace
-    - COMMAND3=sudo mkdir -p ${_MOUNT_POINT} && sudo mount ${_NFS_IP}:/${_SHARED_FS} ${_MOUNT_POINT} &&  sudo chmod go+rw ${_MOUNT_POINT} && df -kh && ls -al ${_MOUNT_POINT}
+    - COMMAND2=sudo mkdir -p ${_MOUNT_POINT} && sudo mount ${_NFS_IP}:/${_SHARED_FS} ${_MOUNT_POINT} &&  sudo chmod go+rw ${_MOUNT_POINT} && df -kh && ls -al ${_MOUNT_POINT}
     # Copy the Roberta files to dataset
-    - COMMAND4=if [ -d "${_MOUNT_POINT}/code" ]; then echo "using existing ${_MOUNT_POINT}/code directory"; else sudo mkdir -p ${_MOUNT_POINT}/code && sudo git clone ${_CODE_REPO} ${_MOUNT_POINT}/code/; fi
+    - COMMAND3=if [ -d "${_MOUNT_POINT}/code" ]; then echo "using existing ${_MOUNT_POINT}/code directory"; else sudo mkdir -p ${_MOUNT_POINT}/code && sudo git clone ${_CODE_REPO} ${_MOUNT_POINT}/code/; fi
     # Create the dataset folder and download the dataset
-    - COMMAND5=if [ -d "${_MOUNT_POINT}/data" ]; then echo "using existing ${_MOUNT_POINT}/data directory"; else sudo mkdir -p ${_MOUNT_POINT}/data && sudo gsutil -m cp -r ${_GCS_DATASET} ${_MOUNT_POINT}/data/; fi && sudo umount ${_MOUNT_POINT}
+    - COMMAND4=if [ -d "${_MOUNT_POINT}/data" ]; then echo "using existing ${_MOUNT_POINT}/data directory"; else sudo mkdir -p ${_MOUNT_POINT}/data && sudo gsutil -m cp -r ${_GCS_DATASET} ${_MOUNT_POINT}/data/; fi && sudo umount ${_MOUNT_POINT}
     # Create the docker NFS volume
-    - COMMAND6=docker volume create --driver local --opt type=nfs --opt o=addr=${_NFS_IP} --opt device=:/${_SHARED_FS} ${_SHARED_FS}
+    - COMMAND5=docker volume create --driver local --opt type=nfs --opt o=addr=${_NFS_IP} --opt device=:/${_SHARED_FS} ${_SHARED_FS}
     # Build the appropriate nightly container, pull it and copy the startup script into to workspace 
-    - COMMAND7=df -kh && cd /home/${_USERNAME}/workspace/ && docker build --build-arg IMAGE_NIGHTLY=${_IMAGE_NIGHTLY} --tag gcr.io/$PROJECT_ID/xla:$BUILD_ID .
+    - COMMAND6=df -kh && cd /home/${_USERNAME}/workspace/ && docker build --build-arg IMAGE_NIGHTLY=${_IMAGE_NIGHTLY} --tag gcr.io/$PROJECT_ID/xla:$BUILD_ID .
     # TODO Manual docker registry to address issues related to docker-credential-gcr not working properly
-    - COMMAND8=sudo docker login -u oauth2accesstoken -p "$(sudo gcloud auth print-access-token)" https://gcr.io
+    - COMMAND7=sudo docker login -u oauth2accesstoken -p "$(sudo gcloud auth print-access-token)" https://gcr.io
     # Run the container : Copy files from GCS, clone the taylan@ roberta repo. Push the container to repo with a tag 
-    - COMMAND9=cd /home/${_USERNAME}/workspace/ && docker run -t -v ${_SHARED_FS}:${_MOUNT_POINT} gcr.io/$PROJECT_ID/xla:$BUILD_ID ./setup_nightly.sh ${_MOUNT_POINT} && sudo docker push gcr.io/$PROJECT_ID/xla:$BUILD_ID
-    - ZONE=${_ZONE} ${_NFS_IP}
+    - COMMAND8=cd /home/${_USERNAME}/workspace/ && docker run -t -v ${_SHARED_FS}:${_MOUNT_POINT} gcr.io/$PROJECT_ID/xla:$BUILD_ID ./setup_nightly.sh ${_MOUNT_POINT} && sudo docker push gcr.io/$PROJECT_ID/xla:$BUILD_ID
+    - ZONE=${_ZONE}
     # TODO: Service account. Add service account so that you can set nessaary on permissions from terraform
     # TODO: Add ability to change TPU runtime if set
     - INSTANCE_ARGS=--image-project ubuntu-os-cloud --image-family ubuntu-1804-lts --boot-disk-type=pd-ssd --machine-type n1-standard-16 --boot-disk-size=200 --scopes=storage-rw,logging-write,monitoring,service-management,pubsub,service-control,trace
     - USERNAME=${_USERNAME}
-
     # Create GCE instances
 - id: terraform-google-instances
   name: hashicorp/terraform:0.12.9
@@ -97,10 +152,38 @@ steps:
   - '-c'
   - | 
       set -xe
+      function cleanupnfstpu {
+        if [ "$(cat /workspace/vars/exit_status_nfs_tpu.vars)" == "exit 0" ]
+        then 
+          cd modules/terraform-google-filestore-tpu
+          terraform init \
+            -backend-config="bucket=${_GCS_TF_BACKEND_URL}" \
+            -backend-config="prefix=terraform-google-filestore-tpu"
+          terraform destroy -auto-approve
+        fi
+        exit 0
+      }
+      if [ "$(cat /workspace/vars/exit_status.vars)" != "exit 0" ]
+      then 
+        echo "exit 1" > /workspace/vars/exit_status.vars
+        cleanupnfstpu
+        exit 0
+      fi
+      trap cleanup EXIT
+      function cleanup {
+        if [ "$? == 0" ]
+        then  
+          terraform output compute_instances_slave_0 > /workspace/vars/compute_instances_slave_0.vars
+        else
+          trap terraform destroy -auto-approve
+          cleanupnfstpu
+          exit 0
+        fi 
+      }
       if [ -d "modules/terraform-google-instances/" ]; then
         cd modules/terraform-google-instances
         terraform init \
-            -backend-config="bucket=${_GCS_TF_BACKEND}" \
+            -backend-config="bucket=${_GCS_TF_BACKEND_URL}" \
             -backend-config="prefix=terraform-google-instances"
         terraform validate
         terraform apply -auto-approve \
@@ -111,29 +194,45 @@ steps:
             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
             -var="machine_type=${_MACHINE_TYPE}"
-      fi 
-      trap cleanup ERROR
-      terraform output compute_instances_slave_0 > /vars/compute_instances_slave_0.vars
-      function cleanup {
-          trap terraform destroy -auto-approve
-      }     
+      fi
+
+ # Load data to gcs
+- id: clean-up-gcs
+  # waitFor: 
+  # - terraform-google-filestore-tpu
+  name: gcr.io/cloud-builders/gsutil
+  entrypoint: /bin/bash
+  args:
+    - -c
+    - |
+        set -xe 
+        if [ "$(cat /workspace/vars/exit_status.vars)" != "exit 0" ]
+        then
+          gsutil rm -r gs://${_GCS_TF_BACKEND_URL}
+          gsutil rm -r gs://${_GCS_SCRIPT_URL}
+          exit 0
+        fi
 substitutions:
     _USERNAME: me # default value
     # TODO: Service account.  Add service account to replace the default sv account 
     _MOUNT_POINT: /mnt/common 
     _SHARED_FS: nytpushare
-    _ZONE: europe-west4-a
-    _REGION: europe-west4
+    _ZONE: us-central1-a
+    _REGION: us-central1
     _PROJECT_ID: fair-test-project
     _IMAGE_NIGHTLY: ""
     _GCS_DATASET: gs://tpu-demo-eu/dataset/*
-    _GCS_SCRIPT_URL: $(cat /vars/script_bucket_url.vars)
-    _GCS_TF_BACKEND: $(cat /vars/backend_bucket_url.vars)
+    _NFS_IP: $(cat /workspace/vars/nfs_ip.vars)
     _CODE_REPO: https://github.com/taylanbil/fairseq.git 
     _ACCELERATOR_TYPE: v3-8
-    _PYTORCH_PROJ_NAME: ny
-    _MACHINE_TYPE: n1-standard-16
-    _NFS_IP: $(cat /vars/nfs_ip.vars)
+    _PYTORCH_PROJ_NAME: ${PYTORCH_PROJ_NAME}
+    _GCS_SCRIPT_URL : ${PYTORCH_PROJ_NAME}-tpu-scripts
+    _GCS_TF_BACKEND_URL : ${PYTORCH_PROJ_NAME}-tpu-backend
+    _MACHINE_TYPE: n1-standard-8
+options: 
+    env:
+      'PYTORCH_PROJ_NAME=nyc'
+
 timeout: 1500s
 
 # TODO Cloud build to refresh instances based on changes to github
@@ -142,3 +241,6 @@ timeout: 1500s
 
 # TODO CLoud build TF to turn off enviroment and save data to GCS bucket, watch github page. 
 
+
+
+## TODO, terraform-google-gcs add exit 2 if tf is created, add the check in second in tpu-docker-images-seed-nfs to delete if option 2 found
