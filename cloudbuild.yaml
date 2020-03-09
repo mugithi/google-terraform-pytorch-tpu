@@ -50,6 +50,7 @@ steps:
       if [ "$(cat /workspace/vars/exit_status.vars)" != "exit 0" ]
       then 
         echo "exit 1" > /workspace/vars/exit_status.vars
+        echo "WARNING - Skipping creating TPU and Filestore"
         exit 0
       fi
       function cleanup {
@@ -99,6 +100,7 @@ steps:
         set -xe
         if [ "$(cat /workspace/vars/exit_status.vars)" != "exit 0" ]
         then 
+          echo "WARNING - Skipping loading files to GCS"
           exit 0
         fi
         trap cleanup EXIT
@@ -125,7 +127,7 @@ steps:
     # Install nfs, docker in worker host
     - COMMAND1=sudo apt-get -y install nfs-common curl && sudo curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh && sudo usermod -aG docker ${_USERNAME}
     # Mount the NFS share to workspace
-    - COMMAND2=sudo mkdir -p ${_MOUNT_POINT} && sudo mount ${_NFS_IP}:/${_SHARED_FS} ${_MOUNT_POINT} &&  sudo chmod go+rw ${_MOUNT_POINT} && df -kh && ls -al ${_MOUNT_POINT}
+    - COMMAND2=sudo mkdir -p ${_MOUNT_POINT} && sudo mount -t nfs -o nfsvers=3 ${_NFS_IP}:/${_SHARED_FS} ${_MOUNT_POINT} &&  sudo chmod go+rw ${_MOUNT_POINT} && df -kh && ls -al ${_MOUNT_POINT}
     # Copy the Roberta files to dataset
     - COMMAND3=if [ -d "${_MOUNT_POINT}/code" ]; then echo "using existing ${_MOUNT_POINT}/code directory"; else sudo mkdir -p ${_MOUNT_POINT}/code && sudo git clone ${_CODE_REPO} ${_MOUNT_POINT}/code/; fi
     # Create the dataset folder and download the dataset
@@ -217,13 +219,13 @@ substitutions:
     _USERNAME: me
     # TODO: Service account.  Add service account to replace the default sv account 
     _MOUNT_POINT: /mnt/common 
-    _SHARED_FS: nytpushare
+    _SHARED_FS: ${PYTORCH_PROJ_NAME}tpushare
     _ZONE: us-central1-a
     _REGION: us-central1
     _PROJECT_ID: fair-test-project
     _IMAGE_NIGHTLY: ""
     _GCS_DATASET: gs://tpu-demo-eu/dataset/*
-    _NFS_IP: $(cat vars/nfs_ip.vars) # variable file in the GCE builder instance
+    _NFS_IP: $(cat ~/workspace/vars/nfs_ip.vars) # variable file in the GCE builder instance
     _CODE_REPO: https://github.com/taylanbil/fairseq.git 
     _ACCELERATOR_TYPE: v3-8
     _PYTORCH_PROJ_NAME: ${PYTORCH_PROJ_NAME}
