@@ -15,7 +15,12 @@ fi
 
 # Always delete instance after attempting build
 function cleanup {
-    echo "exit 1" > /workspace/vars/exit_status.vars 
+      if [ "$?" == "0" ]
+         then 
+            echo "exit 0" > /workspace/vars/exit_status.vars
+         else
+            echo "exit 1" > /workspace/vars/exit_status.vars
+       fi
     ${GCLOUD} compute instances delete ${INSTANCE_NAME} --quiet
     exit 0
 }

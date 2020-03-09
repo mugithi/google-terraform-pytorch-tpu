@@ -11,7 +11,6 @@ steps:
   - |  
       set -xe
       mkdir -p vars/
-      ls -al /workspace/
       trap cleanup EXIT
       function cleanup {
           if [ "$?" == "0" ]
@@ -29,7 +28,7 @@ steps:
       if [ -d "modules/terraform-google-gcs/" ]; then
         cd modules/terraform-google-gcs   
         terraform init 
-        terraform validate
+        terraform plan
         terraform apply -auto-approve \
             -var="project_id=${_PROJECT_ID}" \
             -var="pytorch_proj_name=${_PYTORCH_PROJ_NAME}" \
@@ -74,7 +73,7 @@ steps:
         terraform init \
             -backend-config="bucket=${_GCS_TF_BACKEND_URL}" \
             -backend-config="prefix=terraform-google-filestore-tpu"
-        terraform validate
+        terraform plan
         terraform apply -auto-approve \
             -var="project_id=${_PROJECT_ID}" \
             -var="region=${_REGION}" \
@@ -83,7 +82,8 @@ steps:
             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
             -var="machine_type=${_MACHINE_TYPE}" \
-            -var="script_bucket_url=${_GCS_SCRIPT_URL}"
+            -var="script_bucket_url=${_GCS_SCRIPT_URL}" \
+            -var="tpu_shares_name=${_SHARED_FS}"
         echo "exit 0" > /workspace/vars/exit_status_nfs_tpu.vars
       fi 
 
@@ -188,7 +188,7 @@ steps:
         terraform init \
             -backend-config="bucket=${_GCS_TF_BACKEND_URL}" \
             -backend-config="prefix=terraform-google-instances"
-        terraform validate
+        terraform plan
         terraform apply -auto-approve \
             -var="project_id=${_PROJECT_ID}" \
             -var="region=${_REGION}" \
@@ -219,7 +219,7 @@ substitutions:
     _USERNAME: me
     # TODO: Service account.  Add service account to replace the default sv account 
     _MOUNT_POINT: /mnt/common 
-    _SHARED_FS: ${PYTORCH_PROJ_NAME}tpushare
+    _SHARED_FS: tpushare #n eeds to be between 7 - 16 characters
     _ZONE: us-central1-a
     _REGION: us-central1
     _PROJECT_ID: fair-test-project
@@ -235,7 +235,7 @@ substitutions:
 options: 
     env:
       'PYTORCH_PROJ_NAME=nyc'
-timeout: 1500s
+timeout: 2000s
 
 # TODO Cloud build to refresh instances based on changes to github
 ## -  Entire worker
