@@ -10,7 +10,6 @@ steps:
   - '-c'
   - |  
       set -xe
-      mkdir -p vars/
       trap cleanup EXIT
       function cleanup {
           if [ "$?" == "0" ]
@@ -25,10 +24,15 @@ steps:
             exit 0
           fi
       }
+      mkdir -p vars/
       if [ -d "modules/terraform-google-gcs/" ]; then
-        cd modules/terraform-google-gcs   
+        cd modules/terraform-google-gcs  
         terraform init 
-        terraform plan
+        terraform plan \
+            -var="project_id=${_PROJECT_ID}" \
+            -var="pytorch_proj_name=${_PYTORCH_PROJ_NAME}" \
+            -var="gcs_tf_backend=${_GCS_TF_BACKEND_URL}" \
+            -var="gcs_scripts=${_GCS_SCRIPT_URL}" 
         terraform apply -auto-approve \
             -var="project_id=${_PROJECT_ID}" \
             -var="pytorch_proj_name=${_PYTORCH_PROJ_NAME}" \
@@ -52,6 +56,7 @@ steps:
         echo "WARNING - Skipping creating TPU and Filestore"
         exit 0
       fi
+      trap cleanup EXIT
       function cleanup {
         if [ "$?" == "0" ]
         then 
@@ -63,17 +68,28 @@ steps:
           terraform output tpu_zone > /workspace/vars/tpu_zone.vars
         else
           echo "exit 1" > /workspace/vars/exit_status.vars
-          terraform destroy -auto-approve
+          terraform destroy -auto-approve \
+            -var="project_id=${_PROJECT_ID}" \
+            -var="region=${_REGION}" \
+            -var="zone=${_ZONE}" 
           exit 0
         fi
       }
-      trap cleanup EXIT
       if [ -d "modules/terraform-google-filestore-tpu/" ]; then
         cd modules/terraform-google-filestore-tpu
         terraform init \
             -backend-config="bucket=${_GCS_TF_BACKEND_URL}" \
             -backend-config="prefix=terraform-google-filestore-tpu"
-        terraform plan
+        terraform plan \
+            -var="project_id=${_PROJECT_ID}" \
+            -var="region=${_REGION}" \
+            -var="zone=${_ZONE}" \
+            -var="pytorch_proj_name=${_PYTORCH_PROJ_NAME}" \
+            -var="accelerator_type=${_ACCELERATOR_TYPE}" \
+            -var="nightly_image=${_IMAGE_NIGHTLY}" \
+            -var="machine_type=${_MACHINE_TYPE}" \
+            -var="script_bucket_url=${_GCS_SCRIPT_URL}" \
+            -var="tpu_shares_name=${_SHARED_FS}"
         terraform apply -auto-approve \
             -var="project_id=${_PROJECT_ID}" \
             -var="region=${_REGION}" \
@@ -162,7 +178,10 @@ steps:
           terraform init \
             -backend-config="bucket=${_GCS_TF_BACKEND_URL}" \
             -backend-config="prefix=terraform-google-filestore-tpu"
-          terraform destroy -auto-approve
+          terraform destroy -auto-approve \
+            -var="project_id=${_PROJECT_ID}" \
+            -var="region=${_REGION}" \
+            -var="zone=${_ZONE}" 
         fi
         exit 0
       }
@@ -172,23 +191,36 @@ steps:
         cleanupnfstpu
         exit 0
       fi
-      trap cleanup EXIT
       function cleanup {
         if [ "$? == 0" ]
         then  
           terraform output compute_instances_slave_0 > /workspace/vars/compute_instances_slave_0.vars
         else
-          trap terraform destroy -auto-approve
+          terraform init \
+            -backend-config="bucket=${_GCS_TF_BACKEND_URL}" \
+            -backend-config="prefix=terraform-google-instances"
+          terraform destroy -auto-approve \
+            -var="project_id=${_PROJECT_ID}" \
+            -var="region=${_REGION}" \
+            -var="zone=${_ZONE}" 
           cleanupnfstpu
           exit 0
         fi 
       }
+      trap cleanup EXIT
       if [ -d "modules/terraform-google-instances/" ]; then
         cd modules/terraform-google-instances
         terraform init \
             -backend-config="bucket=${_GCS_TF_BACKEND_URL}" \
             -backend-config="prefix=terraform-google-instances"
-        terraform plan
+        terraform plan \
+            -var="project_id=${_PROJECT_ID}" \
+            -var="region=${_REGION}" \
+            -var="zone=${_ZONE}" \
+            -var="pytorch_proj_name=${_PYTORCH_PROJ_NAME}" \
+            -var="accelerator_type=${_ACCELERATOR_TYPE}" \
+            -var="nightly_image=${_IMAGE_NIGHTLY}" \
+            -var="machine_type=${_MACHINE_TYPE}"
         terraform apply -auto-approve \
             -var="project_id=${_PROJECT_ID}" \
             -var="region=${_REGION}" \
@@ -198,7 +230,6 @@ steps:
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
             -var="machine_type=${_MACHINE_TYPE}"
       fi
-
  # Load data to gcs
 - id: clean-up-gcs
   waitFor: 
@@ -216,7 +247,7 @@ steps:
           exit 0
         fi
 substitutions:
-    _USERNAME: me
+    _USERNAME: name
     # TODO: Service account.  Add service account to replace the default sv account 
     _MOUNT_POINT: /mnt/common 
     _SHARED_FS: tpushare #n eeds to be between 7 - 16 characters

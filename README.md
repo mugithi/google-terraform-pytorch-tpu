@@ -1,6 +1,6 @@
 # Introduction 
 
-This module builds off [](https://github.com/pytorch/xla) and enables you to do build a full TPU PyTorch Distributed training enviroment using [PyTorch/XLA](https://github.com/pytorch/xla) to perform training using the RoBERTa Fairseq models. 
+This module builds off [](https://github.com/pytorch/xla) and enables you to do build a  TPU PyTorch Distributed training enviroment using [PyTorch/XLA](https://github.com/pytorch/xla) to perform training using the RoBERTa Fairseq models. 
 
 ### What this module does
 This module does the following 
