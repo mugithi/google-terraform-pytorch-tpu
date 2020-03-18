@@ -251,14 +251,14 @@ substitutions:
     # TODO: Service account.  Add service account to replace the default sv account 
     _MOUNT_POINT: /mnt/common 
     _SHARED_FS: tpushare #n eeds to be between 7 - 16 characters
-    _ZONE: us-central1-a
-    _REGION: us-central1
+    _ZONE: europe-west4-a
+    _REGION: europe-west4
     _PROJECT_ID: fair-test-project
     _IMAGE_NIGHTLY: ""
     _GCS_DATASET: gs://tpu-demo-eu/dataset/*
     _NFS_IP: $(cat ~/workspace/vars/nfs_ip.vars) # variable file in the GCE builder instance
     _CODE_REPO: https://github.com/taylanbil/fairseq.git 
-    _ACCELERATOR_TYPE: v3-8
+    _ACCELERATOR_TYPE: v3-32
     _PYTORCH_PROJ_NAME: ${PYTORCH_PROJ_NAME}
     _GCS_SCRIPT_URL : ${PYTORCH_PROJ_NAME}-tpu-scripts
     _GCS_TF_BACKEND_URL : ${PYTORCH_PROJ_NAME}-tpu-backend
@@ -268,8 +268,17 @@ options:
       'PYTORCH_PROJ_NAME=nyc'
 timeout: 2000s
 
-# TODO Cloud build to refresh instances based on changes to github
+
+# TODO: Ability to set TPU Runtime when specified 
+
+# TODO: Cloud build to refresh instances based on changes to github
 ## -  Entire worker
 ## -  Githbu instances 
 
-# TODO CLoud build TF to turn off enviroment and save data to GCS bucket, watch github page. 
+# TODO: CLoud build TF to turn off enviroment and save data to GCS bucket, 
+
+# TODO: add ability to trigger changes, watching the github checkin 
+
+# TODO: add ability to cache run
+
+
