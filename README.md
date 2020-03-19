@@ -20,7 +20,7 @@ This module does the following
 
 Clone the repo to your local enviroment. 
 ```
-git clone 
+git clone https://github.com/mugithi/google-terraform-pytorch-tpu.git . 
 ```
 ### Configure the enviroment 
 
