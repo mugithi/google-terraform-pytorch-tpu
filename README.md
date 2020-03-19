@@ -13,16 +13,22 @@ This module does the following
 6. Mounts NFS share to FAIRseq Docker Containers 
 7. Manually or automatically kicks off RoBERTa training job
 
-
 ### Diagram 
 
+
 ## Getting started
+
+Clone the repo to your local enviroment. 
+```
+git clone 
+```
 ### Configure the enviroment 
 
 ### Configure Permissions
 
-### Configure the environment: Cloud Build 
+### Configure the environment: Cloud Builder 
 
+Use the instructions in Cloud Builder to push the cloud build VM into the GCR registry. This container will form your base to execute 
 ### Configure environment: PyTorch TPU 
 
 ##### Table with modifiable modules 

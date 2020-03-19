@@ -188,7 +188,7 @@ steps:
       if [ "$(cat /workspace/vars/exit_status.vars)" != "exit 0" ]
       then 
         echo "exit 1" > /workspace/vars/exit_status.vars
-        cleanupnfstpu
+        cleanup
         exit 0
       fi
       function cleanup {
