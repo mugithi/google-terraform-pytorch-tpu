@@ -22,20 +22,64 @@ Clone the repo to your local enviroment.
 ```
 git clone https://github.com/mugithi/google-terraform-pytorch-tpu.git . 
 ```
-### Configure the enviroment 
 
-### Configure Permissions
+### Enable the following services
+```
+gcloud services enable cloudbuild.googleapis.com
+gcloud services enable compute.googleapis.com
+gcloud services enable iam.googleapis.com
+gcloud services enable tpu.googleapis.com
+gcloud services enable file.googleapis.com
+```
+### Configure Permissions and enable services 
+```
+export PROJECT=$(gcloud info --format='value(config.project)')
+export PROJECT_NUMBER=$(gcloud projects describe $PROJECT --format 'value(projectNumber)')
+export CB_SA_EMAIL=$PROJECT_NUMBER@cloudbuild.gserviceaccount.com
+gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_EMAIL --role='roles/iam.serviceAccountUser' --role='roles/compute.instanceAdmin.v1' --role='roles/iam.serviceAccountActor' --role='roles/roles/file.editor'
+```
 
 ### Configure the environment: Cloud Builder 
 
-Use the instructions in Cloud Builder to push the cloud build VM into the GCR registry. This container will form your base to execute 
-### Configure environment: PyTorch TPU 
+Seed the remote-builder container using cloudbuild. 
 
-##### Table with modifiable modules 
+```
+cd remote-buider
+gcloud builds submit --config=cloudbuild.yaml .
 
-### Configure scripts to run 
+```
+### Configure the enviroment 
 
-### Running the enviroment 
+##### Configure environment: TPU 
+
+Navigate to the root directory and modify the `cloudbuild.yml` file  variables below to configure the PyTorch TPU enviroment  
+```
+cd .. 
+vi cloudbuild.yml
+_USERNAME: <username>
+_MOUNT_POINT: /mnt/common
+_SHARED_FS: <file_system_name> #n eeds to be between 7 - 16 characters
+_ZONE: europe-west4-a
+_REGION: europe-west4
+_PROJECT_ID: <project_id>
+_IMAGE_NIGHTLY: ""
+_PYTORCH_PROJ_NAME: ${PYTORCH_PROJ_NAME}
+_ACCELERATOR_TYPE: v3-8
+_MACHINE_TYPE: n1-standard-8
+```
+
+##### Configure 
+
+Modify the variables with the source of the training dataset and the code repo to be used in the training VM.
+
+```
+_GCS_DATASET: gs://<gcs_bucket_with_training_dataset>
+_CODE_REPO: https://github.com/taylanbil/fairseq.git
+```
+
+### Deploying the enviroment. 
+
+
 
 # TODO
 
