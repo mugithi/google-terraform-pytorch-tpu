@@ -78,8 +78,24 @@ _CODE_REPO: https://github.com/taylanbil/fairseq.git
 ```
 
 ### Deploying the enviroment. 
+To deply the enviroment execute, cloud build from the command line 
 
+```
+gcloud builds submit --config=cloudbuild.yaml .
+```
 
+This will launch cloud build, you can monitor the deployment in the Gcloud Cloud bashboard in this [link](https://console.cloud.google.com/cloud-build/builds?) 
+
+A succesfull deplyment of the enviroment will result in the following output
+
+```
+```
+
+Once you are ready to clean up the enviroment, re-run the `cloudbuild`. This will cause a tear down of the environment created in the intial run. 
+ 
+```
+gcloud builds submit --config=cloudbuild.yaml .
+```
 
 # TODO
 
