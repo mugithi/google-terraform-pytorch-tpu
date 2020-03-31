@@ -10,8 +10,8 @@ This module does the following
 3. Seeds the NFS Share with training dataset specified GCS bucket
 4. Builds an XLA docker container with FAIRseq modules and pushes it to GCR
 5. Starts a GCE instance with FAIRsq Docker containers pre-loaded
-6. Mounts NFS share to FAIRseq Docker Containers 
-7. Manually or automatically kicks off RoBERTa training job
+6. TODO: Mounts NFS share to FAIRseq Docker Containers 
+6. TODO: Manually or automatically kicks off RoBERTa training job
 
 ### Diagram 
 
