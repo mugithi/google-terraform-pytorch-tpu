@@ -55,3 +55,19 @@ variable "access_config" {
     network_tier = "PREMIUM"
   }]
 }
+
+variable "source_image_family" {
+  default = ""
+}
+
+variable "source_image_project" {
+  default = ""
+}
+
+variable "source_image" {
+  default = ""
+}
+
+variable "disk_size_gb" {
+  default = ""
+}

@@ -18,6 +18,7 @@ function cleanup {
       if [ "$?" == "0" ]
          then 
             echo "exit 0" > /workspace/vars/exit_status.vars
+            ${GCLOUD} compute images create ${INSTANCE_NAME} --source-disk ${INSTANCE_NAME} --source-disk-zone ${ZONE} --force
          else
             echo "exit 1" > /workspace/vars/exit_status.vars
        fi
@@ -73,10 +74,13 @@ for ((i=1; i<20; i++))
 do
         COMMAND="COMMAND$i"
         if [ -z "${!COMMAND}" ]; then
-                break
+            echo ${INSTANCE_NAME} > /workspace/vars/gce_image_name.vars
+            ${GCLOUD} compute scp --compress --recurse \
+                ${USERNAME}@${INSTANCE_NAME}:${REMOTE_WORKSPACE}* $(pwd) --ssh-key-file=${KEYNAME}
+            break
         else
-              ${GCLOUD} compute ssh --ssh-key-file=${KEYNAME} --verbosity=debug --force-key-file-overwrite --strict-host-key-checking=no \
-                     ${USERNAME}@${INSTANCE_NAME} -- ${!COMMAND}  
+            ${GCLOUD} compute ssh --ssh-key-file=${KEYNAME} --verbosity=debug --force-key-file-overwrite --strict-host-key-checking=no \
+                ${USERNAME}@${INSTANCE_NAME} -- ${!COMMAND}  
         fi
 done
 

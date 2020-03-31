@@ -61,9 +61,11 @@ module "mig_slave_template" {
   network              = var.network
   service_account      = local.compute_service_account
   name_prefix          = "${var.pytorch_proj_name}-tpu-slave"
-  source_image_family  = "cos-stable"
-  source_image_project = "cos-cloud"
-  startup_script       = "${file("../../scripts/setup_slaves.sh")}"
+  source_image_family  = var.source_image_family
+  source_image_project = var.source_image_project
+  source_image         = var.source_image
+  # startup_script       = "${file("../../scripts/setup_slaves.sh")}"
+  disk_size_gb         = var.disk_size_gb
   access_config        = var.access_config
   # source_image         = "${var.nightly_image == "" ? "" : "debian-9-torch-xla-v${var.nightly_image}"}"
 #   metadata = map("gce-container-declaration", module.gce-container.metadata_value)
