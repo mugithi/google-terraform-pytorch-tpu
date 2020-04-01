@@ -19,14 +19,14 @@
 # Pull slave data from the mig
 
 provider "google" {
-  version  = "~> 3.9.0"
+  version = "~> 3.9.0"
   project = var.project_id
   region  = var.region
   zone    = var.zone
 }
 
 provider "google-beta" {
-  version  = "~> 3.9.0"
+  version = "~> 3.9.0"
 }
 
 locals {
@@ -41,7 +41,7 @@ terraform {
   backend "gcs" {}
 }
 
-data "google_compute_region_instance_group" "slave" {
+data "google_compute_instance_group" "slave" {
   self_link = "${module.mig-slave.self_link}"
 }
 
@@ -51,7 +51,7 @@ data "google_compute_default_service_account" "default" {
 
 # Supporting module pull the GCE MIG MODULE to be used in Main.tf file
 module "gce-mig" {
-  source = "git::https://github.com/mugithi/terraform-google-vm?ref=v1.3.1"
+  source = "git::https://github.com/mugithi/terraform-google-vm?ref=v1.3.6"
 }
 
 ## Create SLAVE MIG TEMPLATE
@@ -65,22 +65,22 @@ module "mig_slave_template" {
   source_image_project = var.source_image_project
   source_image         = var.source_image
   # startup_script       = "${file("../../scripts/setup_slaves.sh")}"
-  disk_size_gb         = var.disk_size_gb
-  access_config        = var.access_config
+  disk_size_gb  = var.disk_size_gb
+  access_config = var.access_config
   # source_image         = "${var.nightly_image == "" ? "" : "debian-9-torch-xla-v${var.nightly_image}"}"
-#   metadata = map("gce-container-declaration", module.gce-container.metadata_value)
+  #   metadata = map("gce-container-declaration", module.gce-container.metadata_value)
 }
 
 
 ## Create SLAVE
 module "mig-slave" {
-  source                    = "./.terraform/modules/gce-mig/modules/mig"
-  instance_template         = module.mig_slave_template.self_link
-  project_id                = var.project_id 
-  region                    = var.region
-  hostname                  = "${var.pytorch_proj_name}-tpu-slave"
-  distribution_policy_zones = ["${var.zone}", ]
-  target_size               = split("-", var.accelerator_type)[1] / 8
-  network                   = var.network
-  subnetwork                = var.network
+  source            = "./.terraform/modules/gce-mig/modules/mig"
+  instance_template = module.mig_slave_template.self_link
+  project_id        = var.project_id
+  region            = var.region
+  zone              = var.zone
+  hostname          = "${var.pytorch_proj_name}-tpu-slave"
+  target_size       = split("-", var.accelerator_type)[1] / 8
+  network           = var.network
+  subnetwork        = var.network
 }
