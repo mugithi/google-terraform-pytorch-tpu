@@ -14,22 +14,22 @@
 # * limitations under the License.
 # 
 
-if [ -z "$1" ];
-then
-  echo "arg empty";
-  exit
-fi
+# if [ -z "$1" ];
+# then
+#   echo "arg empty";
+#   exit
+# fi
 
-logfile="$(date +%Y%m%d)-roberta-podrun-$1.txt"
+logfile="$(date +%Y%m%d)-roberta-podrun-8.txt"
 nshards=1
-num_cores=$1
+num_cores=8
 MOUNT_POINT=/mnt/common
 data_path="$MOUNT_POINT/data/" #EDIT ME AS PER DATASET LOCATION
 DATABIN=$(seq 0 $nshards | xargs -I{} echo $data_path/shard{} | tr "\n" ":")
 checkpoints_out=$MOUNT_POINT/checkpoints-roberta-$1
 
 python -m torch_xla.distributed.xla_dist \
-        --tpu=fseqrobertatpu \
+        --tpu=nyc-tpu-v3-8 \
         --conda-env=torch-xla-nightly\
         --env XLA_USE_BF16=1 \
         -- python $MOUNT_POINT/code/fairseq/train.py \

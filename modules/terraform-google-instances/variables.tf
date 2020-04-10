@@ -71,3 +71,24 @@ variable "source_image" {
 variable "disk_size_gb" {
   default = ""
 }
+
+variable "protocol" {
+  description = "tcp/udp/icmp"
+  default = "tcp"
+}
+
+variable "ports" {
+  description = "list of ports to allow traffic"
+  default = []
+}
+
+variable "source_ranges" {
+  description = "list of source ip ranges"
+  default = []
+}
+
+variable "tags" {
+  description = "list of tags"
+  default = []
+}
+
