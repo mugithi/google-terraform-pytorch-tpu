@@ -74,21 +74,21 @@ variable "disk_size_gb" {
 
 variable "protocol" {
   description = "tcp/udp/icmp"
-  default = "tcp"
+  default     = "tcp"
 }
 
 variable "ports" {
   description = "list of ports to allow traffic"
-  default = []
+  default     = ""
 }
 
 variable "source_ranges" {
   description = "list of source ip ranges"
-  default = []
+  default     = ""
 }
 
 variable "tags" {
   description = "list of tags"
-  default = []
+  default     = ""
 }
 

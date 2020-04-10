@@ -64,7 +64,7 @@ module "mig_slave_template" {
   source_image_family  = var.source_image_family
   source_image_project = var.source_image_project
   source_image         = var.source_image
-  tags                 = var.tags
+  tags                 = ["${var.tags}"]
   # startup_script       = "${file("../../scripts/setup_slaves.sh")}"
   disk_size_gb  = var.disk_size_gb
   access_config = var.access_config
@@ -87,10 +87,10 @@ module "mig-slave" {
 }
 
 module "firewall" {
-  source = "git::https://github.com/mugithi/terraform-google-firewall-rules.git"
-  network = var.network
-  protocol = var.protocol
-  ports = ["${var.ports}"]
+  source        = "git::https://github.com/mugithi/terraform-google-firewall-rules.git"
+  network       = var.network
+  protocol      = var.protocol
+  ports         = ["${var.ports}"]
   source_ranges = ["${var.source_ranges}"]
-  tags = ["${var.tags}"]
+  tags          = ["${var.tags}"]
 }

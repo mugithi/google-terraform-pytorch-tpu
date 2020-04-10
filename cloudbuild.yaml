@@ -159,7 +159,7 @@ steps:
     - ZONE=${_ZONE}
     # TODO: Service account. Add service account so that you can set nessaary on permissions from terraform
     # TODO: Add ability to change TPU runtime if set
-    - INSTANCE_ARGS=--image-project ubuntu-os-cloud --image-family ubuntu-1604-lts --boot-disk-type=pd-ssd --machine-type n1-standard-16 --boot-disk-size=200 --scopes=storage-rw,logging-write,monitoring,service-management,pubsub,service-control,trace
+    - INSTANCE_ARGS=--image-project ubuntu-os-cloud --image-family ubuntu-1804-lts --boot-disk-type=pd-ssd --machine-type n1-standard-16 --tags=allow-ssh --boot-disk-size=200 --scopes=storage-rw,logging-write,monitoring,service-management,pubsub,service-control,trace
     - USERNAME=${_USERNAME}
     # Create GCE instances
 - id: terraform-google-instances
@@ -267,9 +267,9 @@ substitutions:
     _SHARED_FS: tpushare #n eeds to be between 7 - 16 characters
     _ZONE: europe-west4-a
     _REGION: europe-west4
-    _PROJECT_ID: fair-test-project
+    _PROJECT_ID: pytorch-tpu-nfs
     _IMAGE_NIGHTLY: ""
-    _GCS_DATASET: gs://tpu-demo-eu/dataset/*
+    _GCS_DATASET: gs://pytorch-tpu-nfs-dataset/dataset/*
     _NFS_IP: $(cat ~/workspace/vars/nfs_ip.vars) # variable file in the GCE builder instance
     _GCE_IMAGE_NAME: $(cat /workspace/vars/gce_image_name.vars)
     _CODE_REPO: https://github.com/taylanbil/fairseq.git 
@@ -292,7 +292,6 @@ timeout: 4000s
 
 # TODO: Cloud build to refresh instances based on changes to github
 ## -  Entire worker
-## -  Githbu instances 
 
 # TODO: CLoud build TF to turn off enviroment and save data to GCS bucket, 
 
