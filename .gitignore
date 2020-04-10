@@ -1,1 +1,2 @@
 .terraform/*
+/modules/terraform-google-instances/.terraform/

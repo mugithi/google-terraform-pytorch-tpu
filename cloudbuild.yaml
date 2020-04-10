@@ -277,7 +277,7 @@ substitutions:
     _PYTORCH_PROJ_NAME: ${PYTORCH_PROJ_NAME}
     _GCS_SCRIPT_URL : ${PYTORCH_PROJ_NAME}-tpu-scripts
     _GCS_TF_BACKEND_URL : ${PYTORCH_PROJ_NAME}-tpu-backend
-    _MACHINE_TYPE: n1-standard-64
+    _MACHINE_TYPE: n1-standard-16
     _GCE_DISK_SIZE: "200"
     _PORTS: "8888"
     _SOURCE_RANGES: "0.0.0.0/0"
