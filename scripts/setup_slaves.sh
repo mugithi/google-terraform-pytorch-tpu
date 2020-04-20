@@ -15,60 +15,14 @@
 # 
 
 set -x
-# Set Variables
-PROJECT_ID=$(curl "http://metadata.google.internal/computeMetadata/v1/project/attributes/PROJECT_ID" -H "Metadata-Flavor: Google")
-ZONE=$(curl "http://metadata.google.internal/computeMetadata/v1/project/attributes/ZONE" -H "Metadata-Flavor: Google")
-TPU_NAME=$(curl "http://metadata.google.internal/computeMetadata/v1/project/attributes/TPU_NAME" -H "Metadata-Flavor: Google")
-IMAGE_NIGHTLY=$(curl "http://metadata.google.internal/computeMetadata/v1/project/attributes/IMAGE_NIGHTLY" -H "Metadata-Flavor: Google") 
-MOUNT_POINT=$(curl "http://metadata.google.internal/computeMetadata/v1/project/attributes/MOUNT_POINT" -H "Metadata-Flavor: Google")
-SHARED_FS=$(curl "http://metadata.google.internal/computeMetadata/v1/project/attributes/SHARED_FS" -H "Metadata-Flavor: Google") 
-NFS_IP=$(curl "http://metadata.google.internal/computeMetadata/v1/project/attributes/NFS_IP" -H "Metadata-Flavor: Google")
-SCRIPTS_URL=$(curl "http://metadata.google.internal/computeMetadata/v1/project/attributes/SCRIPTS_URL" -H "Metadata-Flavor: Google")
-TPU_ACCELERATOR_TYPE=$(curl "http://metadata.google.internal/computeMetadata/v1/project/attributes/TPU_ACCELERATOR_TYPE" -H "Metadata-Flavor: Google")
 
 ## Add usr groups
+SHARED_FS=tpushare
+MOUNT_POINT=/mnt/common
+PYTORCH_PROJ_NAME=pytorch-project-mount
+BUILD=5e452b42-a97c-40da-9a1a-5f2a5fc6ba34
+
 sudo groupadd docker
 sudo usermod -aG docker $USER
 
-## Install Docker
-apt-get update 
-apt-get install -y \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg-agent 
-    software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-apt-key fingerprint 0EBFCD88
-add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
-
-sudo apt-get -y update
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-
-
-## Perform Docker pull 
-if [ -z "$IMAGE_NIGHTLY" ];
-then 
-  docker pull gcr.io/tpu-pytorch/xla:nightly
-else
-  docker pull gcr.io/tpu-pytorch/xla:nightly_$IMAGE_NIGHTLY
-fi 
-
-mkdir -p $MOUNT_POINT
-
-NFS_OPTS=rw,sync,no_subtree_check,insecure
-docker volume create --driver local \
-  --opt type=nfs --opt o=addr=$NFS_IP,$NFS_OPTS \
-  --opt device=:$MOUNT_POINT $SHARED_FS
-
-## Perform Docker pull 
-if [ -z "$IMAGE_NIGHTLY" ];
-then 
-  docker run -it -v $SHARED_FS:$MOUNT_POINT gcr.io/tpu-pytorch/xla:nightly /bin/bash
-else
-  docker run -it -v $SHARED_FS:$MOUNT_POINT gcr.io/tpu-pytorch/xla:nightly_$IMAGE_NIGHTLY /bin/bash
-fi 
-
+docker run -d -v ${SHARED_FS}:${MOUNT_POINT} --shm-size 16G --log-driver=gcplogs -p 8888:8888 gcr.io/$PYTORCH_PROJ_NAME/xla:$BUILD

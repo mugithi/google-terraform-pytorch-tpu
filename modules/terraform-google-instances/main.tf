@@ -65,7 +65,7 @@ module "mig_slave_template" {
   source_image_project = var.source_image_project
   source_image         = var.source_image
   tags                 = ["${var.tags}"]
-  # startup_script       = "${file("../../scripts/setup_slaves.sh")}"
+  startup_script       = "${file("../../scripts/setup_slaves.sh")}"
   disk_size_gb  = var.disk_size_gb
   access_config = var.access_config
   # source_image         = "${var.nightly_image == "" ? "" : "debian-9-torch-xla-v${var.nightly_image}"}"
