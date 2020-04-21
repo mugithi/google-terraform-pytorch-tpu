@@ -36,6 +36,8 @@ gcloud services enable file.googleapis.com
 export PROJECT=$(gcloud info --format='value(config.project)')
 export PROJECT_NUMBER=$(gcloud projects describe $PROJECT --format 'value(projectNumber)')
 export CB_SA_EMAIL=$PROJECT_NUMBER@cloudbuild.gserviceaccount.com
+export DEFAULT_SA_EMAIL=$PROJECT_NUMBER-compute@developer.gserviceaccount.com
+gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$DEFAULT_SA_EMAIL --role='roles/storage.admin'
 gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_EMAIL --role='roles/iam.serviceAccountUser' 
 gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_EMAIL  --role='roles/compute.admin' 
 gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_EMAIL  --role='roles/iam.serviceAccountActor' 
