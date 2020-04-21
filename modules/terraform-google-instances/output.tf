@@ -16,6 +16,6 @@
 
 
 output "compute_instances_slave_0" {
-  value = data.google_compute_instance_group.slave.instances
-  #value = split("/", data.google_compute_instance_group.slave.instances)
+  #value = data.google_compute_instance_group.slave.instances
+  value = split("/", data.google_compute_instance_group.slave.instances[0])[10]
 }
