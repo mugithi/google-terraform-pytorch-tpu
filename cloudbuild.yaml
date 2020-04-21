@@ -131,6 +131,17 @@ steps:
             exit 0
           fi
         }
+        sed -i "s|\(SHARED_FS=\)\(.*\)|\1${_SHARED_FS}|" scripts/setup_slaves.sh
+        sed -i "s|\(MOUNT_POINT=\)\(.*\)|\1${_MOUNT_POINT}|" scripts/setup_slaves.sh
+        sed -i "s|\(PYTORCH_PROJ_NAME=\)\(.*\)|\1${_PROJECT_ID}|" scripts/setup_slaves.sh
+        sed -i "s|\(BUILD=\)\(.*\)|\1${BUILD_ID}|" scripts/setup_slaves.sh
+
+        sed -i "s|\(SHARED_FS\ =\)\(.*\)|\1${_SHARED_FS}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s|\(MOUNT_POINT\ =\)\(.*\)|\1${_MOUNT_POINT}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s|\(PYTORCH_PROJ_NAME\ =\)\(.*\)|\1${_PROJECT_ID}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s|\(BUILD\ =\)\(.*\)|\1${BUILD_ID}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s|\(TPU_POD_NAME\ =\)\(.*\)|\1$(cat /workspace/vars/tpu_name.vars)|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s|\(NFS_IP\ =\)\(.*\)|\1$(cat /workspace/vars/nfs_ip.vars)|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
         gsutil -m cp -r scripts/* gs://${_GCS_SCRIPT_URL}
 
     # TODO Replace remote-builder with custom workers currently in (alpha)[https://cloud.google.com/cloud-build/docs/custom-worker-pool] 
@@ -143,19 +154,21 @@ steps:
     # Install nfs, docker in worker host
     - COMMAND1=sudo apt-get -y install nfs-common curl && sudo curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh && sudo usermod -aG docker ${_USERNAME}
     # Mount the NFS share to workspace
-    - COMMAND2=sudo mkdir -p ${_MOUNT_POINT} && sudo mount -t nfs -o nfsvers=3 ${_NFS_IP}:/${_SHARED_FS} ${_MOUNT_POINT} &&  sudo chmod go+rw ${_MOUNT_POINT} && df -kh && ls -al ${_MOUNT_POINT}
+    - COMMAND2=sudo mkdir -p ${_MOUNT_POINT} && sudo mount -t nfs -o nfsvers=3 ${_NFS_IP}:/${_SHARED_FS} ${_MOUNT_POINT} &&  sudo chmod go+rw ${_MOUNT_POINT}
     # Copy the Roberta files to dataset
     - COMMAND3=if [ -d "${_MOUNT_POINT}/code" ]; then echo "using existing ${_MOUNT_POINT}/code directory"; else sudo mkdir -p ${_MOUNT_POINT}/code && sudo git clone ${_CODE_REPO} ${_MOUNT_POINT}/code/; fi
+    # Copy the PyTorch_RoBERTa_CloudTPU.ipynb files and setup_slaves.sh files
+    - COMMAND4=if [ -d "${_MOUNT_POINT}/scripts" ]; then echo "using existing ${_MOUNT_POINT}/scripts directory"; else sudo mkdir -p ${_MOUNT_POINT}/scripts && sudo gsutil -m cp -r gs://${_GCS_SCRIPT_URL} ${_MOUNT_POINT}/scripts/; fi
     # Create the dataset folder and download the dataset
-    - COMMAND4=if [ -d "${_MOUNT_POINT}/data" ]; then echo "using existing ${_MOUNT_POINT}/data directory"; else sudo mkdir -p ${_MOUNT_POINT}/data && sudo gsutil -m cp -r ${_GCS_DATASET} ${_MOUNT_POINT}/data/; fi && sudo umount ${_MOUNT_POINT}
+    - COMMAND5=if [ -d "${_MOUNT_POINT}/data" ]; then echo "using existing ${_MOUNT_POINT}/data directory"; else sudo mkdir -p ${_MOUNT_POINT}/data && sudo gsutil -m cp -r ${_GCS_DATASET} ${_MOUNT_POINT}/data/; fi && sudo umount ${_MOUNT_POINT}
     # Create the docker NFS volume
-    - COMMAND5=docker volume create --driver local --opt type=nfs --opt o=addr=${_NFS_IP} --opt device=:/${_SHARED_FS} ${_SHARED_FS}
+    - COMMAND6=docker volume create --driver local --opt type=nfs --opt o=addr=${_NFS_IP} --opt device=:/${_SHARED_FS} ${_SHARED_FS}
     # Build the appropriate nightly container, pull it and copy the startup script into to workspace 
-    - COMMAND6=df -kh && cd /home/${_USERNAME}/workspace/ && docker build --build-arg IMAGE_NIGHTLY=${_IMAGE_NIGHTLY} --tag gcr.io/$PROJECT_ID/xla:$BUILD_ID .
+    - COMMAND7=df -kh && cd /home/${_USERNAME}/workspace/ && docker build --build-arg IMAGE_NIGHTLY=${_IMAGE_NIGHTLY} --tag gcr.io/$PROJECT_ID/xla:$BUILD_ID .
     # TODO Manual docker registry to address issues related to docker-credential-gcr not working properly
-    - COMMAND7=sudo docker login -u oauth2accesstoken -p "$(sudo gcloud auth print-access-token)" https://gcr.io
+    - COMMAND8=sudo docker login -u oauth2accesstoken -p "$(sudo gcloud auth print-access-token)" https://gcr.io
     # Run the container : Copy files from GCS, clone the taylan@ roberta repo. Push the container to repo with a tag 
-    - COMMAND8=cd /home/${_USERNAME}/workspace/ && docker run -t -v ${_SHARED_FS}:${_MOUNT_POINT} gcr.io/$PROJECT_ID/xla:$BUILD_ID ./setup_nightly.sh ${_MOUNT_POINT} && sudo docker push gcr.io/$PROJECT_ID/xla:$BUILD_ID
+    - COMMAND9=cd /home/${_USERNAME}/workspace/ && docker run -t -v ${_SHARED_FS}:${_MOUNT_POINT} gcr.io/$PROJECT_ID/xla:$BUILD_ID ./setup_nightly.sh ${_MOUNT_POINT} && sudo docker push gcr.io/$PROJECT_ID/xla:$BUILD_ID
     - ZONE=${_ZONE}
     # TODO: Service account. Add service account so that you can set nessaary on permissions from terraform
     # TODO: Add ability to change TPU runtime if set
@@ -208,18 +221,6 @@ steps:
       fi
       trap cleanup EXIT
       if [ -d "modules/terraform-google-instances/" ]; then
-        sed -i "s|\(SHARED_FS=\)\(.*\)|\1${_SHARED_FS}|" scripts/setup_slaves.sh
-        sed -i "s|\(MOUNT_POINT=\)\(.*\)|\1${_MOUNT_POINT}|" scripts/setup_slaves.sh
-        sed -i "s|\(PYTORCH_PROJ_NAME=\)\(.*\)|\1${_PROJECT_ID}|" scripts/setup_slaves.sh
-        sed -i "s|\(BUILD=\)\(.*\)|\1${BUILD_ID}|" scripts/setup_slaves.sh
-
-        sed -i "s|\(SHARED_FS=\)\(.*\)|\1${_SHARED_FS}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s|\(MOUNT_POINT=\)\(.*\)|\1${_MOUNT_POINT}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s|\(PYTORCH_PROJ_NAME=\)\(.*\)|\1${_PROJECT_ID}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s|\(BUILD=\)\(.*\)|\1${BUILD_ID}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s|\(TPU_POD_NAME=\)\(.*\)|\1$(cat /workspace/vars/tpu_name.vars)|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s|\(NFS_IP=\)\(.*\)|\1$(cat /workspace/vars/nfs_ip.vars)|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-
         cd modules/terraform-google-instances
         terraform init \
             -backend-config="bucket=${_GCS_TF_BACKEND_URL}" \
@@ -273,8 +274,8 @@ steps:
           echo -e "\033[0;32m export SHARED_FS=${_SHARED_FS} \033[0m"
           echo -e "\033[0;32m export BUILD=$BUILD_ID \033[0m"
           echo -e "\033[0;32m export PYTORCH_PROJ_NAME=${_PROJECT_ID} \033[0m"
-          echo -e "\033[0;32m Jupyter URL:http://$(gcloud compute instances describe ${_GCE_SLAVE_0} --zone ${_ZONE} --format='get(networkInterfaces[0].accessConfigs[0].natIP)'):${_PORTS} = \033[0m"
-          echo -e "\033[0;32m Jupyter PASSWORD:$BUILD_ID \033[0m"
+          echo -e "\033[0;32m Jupyter URL-> http://$(gcloud compute instances describe ${_GCE_SLAVE_0} --zone ${_ZONE} --format='get(networkInterfaces[0].accessConfigs[0].natIP)'):${_PORTS} \033[0m"
+          echo -e "\033[0;32m Jupyter PASSWORD->  $BUILD_ID \033[0m"
         fi
 substitutions:
     _USERNAME: isaackkaranja

@@ -23,10 +23,10 @@ set -x
 ## Add usr groups
 SHARED_FS=tpushare
 MOUNT_POINT=/mnt/common
-PYTORCH_PROJ_NAME=pytorch-project-mount
-BUILD=5e452b42-a97c-40da-9a1a-5f2a5fc6ba34
+PYTORCH_PROJ_NAME=pytorch-tpu-new
+BUILD=e01fadb0-c2ea-4ac3-bedf-570ea097fbab
 
 sudo groupadd docker
 sudo usermod -aG docker $USER
 
-docker run -d -v ${SHARED_FS}:${MOUNT_POINT} --shm-size 16G -p 8888:8888 gcr.io/$PYTORCH_PROJ_NAME/xla:$BUILD -- jupyter lab --port=8888 --no-browser --ip=0.0.0.0 --allow-root --NotebookApp.token='' --NotebookApp.password=$BUILD --notebook-dir=./tpu-examples/
+docker run -d -v ${SHARED_FS}:${MOUNT_POINT} --shm-size 512M -p 8888:8888 gcr.io/$PYTORCH_PROJ_NAME/xla:$BUILD -- jupyter lab --port=8888 --no-browser --ip=0.0.0.0 --allow-root --NotebookApp.token=$BUILD --NotebookApp.password=$BUILD --notebook-dir=${MOUNT_POINT}/scripts/
