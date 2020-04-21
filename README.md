@@ -118,7 +118,6 @@ gcloud builds submit --config=cloudbuild.yaml .
 
 # TODO
 
-- Add: Jypter Notebook functionality to manipute the runtime 
 - Switch from GCE to GKE instances
 
 
