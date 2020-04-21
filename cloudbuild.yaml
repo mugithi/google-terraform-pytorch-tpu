@@ -30,12 +30,12 @@ steps:
         terraform init 
         terraform plan \
             -var="project_id=${_PROJECT_ID}" \
-            -var="pytorch_proj_name=${_PYTORCH_PROJ_NAME}" \
+            -var="pytorch_proj_name=${_PROJECT_ID}" \
             -var="gcs_tf_backend=${_GCS_TF_BACKEND_URL}" \
             -var="gcs_scripts=${_GCS_SCRIPT_URL}" 
         terraform apply -auto-approve \
             -var="project_id=${_PROJECT_ID}" \
-            -var="pytorch_proj_name=${_PYTORCH_PROJ_NAME}" \
+            -var="pytorch_proj_name=${_PROJECT_ID}" \
             -var="gcs_tf_backend=${_GCS_TF_BACKEND_URL}" \
             -var="gcs_scripts=${_GCS_SCRIPT_URL}" 
       fi 
@@ -84,7 +84,7 @@ steps:
             -var="project_id=${_PROJECT_ID}" \
             -var="region=${_REGION}" \
             -var="zone=${_ZONE}" \
-            -var="pytorch_proj_name=${_PYTORCH_PROJ_NAME}" \
+            -var="pytorch_proj_name=${_PROJECT_ID}" \
             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
             -var="machine_type=${_MACHINE_TYPE}" \
@@ -94,7 +94,7 @@ steps:
             -var="project_id=${_PROJECT_ID}" \
             -var="region=${_REGION}" \
             -var="zone=${_ZONE}" \
-            -var="pytorch_proj_name=${_PYTORCH_PROJ_NAME}" \
+            -var="pytorch_proj_name=${_PROJECT_ID}" \
             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
             -var="machine_type=${_MACHINE_TYPE}" \
@@ -210,8 +210,16 @@ steps:
       if [ -d "modules/terraform-google-instances/" ]; then
         sed -i "s|\(SHARED_FS=\)\(.*\)|\1${_SHARED_FS}|" scripts/setup_slaves.sh
         sed -i "s|\(MOUNT_POINT=\)\(.*\)|\1${_MOUNT_POINT}|" scripts/setup_slaves.sh
-        sed -i "s|\(PYTORCH_PROJ_NAME=\)|(.*\)/\1${_PYTORCH_PROJ_NAME}|" scripts/setup_slaves.sh
-        sed -i "s|\(BUILD=\)\(.*\)/|1${BUILD_ID}|" scripts/setup_slaves.sh
+        sed -i "s|\(PYTORCH_PROJ_NAME=\)\(.*\)|\1${_PROJECT_ID}|" scripts/setup_slaves.sh
+        sed -i "s|\(BUILD=\)\(.*\)|\1${BUILD_ID}|" scripts/setup_slaves.sh
+
+        sed -i "s|\(SHARED_FS=\)\(.*\)|\1${_SHARED_FS}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s|\(MOUNT_POINT=\)\(.*\)|\1${_MOUNT_POINT}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s|\(PYTORCH_PROJ_NAME=\)\(.*\)|\1${_PROJECT_ID}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s|\(BUILD=\)\(.*\)|\1${BUILD_ID}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s|\(TPU_POD_NAME=\)\(.*\)|\1$(cat /workspace/vars/tpu_name.vars)|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s|\(NFS_IP=\)\(.*\)|\1$(cat /workspace/vars/nfs_ip.vars)|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+
         cd modules/terraform-google-instances
         terraform init \
             -backend-config="bucket=${_GCS_TF_BACKEND_URL}" \
@@ -220,7 +228,7 @@ steps:
             -var="project_id=${_PROJECT_ID}" \
             -var="region=${_REGION}" \
             -var="zone=${_ZONE}" \
-            -var="pytorch_proj_name=${_PYTORCH_PROJ_NAME}" \
+            -var="pytorch_proj_name=${_PROJECT_ID}" \
             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
             -var="machine_type=${_MACHINE_TYPE}" \
@@ -234,7 +242,7 @@ steps:
             -var="project_id=${_PROJECT_ID}" \
             -var="region=${_REGION}" \
             -var="zone=${_ZONE}" \
-            -var="pytorch_proj_name=${_PYTORCH_PROJ_NAME}" \
+            -var="pytorch_proj_name=${_PROJECT_ID}" \
             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
             -var="machine_type=${_MACHINE_TYPE}" \
@@ -264,17 +272,18 @@ steps:
           echo -e "\033[0;32m export MOUNT_POINT=${_MOUNT_POINT} \033[0m"
           echo -e "\033[0;32m export SHARED_FS=${_SHARED_FS} \033[0m"
           echo -e "\033[0;32m export BUILD=$BUILD_ID \033[0m"
-          echo -e "\033[0;32m export PYTORCH_PROJ_NAME=${_PYTORCH_PROJ_NAME} \033[0m"
-          echo -e "\033[0;32m https://$(gcloud compute instances describe ${_GCE_SLAVE_0} --zone ${_ZONE} --format='get(networkInterfaces[0].accessConfigs[0].natIP)'):${_PORTS} \033[0m"
+          echo -e "\033[0;32m export PYTORCH_PROJ_NAME=${_PROJECT_ID} \033[0m"
+          echo -e "\033[0;32m Jupyter URL:http://$(gcloud compute instances describe ${_GCE_SLAVE_0} --zone ${_ZONE} --format='get(networkInterfaces[0].accessConfigs[0].natIP)'):${_PORTS} = \033[0m"
+          echo -e "\033[0;32m Jupyter PASSWORD:$BUILD_ID \033[0m"
         fi
 substitutions:
     _USERNAME: isaackkaranja
     # TODO: Service account.  Add service account to replace the default sv account 
     _MOUNT_POINT: /mnt/common 
-    _SHARED_FS: tpushare #n eeds to be between 7 - 16 characters
+    _SHARED_FS: tpushare # needs to be between 7 - 16 characters
     _ZONE: europe-west4-a
     _REGION: europe-west4
-    _PROJECT_ID: pytorch-tpu-nfs
+    _PROJECT_ID: pytorch-tpu-new
     _IMAGE_NIGHTLY: ""
     _GCS_DATASET: gs://pytorch-tpu-nfs-dataset/dataset/*
     _NFS_IP: $(cat ~/workspace/vars/nfs_ip.vars) # variable file in the GCE builder instance
@@ -282,7 +291,6 @@ substitutions:
     _GCE_SLAVE_0: $(cat /workspace/vars/compute_instances_slave_0.vars)
     _CODE_REPO: https://github.com/taylanbil/fairseq.git 
     _ACCELERATOR_TYPE: v3-32
-    _PYTORCH_PROJ_NAME: ${PYTORCH_PROJ_NAME}
     _GCS_SCRIPT_URL : ${PYTORCH_PROJ_NAME}-tpu-scripts
     _GCS_TF_BACKEND_URL : ${PYTORCH_PROJ_NAME}-tpu-backend
     _MACHINE_TYPE: n1-standard-16
@@ -292,7 +300,7 @@ substitutions:
     _TAGS: jupyter
 options: 
     env:
-      'PYTORCH_PROJ_NAME=nyc'
+      'PYTORCH_PROJ_NAME=nyc-isaack'
 timeout: 4000s
 
 

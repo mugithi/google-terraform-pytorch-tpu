@@ -9,6 +9,7 @@ ARG IMAGE_NIGHTLY=""
 
 ## Copy the enviromental file and set permissions
 COPY scripts/setup_nightly.sh .
+COPY scripts/PyTorch_RoBERTa_CloudTPU.ipynb /tpu-examples/PyTorch_RoBERTa_CloudTPU.ipynb
 RUN chmod a+x setup_nightly.sh
 
 # Define entrypoint and cmd
