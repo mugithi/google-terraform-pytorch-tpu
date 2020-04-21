@@ -11,10 +11,6 @@ This module does the following
 4. Builds an XLA docker container with Fairseq modules and pushes it to GCR
 5. Starts a GCE instance with Fairseq docker containers pre-loaded
 
-TODO: Setup configuratable TPU image runtime
-TODO: Use GKE instances
-TODO: Add Diagram
-
 ## Getting started
 
 Clone the repo to your local enviroment. 
@@ -116,6 +112,10 @@ gcloud builds submit --config=cloudbuild.yaml .
 ```
 
 
+TODO:
+- Setup configuratable TPU image runtime
+- Switch from GCE instance with docker image to  GKE instances
+- Add Diagram
 
 
  
