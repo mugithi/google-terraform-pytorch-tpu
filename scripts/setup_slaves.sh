@@ -29,4 +29,4 @@ BUILD=5e452b42-a97c-40da-9a1a-5f2a5fc6ba34
 sudo groupadd docker
 sudo usermod -aG docker $USER
 
-docker run -it -v ${SHARED_FS}:${MOUNT_POINT} --shm-size 16G -p 8888:8888 gcr.io/$PYTORCH_PROJ_NAME/xla:$BUILD -- jupyter lab --port=8888 --no-browser --ip=0.0.0.0 --allow-root --NotebookApp.token='' --NotebookApp.password=$BUILD --notebook-dir=./tpu-examples/
+docker run -d -v ${SHARED_FS}:${MOUNT_POINT} --shm-size 16G -p 8888:8888 gcr.io/$PYTORCH_PROJ_NAME/xla:$BUILD -- jupyter lab --port=8888 --no-browser --ip=0.0.0.0 --allow-root --NotebookApp.token='' --NotebookApp.password=$BUILD --notebook-dir=./tpu-examples/
