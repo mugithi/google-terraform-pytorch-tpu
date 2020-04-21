@@ -95,6 +95,17 @@ This will launch cloud build, you can monitor the deployment in the Gcloud Cloud
 A succesfull deplyment of the enviroment will result in the following output
 
 ```
+Step #5 - "clean-up-gcs": Already have image (with digest): gcr.io/cloud-builders/gsutil
+Step #5 - "clean-up-gcs":  export NFS_IP=10.232.62.106 
+Step #5 - "clean-up-gcs":  export TPU_POD_NAME=pytorch-tpu-new-tpu-v3-32 
+Step #5 - "clean-up-gcs":  export MOUNT_POINT=/mnt/common 
+Step #5 - "clean-up-gcs":  export SHARED_FS=tpushare 
+Step #5 - "clean-up-gcs":  export BUILD=b3484b2e-7b3a-40f8-bc53-15da7e98e57a 
+Step #5 - "clean-up-gcs":  export PYTORCH_PROJ_NAME=pytorch-tpu-new 
+Step #5 - "clean-up-gcs":  Jupyter URL:http://35.204.4xx8.xxx:8888
+Step #5 - "clean-up-gcs":  Jupyter PASSWORD:b3484b2e-7b3a-40f8-bc53-15da7e98e57a 
+Finished Step #5 - "clean-up-gcs"
+PUSH
 ```
 
 Once you are ready to clean up the enviroment, re-run the `cloudbuild`. This will cause a tear down of the environment created in the intial run. 
