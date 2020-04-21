@@ -1,11 +1,12 @@
-FROM gcr.io/tpu-pytorch/xla:nightly${IMAGE_NIGHTLY}
-# FROM debian:stretch 
-
 ## Set Docker Arguments 
 ARG MOUNT_POINT=""
 ARG NFS_IP=""
 ARG SHARED_FS=""
 ARG IMAGE_NIGHTLY=""
+
+
+FROM gcr.io/tpu-pytorch/xla:nightly${IMAGE_NIGHTLY}
+# FROM debian:stretch 
 
 ## Copy the enviromental file and set permissions
 COPY scripts/setup_nightly.sh .

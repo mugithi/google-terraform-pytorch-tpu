@@ -136,12 +136,14 @@ steps:
         sed -i "s|\(PYTORCH_PROJ_NAME=\)\(.*\)|\1${_PROJECT_ID}|" scripts/setup_slaves.sh
         sed -i "s|\(BUILD=\)\(.*\)|\1${BUILD_ID}|" scripts/setup_slaves.sh
 
-        sed -i "s|\(SHARED_FS\ =\)\(.*\)|\1${_SHARED_FS}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s|\(MOUNT_POINT\ =\)\(.*\)|\1${_MOUNT_POINT}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s|\(PYTORCH_PROJ_NAME\ =\)\(.*\)|\1${_PROJECT_ID}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s|\(BUILD\ =\)\(.*\)|\1${BUILD_ID}|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s|\(TPU_POD_NAME\ =\)\(.*\)|\1$(cat /workspace/vars/tpu_name.vars)|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s|\(NFS_IP\ =\)\(.*\)|\1$(cat /workspace/vars/nfs_ip.vars)|" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s@\(SHARED_FS =[ ']\)[^']\(.\)@\1${_SHARED_FS}\2@" PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s@\(MOUNT_POINT =[ ']\)[^']\(.\)@\1${_MOUNT_POINT}\2@" PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s@\(PYTORCH_PROJ_NAME =[ ']\)[^']\(.\)@\1${_PROJECT_ID}\2@" PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s@\(BUILD =[ ']\)[^']\(.\)@\1${_MOUNT_POINT}\2@" PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s@\(MOUNT_POINT =[ ']\)[^']\(.\)@\1${BUILD_ID}\2@" PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s@\(TPU_POD_NAME =[ ']\)[^']\(.\)@\1$(cat /workspace/vars/tpu_name.vars)\2@" PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s@\(NFS_IP =[ ']\)[^']\(.\)@\1$(cat /workspace/vars/nfs_ip.vars)\2@" PyTorch_RoBERTa_CloudTPU.ipynb
+
         gsutil -m cp -r scripts/* gs://${_PROJECT_ID}-tpu-scripts
 
     # TODO Replace remote-builder with custom workers currently in (alpha)[https://cloud.google.com/cloud-build/docs/custom-worker-pool] 
@@ -164,7 +166,7 @@ steps:
     # Create the docker NFS volume
     - COMMAND6=docker volume create --driver local --opt type=nfs --opt o=addr=${_NFS_IP} --opt device=:/${_SHARED_FS} ${_SHARED_FS}
     # Build the appropriate nightly container, pull it and copy the startup script into to workspace 
-    - COMMAND7=df -kh && cd /home/${_USERNAME}/workspace/ && docker build --build-arg IMAGE_NIGHTLY=${_IMAGE_NIGHTLY} --tag gcr.io/$PROJECT_ID/xla:$BUILD_ID .
+    - COMMAND7=df -kh && cd /home/${_USERNAME}/workspace/ && docker build --build-arg IMAGE_NIGHTLY=_${_IMAGE_NIGHTLY} --tag gcr.io/$PROJECT_ID/xla:$BUILD_ID .
     # TODO Manual docker registry to address issues related to docker-credential-gcr not working properly
     - COMMAND8=sudo docker login -u oauth2accesstoken -p "$(sudo gcloud auth print-access-token)" https://gcr.io
     # Run the container : Copy files from GCS, clone the taylan@ roberta repo. Push the container to repo with a tag 
@@ -285,7 +287,7 @@ substitutions:
     _ZONE: europe-west4-a
     _REGION: europe-west4
     _PROJECT_ID: pytorch-tpu-new
-    _IMAGE_NIGHTLY: ""
+    _IMAGE_NIGHTLY: '20200418'
     _GCS_DATASET: gs://pytorch-tpu-nfs-dataset/dataset/*
     _NFS_IP: $(cat ~/workspace/vars/nfs_ip.vars) # variable file in the GCE builder instance
     _GCE_IMAGE_NAME: $(cat /workspace/vars/gce_image_name.vars)
@@ -303,7 +305,6 @@ timeout: 4000s
 # TODO: Ability to set TPU Runtime when specified 
 
 # TODO: Cloud build to refresh instances based on changes to github
-## -  Entire worker
 
 # TODO: CLoud build TF to turn off enviroment and save data to GCS bucket, 
 

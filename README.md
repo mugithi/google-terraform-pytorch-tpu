@@ -46,7 +46,7 @@ gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_E
 Seed the remote-builder container using cloudbuild. 
 
 ```
-cd remote-buider
+cd remote-builder
 gcloud builds submit --config=cloudbuild.yaml .
 ```
 ### 4. Configure the enviroment: Cloud TPU  
