@@ -115,7 +115,7 @@ gcloud builds submit --config=cloudbuild.yaml .
 
 ## TODO:
 
-- Setup configuratable TPU image runtime
+- Setup configurable TPU image runtime
 - Switch from GCE instance with docker image to  GKE instances
 - Add Diagram
 
