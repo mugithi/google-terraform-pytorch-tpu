@@ -5,22 +5,22 @@ This module builds off [](https://github.com/pytorch/xla) and enables you to do 
 ### What this module does
 This module does the following 
 
-1. Creates Cloud TPU POD using your configuratable accelerator with Image version specification ability
+1. Creates Cloud TPU pod
 2. Creates a NFS share to allow share your dataset between your compute instances 
 3. Seeds the NFS Share with training dataset specified GCS bucket
-4. Builds an XLA docker container with FAIRseq modules and pushes it to GCR
-5. Starts a GCE instance with FAIRsq Docker containers pre-loaded
-6. TODO: Mounts NFS share to FAIRseq Docker Containers 
-6. TODO: Manually or automatically kicks off RoBERTa training job
+4. Builds an XLA docker container with Fairseq modules and pushes it to GCR
+5. Starts a GCE instance with Fairseq docker containers pre-loaded
 
-### Diagram 
-
+TODO: Setup configuratable TPU image runtime
+TODO: Use GKE instances
+TODO: Add Diagram
 
 ## Getting started
 
 Clone the repo to your local enviroment. 
 ```
-git clone https://github.com/mugithi/google-terraform-pytorch-tpu.git . 
+git clone https://github.com/mugithi/google-terraform-pytorch-tpu.git
+cd google-terraform-pytorch-tpu
 ```
 
 ### Enable the following services
@@ -52,11 +52,10 @@ Seed the remote-builder container using cloudbuild.
 ```
 cd remote-buider
 gcloud builds submit --config=cloudbuild.yaml .
-
 ```
 ### Configure the enviroment 
 
-#### Configure environment: TPU 
+#### Configure: TPU environment 
 
 Navigate to the root directory and modify the `cloudbuild.yml` file  variables below to configure the PyTorch TPU enviroment  
 ```
@@ -74,7 +73,7 @@ _ACCELERATOR_TYPE: v3-8
 _MACHINE_TYPE: n1-standard-8
 ```
 
-##### Configure GCS bucket and Github Repo
+##### Configure:  GCS bucket and Github Repo
 
 Modify the variables with the source of the training dataset and the code repo to be used in the training VM.
 
@@ -116,9 +115,7 @@ Once you are ready to clean up the enviroment, re-run  `cloudbuild`. This will c
 gcloud builds submit --config=cloudbuild.yaml .
 ```
 
-# TODO
 
-- Switch from GCE to GKE instances
 
 
  
