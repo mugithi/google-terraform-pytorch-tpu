@@ -27,7 +27,7 @@ gcloud services enable iam.googleapis.com
 gcloud services enable tpu.googleapis.com
 gcloud services enable file.googleapis.com
 ```
-### Configure Permissions and enable services 
+### Configure IAM Permissions 
 ```
 export PROJECT=$(gcloud info --format='value(config.project)')
 export PROJECT_NUMBER=$(gcloud projects describe $PROJECT --format 'value(projectNumber)')
@@ -49,9 +49,7 @@ Seed the remote-builder container using cloudbuild.
 cd remote-buider
 gcloud builds submit --config=cloudbuild.yaml .
 ```
-### Configure the enviroment 
-
-#### Configure: TPU environment 
+### Configure the enviroment: Cloud TPU  
 
 Navigate to the root directory and modify the `cloudbuild.yml` file  variables below to configure the PyTorch TPU enviroment  
 ```
@@ -69,7 +67,7 @@ _ACCELERATOR_TYPE: v3-8
 _MACHINE_TYPE: n1-standard-8
 ```
 
-##### Configure:  GCS bucket and Github Repo
+### Configure the enviroment: GCS bucket and Github Repo
 
 Modify the variables with the source of the training dataset and the code repo to be used in the training VM.
 
@@ -111,8 +109,8 @@ Once you are ready to clean up the enviroment, re-run  `cloudbuild`. This will c
 gcloud builds submit --config=cloudbuild.yaml .
 ```
 
+### TODO:
 
-TODO:
 - Setup configuratable TPU image runtime
 - Switch from GCE instance with docker image to  GKE instances
 - Add Diagram
