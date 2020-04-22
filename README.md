@@ -21,11 +21,11 @@ cd google-terraform-pytorch-tpu
 
 ### 1. Configure the environment: Enable the following services
 ```
-gcloud services enable cloudbuild.googleapis.com
-gcloud services enable compute.googleapis.com
-gcloud services enable iam.googleapis.com
-gcloud services enable tpu.googleapis.com
-gcloud services enable file.googleapis.com
+gcloud services enable cloudbuild.googleapis.com \
+                       compute.googleapis.com \
+                       iam.googleapis.com \
+                       tpu.googleapis.com \
+                       file.googleapis.com 
 ```
 ### 2. Configure the environment: IAM Permissions 
 ```
