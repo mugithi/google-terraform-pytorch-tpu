@@ -41,7 +41,7 @@ gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_E
 gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_EMAIL  --role='roles/tpu.admin'
 ```
 
-### 3. Configure the environment: Cloud Builder 
+### 3.  Configure the environment: Cloud Builder 
 
 Seed the remote-builder container using cloudbuild. 
 
