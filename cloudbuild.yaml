@@ -86,6 +86,7 @@ steps:
             -var="zone=${_ZONE}" \
             -var="pytorch_proj_name=${_PROJECT_ID}" \
             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
+            -var="cidr_block=${_TPU_CIDR_BLOCK}" \
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
             -var="machine_type=${_MACHINE_TYPE}" \
             -var="script_bucket_url=${_PROJECT_ID}-tpu-scripts" \
@@ -96,6 +97,7 @@ steps:
             -var="zone=${_ZONE}" \
             -var="pytorch_proj_name=${_PROJECT_ID}" \
             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
+            -var="cidr_block=${_TPU_CIDR_BLOCK}" \
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
             -var="machine_type=${_MACHINE_TYPE}" \
             -var="script_bucket_url=${_PROJECT_ID}-tpu-scripts" \
@@ -281,20 +283,21 @@ steps:
           echo -e "\033[0;32m Jupyter PASSWORD->  $BUILD_ID \033[0m"
         fi
 substitutions:
-    _USERNAME: isaackkaranja
+    _USERNAME: sivaibhav
     # TODO: Service account.  Add service account to replace the default sv account 
     _MOUNT_POINT: /mnt/common 
     _SHARED_FS: tpushare # needs to be between 7 - 16 characters
     _ZONE: europe-west4-a
     _REGION: europe-west4
-    _PROJECT_ID: pytorch-tpu-new
-    _IMAGE_NIGHTLY: '20200418'
-    _GCS_DATASET: gs://pytorch-tpu-nfs-dataset/dataset/*
+    _PROJECT_ID: gcp-ml-demo-233523
+    _IMAGE_NIGHTLY: '20200420'
+    _GCS_DATASET: gs://tpu-demo-eu/dataset/*
     _NFS_IP: $(cat ~/workspace/vars/nfs_ip.vars) # variable file in the GCE builder instance
     _GCE_IMAGE_NAME: $(cat /workspace/vars/gce_image_name.vars)
     _GCE_SLAVE_0: $(cat /workspace/vars/compute_instances_slave_0.vars)
     _CODE_REPO: https://github.com/taylanbil/fairseq.git 
-    _ACCELERATOR_TYPE: v3-32
+    _ACCELERATOR_TYPE: v3-128
+    _TPU_CIDR_BLOCK: "10.2.0.0/27"
     _MACHINE_TYPE: n1-standard-16
     _GCE_DISK_SIZE: '200'
     _PORTS: '8888'

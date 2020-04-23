@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+variable "cidr_block" {
+  default = "10.2.0.0/29"
+}
 
 variable "project_id" {
   default = ""

@@ -56,12 +56,13 @@ module "filestore" {
 
 ### Create TPU 
 module "tpu" {
-  source           = "git::https://github.com/mugithi/terraform-google-tpu?ref=v1.0.1"
+  source           = "git::https://github.com/mugithi/terraform-google-tpu?ref=v1.0.2"
   project_id       = var.project_id
   zone             = var.zone
   tpu_name         = "${var.pytorch_proj_name}-tpu-${var.accelerator_type}"
   accelerator_type = var.accelerator_type
   network          = var.network
+  cidr_block       = var.cidr_block
   preemptible      = false
 }
 
