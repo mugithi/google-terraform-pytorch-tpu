@@ -5,7 +5,7 @@ ARG SHARED_FS=""
 ARG IMAGE_NIGHTLY=""
 
 
-FROM gcr.io/tpu-pytorch/xla:nightly${IMAGE_NIGHTLY}
+FROM gcr.io/tpu-pytorch/xla:${IMAGE_NIGHTLY}
 # FROM debian:stretch 
 
 ## Copy the enviromental file and set permissions
