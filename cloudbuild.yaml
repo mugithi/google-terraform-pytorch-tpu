@@ -137,13 +137,13 @@ steps:
         sed -i "s|\(BUILD=\)\(.*\)|\1${BUILD_ID}|" scripts/setup_slaves.sh
         sed -i "s|\(USERNAME=\)\(.*\)|\1${_USERNAME}|" scripts/setup_slaves.sh
 
-        sed -i "s@\(SHARED_FS =[ ']\)[^']\(.\)@\1${_SHARED_FS}\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s@\(MOUNT_POINT =[ ']\)[^']\(.\)@\1${_MOUNT_POINT}\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s@\(PYTORCH_PROJ_NAME =[ ']\)[^']\(.\)@\1${_PROJECT_ID}\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s@\(BUILD =[ ']\)[^']\(.\)@\1${_MOUNT_POINT}\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s@\(MOUNT_POINT =[ ']\)[^']\(.\)@\1${BUILD_ID}\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s@\(TPU_POD_NAME =[ ']\)[^']\(.\)@\1$(cat /workspace/vars/tpu_name.vars)\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
-        sed -i "s@\(NFS_IP =[ ']\)[^']\(.\)@\1$(cat /workspace/vars/nfs_ip.vars)\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s@\(SHARED_FS =[ ']*\)[^']*\(.\)@\1${_SHARED_FS}\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s@\(MOUNT_POINT =[ ']*\)[^']*\(.\)@\1${_MOUNT_POINT}\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s@\(PYTORCH_PROJ_NAME =[ ']*\)[^']*\(.\)@\1${_PROJECT_ID}\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s@\(BUILD =[ ']*\)[^']*\(.\)@\1${BUILD_ID}\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s@\(MOUNT_POINT =[ ']*\)[^']*\(.\)@\1${_MOUNT_POINT}\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s@\(TPU_POD_NAME =[ ']*\)[^']*\(.\)@\1$(cat /workspace/vars/tpu_name.vars)\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
+        sed -i "s@\(NFS_IP =[ ']*\)[^']*\(.\)@\1$(cat /workspace/vars/nfs_ip.vars)\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
 
         gsutil -m cp -r scripts/* gs://${_PROJECT_ID}-tpu-scripts
 
