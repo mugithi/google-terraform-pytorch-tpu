@@ -63,6 +63,7 @@ module "tpu" {
   accelerator_type = var.accelerator_type
   network          = var.network
   cidr_block       = var.cidr_block
+  pytorch_version  = var.pytorch_version
   preemptible      = false
 }
 

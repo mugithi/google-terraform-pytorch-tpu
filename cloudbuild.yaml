@@ -86,6 +86,7 @@ steps:
             -var="zone=${_ZONE}" \
             -var="pytorch_proj_name=${_PROJECT_ID}" \
             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
+            -var="pytorch_version=${_PYTORCH_VERSION}" \
             -var="cidr_block=${_TPU_CIDR_BLOCK}" \
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
             -var="machine_type=${_MACHINE_TYPE}" \
@@ -97,6 +98,7 @@ steps:
             -var="zone=${_ZONE}" \
             -var="pytorch_proj_name=${_PROJECT_ID}" \
             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
+            -var="pytorch_version=${_PYTORCH_VERSION}" \
             -var="cidr_block=${_TPU_CIDR_BLOCK}" \
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
             -var="machine_type=${_MACHINE_TYPE}" \
@@ -298,6 +300,7 @@ substitutions:
     _CODE_REPO: https://github.com/taylanbil/fairseq.git 
     _ACCELERATOR_TYPE: v3-128
     _TPU_CIDR_BLOCK: "10.2.0.0/27"
+    _PYTORCH_VERSION: pytorch-nightly
     _MACHINE_TYPE: n1-standard-16
     _GCE_DISK_SIZE: '200'
     _PORTS: '8888'

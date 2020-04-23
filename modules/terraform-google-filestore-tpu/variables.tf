@@ -68,7 +68,10 @@ variable "script_bucket_url" {
   default = ""
 }
 
-
 variable "tpu_shares_name" {
+  default = ""
+}
+
+variable "pytorch_version" {
   default = ""
 }
