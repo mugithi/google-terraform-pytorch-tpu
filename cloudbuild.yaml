@@ -135,6 +135,7 @@ steps:
         sed -i "s|\(MOUNT_POINT=\)\(.*\)|\1${_MOUNT_POINT}|" scripts/setup_slaves.sh
         sed -i "s|\(PYTORCH_PROJ_NAME=\)\(.*\)|\1${_PROJECT_ID}|" scripts/setup_slaves.sh
         sed -i "s|\(BUILD=\)\(.*\)|\1${BUILD_ID}|" scripts/setup_slaves.sh
+        sed -i "s|\(USERNAME=\)\(.*\)|\1${_USERNAME}|" scripts/setup_slaves.sh
 
         sed -i "s@\(SHARED_FS =[ ']\)[^']\(.\)@\1${_SHARED_FS}\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
         sed -i "s@\(MOUNT_POINT =[ ']\)[^']\(.\)@\1${_MOUNT_POINT}\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb

@@ -23,8 +23,9 @@ SHARED_FS=tpushare
 MOUNT_POINT=/mnt/common
 PYTORCH_PROJ_NAME=pytorch-tpu-new
 BUILD=e01fadb0-c2ea-4ac3-bedf-570ea097fbab
+USERNAME=me
 
 sudo groupadd docker
-sudo usermod -aG docker $USER
+sudo usermod -aG docker $USERNAME
 
 docker run -d -v ${SHARED_FS}:${MOUNT_POINT} --shm-size 8G -p 8888:8888 gcr.io/$PYTORCH_PROJ_NAME/xla:$BUILD -- jupyter lab --port=8888 --no-browser --ip=0.0.0.0 --allow-root --NotebookApp.token=$BUILD --NotebookApp.password=$BUILD --notebook-dir=${MOUNT_POINT}/scripts/
