@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+variable "tpu_name" {
+  default = ""
+}
 variable "project_id" {
   default = ""
 }

@@ -17,6 +17,14 @@ variable "cidr_block" {
   default = "10.2.0.0/29"
 }
 
+variable "filestore_name" {
+  default = "filestore"
+}
+
+variable "tpu_name" {
+  default = "tpu"
+}
+
 variable "project_id" {
   default = ""
 }

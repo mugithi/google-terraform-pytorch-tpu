@@ -60,7 +60,7 @@ module "mig_slave_template" {
   machine_type         = var.machine_type
   network              = var.network
   service_account      = local.compute_service_account
-  name_prefix          = "${var.pytorch_proj_name}-tpu-slave"
+  name_prefix          = "${var.tpu_name}-tpu-slave"
   source_image_family  = var.source_image_family
   source_image_project = var.source_image_project
   source_image         = var.source_image
@@ -80,7 +80,7 @@ module "mig-slave" {
   project_id        = var.project_id
   region            = var.region
   zone              = var.zone
-  hostname          = "${var.pytorch_proj_name}-tpu-slave"
+  hostname          = "${var.tpu_name}-tpu-slave"
   target_size       = split("-", var.accelerator_type)[1] / 8
   network           = var.network
   subnetwork        = var.network

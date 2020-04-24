@@ -47,7 +47,7 @@ module "filestore" {
   source           = "git::https://github.com/mugithi/terraform-google-filestore?ref=v1.0.0"
   project_id       = var.project_id
   zone             = var.zone
-  filestore_name   = "${var.pytorch_proj_name}-tpu-filestore"
+  filestore_name   = var.filestore_name
   tier             = "PREMIUM"
   capacity_gb      = 2560
   file_shares_name = var.tpu_shares_name
@@ -59,7 +59,7 @@ module "tpu" {
   source           = "git::https://github.com/mugithi/terraform-google-tpu?ref=v1.0.2"
   project_id       = var.project_id
   zone             = var.zone
-  tpu_name         = "${var.pytorch_proj_name}-tpu-${var.accelerator_type}"
+  tpu_name         = var.tpu_name
   accelerator_type = var.accelerator_type
   network          = var.network
   cidr_block       = var.cidr_block

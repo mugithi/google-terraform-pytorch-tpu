@@ -31,13 +31,13 @@ steps:
         terraform plan \
             -var="project_id=${_PROJECT_ID}" \
             -var="pytorch_proj_name=${_PROJECT_ID}" \
-            -var="gcs_tf_backend=${_PROJECT_ID}-tpu-backend" \
-            -var="gcs_scripts=${_PROJECT_ID}-tpu-scripts" 
+            -var="gcs_tf_backend=${_PROJECT_ID}-${_BUCKET_NAME}-tpu-backend" \
+            -var="gcs_scripts=${_PROJECT_ID}-${_BUCKET_NAME}-tpu-scripts" 
         terraform apply -auto-approve \
             -var="project_id=${_PROJECT_ID}" \
             -var="pytorch_proj_name=${_PROJECT_ID}" \
-            -var="gcs_tf_backend=${_PROJECT_ID}-tpu-backend" \
-            -var="gcs_scripts=${_PROJECT_ID}-tpu-scripts" 
+            -var="gcs_tf_backend=${_PROJECT_ID}-${_BUCKET_NAME}-tpu-backend" \
+            -var="gcs_scripts=${_PROJECT_ID}-${_BUCKET_NAME}-tpu-scripts" 
       fi 
       
 # Create TPU, Filestore 
@@ -78,7 +78,7 @@ steps:
       if [ -d "modules/terraform-google-filestore-tpu/" ]; then
         cd modules/terraform-google-filestore-tpu
         terraform init \
-            -backend-config="bucket=${_PROJECT_ID}-tpu-backend" \
+            -backend-config="bucket=${_PROJECT_ID}-${_BUCKET_NAME}-tpu-backend" \
             -backend-config="prefix=terraform-google-filestore-tpu"
         terraform plan \
             -var="project_id=${_PROJECT_ID}" \
@@ -86,11 +86,13 @@ steps:
             -var="zone=${_ZONE}" \
             -var="pytorch_proj_name=${_PROJECT_ID}" \
             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
+            -var="tpu_name=${_PROJECT_ID}-${_ACCELERATOR_TYPE}-${_BUCKET_NAME}" \
+            -var="filestore_name=${_PROJECT_ID}-${_ACCELERATOR_TYPE}-${_BUCKET_NAME}" \
             -var="pytorch_version=${_PYTORCH_VERSION}" \
             -var="cidr_block=${_TPU_CIDR_BLOCK}" \
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
             -var="machine_type=${_MACHINE_TYPE}" \
-            -var="script_bucket_url=${_PROJECT_ID}-tpu-scripts" \
+            -var="script_bucket_url=${_PROJECT_ID}-${_BUCKET_NAME}-tpu-scripts" \
             -var="tpu_shares_name=${_SHARED_FS}"
         terraform apply -auto-approve \
             -var="project_id=${_PROJECT_ID}" \
@@ -98,11 +100,13 @@ steps:
             -var="zone=${_ZONE}" \
             -var="pytorch_proj_name=${_PROJECT_ID}" \
             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
+            -var="tpu_name=${_PROJECT_ID}-${_ACCELERATOR_TYPE}-${_BUCKET_NAME}" \
+            -var="filestore_name=${_PROJECT_ID}-${_ACCELERATOR_TYPE}-${_BUCKET_NAME}" \
             -var="pytorch_version=${_PYTORCH_VERSION}" \
             -var="cidr_block=${_TPU_CIDR_BLOCK}" \
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
             -var="machine_type=${_MACHINE_TYPE}" \
-            -var="script_bucket_url=${_PROJECT_ID}-tpu-scripts" \
+            -var="script_bucket_url=${_PROJECT_ID}-${_BUCKET_NAME}-tpu-scripts" \
             -var="tpu_shares_name=${_SHARED_FS}"
         echo "exit 0" > /workspace/vars/exit_status_nfs_tpu.vars
       fi 
@@ -149,7 +153,7 @@ steps:
         sed -i "s@\(TPU_POD_NAME =[ ']*\)[^']*\(.\)@\1$(cat /workspace/vars/tpu_name.vars)\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
         sed -i "s@\(NFS_IP =[ ']*\)[^']*\(.\)@\1$(cat /workspace/vars/nfs_ip.vars)\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
 
-        gsutil -m cp -r scripts/* gs://${_PROJECT_ID}-tpu-scripts
+        gsutil -m cp -r scripts/* gs://${_PROJECT_ID}-${_BUCKET_NAME}-tpu-scripts
 
     # TODO Replace remote-builder with custom workers currently in (alpha)[https://cloud.google.com/cloud-build/docs/custom-worker-pool] 
 - id: tpu-docker-images-seed-nfs
@@ -165,7 +169,7 @@ steps:
     # Copy the Roberta files to dataset
     - COMMAND3=if [ -d "${_MOUNT_POINT}/code" ]; then echo "using existing ${_MOUNT_POINT}/code directory"; else sudo mkdir -p ${_MOUNT_POINT}/code && sudo git clone ${_CODE_REPO} ${_MOUNT_POINT}/code/; fi
     # Copy the PyTorch_RoBERTa_CloudTPU.ipynb files and setup_slaves.sh files
-    - COMMAND4=if [ -d "${_MOUNT_POINT}/scripts" ]; then echo "using existing ${_MOUNT_POINT}/scripts directory"; else sudo mkdir -p ${_MOUNT_POINT}/scripts && sudo gsutil -m cp -r gs://${_PROJECT_ID}-tpu-scripts ${_MOUNT_POINT}/scripts/; fi
+    - COMMAND4=if [ -d "${_MOUNT_POINT}/scripts" ]; then echo "using existing ${_MOUNT_POINT}/scripts directory"; else sudo mkdir -p ${_MOUNT_POINT}/scripts && sudo gsutil -m cp -r gs://${_PROJECT_ID}-${_BUCKET_NAME}-tpu-scripts ${_MOUNT_POINT}/scripts/; fi
     # Create the dataset folder and download the dataset
     - COMMAND5=if [ -d "${_MOUNT_POINT}/data" ]; then echo "using existing ${_MOUNT_POINT}/data directory"; else sudo mkdir -p ${_MOUNT_POINT}/data && sudo gsutil -m cp -r ${_GCS_DATASET} ${_MOUNT_POINT}/data/; fi && sudo umount ${_MOUNT_POINT}
     # Create the docker NFS volume
@@ -196,7 +200,7 @@ steps:
         then 
           cd modules/terraform-google-filestore-tpu
           terraform init \
-            -backend-config="bucket=${_PROJECT_ID}-tpu-backend" \
+            -backend-config="bucket=${_PROJECT_ID}-${_BUCKET_NAME}-tpu-backend" \
             -backend-config="prefix=terraform-google-filestore-tpu"
           terraform destroy -auto-approve \
             -var="project_id=${_PROJECT_ID}" \
@@ -209,7 +213,7 @@ steps:
         then 
           cleanupnfstpu
           terraform init \
-            -backend-config="bucket=${_PROJECT_ID}-tpu-backend" \
+            -backend-config="bucket=${_PROJECT_ID}-${_BUCKET_NAME}-tpu-backend" \
             -backend-config="prefix=terraform-google-instances"
           terraform destroy -auto-approve \
             -var="project_id=${_PROJECT_ID}" \
@@ -230,7 +234,7 @@ steps:
       if [ -d "modules/terraform-google-instances/" ]; then
         cd modules/terraform-google-instances
         terraform init \
-            -backend-config="bucket=${_PROJECT_ID}-tpu-backend" \
+            -backend-config="bucket=${_PROJECT_ID}-${_BUCKET_NAME}-tpu-backend" \
             -backend-config="prefix=terraform-google-instances"
         terraform plan \
             -var="project_id=${_PROJECT_ID}" \
@@ -238,6 +242,7 @@ steps:
             -var="zone=${_ZONE}" \
             -var="pytorch_proj_name=${_PROJECT_ID}" \
             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
+            -var="tpu_name=${_BUCKET_NAME}" \
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
             -var="machine_type=${_MACHINE_TYPE}" \
             -var="source_image_project=${_PROJECT_ID}" \
@@ -252,6 +257,7 @@ steps:
             -var="zone=${_ZONE}" \
             -var="pytorch_proj_name=${_PROJECT_ID}" \
             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
+            -var="tpu_name=${_BUCKET_NAME}" \
             -var="nightly_image=${_IMAGE_NIGHTLY}" \
             -var="machine_type=${_MACHINE_TYPE}" \
             -var="source_image_project=${_PROJECT_ID}" \
@@ -272,8 +278,8 @@ steps:
     - |
         if [ "$(cat /workspace/vars/exit_status.vars)" != "exit 0" ]
         then
-          gsutil rm -r gs://${_PROJECT_ID}-tpu-backend
-          gsutil rm -r gs://${_PROJECT_ID}-tpu-scripts
+          gsutil rm -r gs://${_PROJECT_ID}-${_BUCKET_NAME}-tpu-backend
+          gsutil rm -r gs://${_PROJECT_ID}-${_BUCKET_NAME}-tpu-scripts
         else
           echo -e "\033[0;32m export NFS_IP=$(cat /workspace/vars/nfs_ip.vars) \033[0m"
           echo -e "\033[0;32m export TPU_POD_NAME=$(cat /workspace/vars/tpu_name.vars) \033[0m"
@@ -285,27 +291,28 @@ steps:
           echo -e "\033[0;32m Jupyter PASSWORD->  $BUILD_ID \033[0m"
         fi
 substitutions:
-    _USERNAME: isaackkaranja
+    _USERNAME: sivaibhav
     # TODO: Service account.  Add service account to replace the default sv account 
     _MOUNT_POINT: /mnt/common 
     _SHARED_FS: tpushare # needs to be between 7 - 16 characters
     _ZONE: europe-west4-a
     _REGION: europe-west4
     _PROJECT_ID: gcp-ml-demo-233523
-    _IMAGE_NIGHTLY: r1.5 # takes the form nightly_20200420,  nightly or r1.5 for latest stable version
+    _IMAGE_NIGHTLY: nightly_20200420 # takes the form nightly_20200420,  nightly or r1.5 for latest stable version
     _GCS_DATASET: gs://tpu-demo-eu/dataset/*
     _NFS_IP: $(cat ~/workspace/vars/nfs_ip.vars) # variable file in the GCE builder instance
     _GCE_IMAGE_NAME: $(cat /workspace/vars/gce_image_name.vars)
     _GCE_SLAVE_0: $(cat /workspace/vars/compute_instances_slave_0.vars)
     _CODE_REPO: https://github.com/taylanbil/fairseq.git 
     _ACCELERATOR_TYPE: v3-32
-    _TPU_CIDR_BLOCK: "10.2.0.0/29"
-    _PYTORCH_VERSION: pytorch-1.5
+    _TPU_CIDR_BLOCK: "10.3.0.0/29"
+    _PYTORCH_VERSION: pytorch-nightly
     _MACHINE_TYPE: n1-standard-16
     _GCE_DISK_SIZE: '200'
     _PORTS: '8888'
     _SOURCE_RANGES: 0.0.0.0/0
     _TAGS: jupyter
+    _BUCKET_NAME: '20200420'
 timeout: 4000s
 
 
