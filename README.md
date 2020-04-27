@@ -11,6 +11,8 @@ This module does the following
 4. Builds an XLA docker container with Fairseq modules and pushes it to GCR
 5. Starts a GCE instance with Fairseq docker containers pre-loaded
 
+![Terraform Cloud TPU deployment Architecture ](https://github.com/mugithi/google-terraform-pytorch-tpu/blob/master/scripts/tf_tpu_deploy_architecture.png?raw=true "Deployment Architecture Diagram")
+
 ## Getting started
 
 Clone the repo to your local enviroment. 
