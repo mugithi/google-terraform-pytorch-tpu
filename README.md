@@ -103,7 +103,7 @@ Step #5 - "clean-up-gcs":  Jupyter PASSWORD:b3484b2e-7b3a-40f8-bc53-15da7e98e57a
 Finished Step #5 - "clean-up-gcs"
 ```
 
-### Diagram: How the Architecture works
+### Diagram: How it works
 
 ![Terraform Cloud TPU deployment Architecture ](https://github.com/mugithi/google-terraform-pytorch-tpu/blob/master/scripts/tf_cloudtpu_pytorch_distributed_training_v1.png?raw=true "Deployment Architecture Diagram")
 
