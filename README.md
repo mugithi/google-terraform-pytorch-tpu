@@ -105,7 +105,7 @@ Finished Step #5 - "clean-up-gcs"
 
 ### Diagram: How the Architecture works
 
-![Terraform Cloud TPU deployment Architecture ](https://github.com/mugithi/google-terraform-pytorch-tpu/blob/master/scripts/tf_cloudtpu_pytorch_distributed_training.png?raw=true "Deployment Architecture Diagram")
+![Terraform Cloud TPU deployment Architecture ](https://github.com/mugithi/google-terraform-pytorch-tpu/blob/master/scripts/ttf_cloudtpu_pytorch_distributed_training_v1.png?raw=true "Deployment Architecture Diagram")
 
 ### 7. Log into the enviroment: Run Cloud Build
 
@@ -124,7 +124,6 @@ gcloud builds submit --config=cloudbuild.yaml .
 
 - Setup configurable TPU image runtime
 - Switch from GCE instance with docker image to  GKE instances
-- Add Diagram
 
 
  
