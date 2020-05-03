@@ -1,10 +1,5 @@
 # Cloud Build Configuration which:
-
-
-
-
 steps:
-
 - name: 'gcr.io/cloud-builders/gcloud'
   id: terraform-google-initialize
   entrypoint: 'bash'
@@ -12,14 +7,12 @@ steps:
   - '-c'
   - |
     # create this resource if TPU, MIG or _SHARED_PD is not specified
-    if [ ${_BUILD_ACTION} == "initialize" ] && [ ${_TPU} == "default" ] && [ ${_MIG} == "default" ] && [ ${_SHARED_PD} == "default" ] 
+    if [[ ${_BUILD_ACTION} == "initialize" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]] 
     then
       gcloud builds submit --config=./env_setup/initialize/initialize.yaml 
       wait
     # skip in all other conditions
     fi
-
-
 
 # Create GCS Buckets
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -29,32 +22,34 @@ steps:
   - '-c'
   - |
     # create this resource if TPU, MIG or _SHARED_PD is not specified
-    if [ ${_BUILD_ACTION} == "create" ] && [ ${_TPU} == "default" ] && [ ${_MIG} == "default" ] && [ ${_SHARED_PD} == "default" ] 
+    if [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]] 
     then
       gcloud builds submit --config=./env_setup/terraform-google-gcs/terraform-google-gcs.yaml --substitutions _BUILD_ACTION=create
       wait
     # destroy this resource if TPU, MIG or _SHARED_PD is not specified
-    elif [ ${_BUILD_ACTION} == "destroy" ] && [ ${_TPU} == "default" ] && [ ${_MIG} == "default" ] && [ ${_SHARED_PD} == "default" ]
+    elif [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]] 
     then
       gcloud builds submit --config=./env_setup/terraform-google-gcs/terraform-google-gcs.yaml --substitutions _BUILD_ACTION=destroy
       wait 
     # skip in all other conditions
     fi 
-# CREATE FILESTORE
 
+# CREATE filestore
 - name: 'gcr.io/cloud-builders/gcloud'
   id: terraform-google-filestore
+  waitFor:
+  - terraform-google-gcs
   entrypoint: 'bash'
   args:
   - '-c'
   - |
     # create this resource if TPU, MIG or _SHARED_PD is not specified
-    if [ ${_BUILD_ACTION} == "create" ] && [ ${_TPU} == "default" ] && [ ${_MIG} == "default" ] && [ ${_SHARED_PD} == "default" ] 
+    if [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]] 
     then
       gcloud builds submit --config=./env_setup/terraform-google-filestore/terraform-google-filestore.yaml --substitutions _BUILD_ACTION=create
       wait
     # destroy this resource if TPU, MIG or _SHARED_PD is not specified
-    elif [ ${_BUILD_ACTION} == "destroy" ] && [ ${_TPU} == "default" ] && [ ${_MIG} == "default" ] && [ ${_SHARED_PD} == "default" ]
+    elif [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]]
     then
       gcloud builds submit --config=./env_setup/terraform-google-gcs/terraform-google-gcs.yaml --substitutions _BUILD_ACTION=destroy
       wait 
@@ -63,20 +58,70 @@ steps:
 
 # Create CLOUD TPU 
 - name: 'gcr.io/cloud-builders/gcloud'
-  id: terraform-google-filestore-tpu
+  id: terraform-google-tpu
   waitFor:
     - terraform-google-gcs
   entrypoint: 'bash'
   args:
   - '-c'
   - |
-    gcloud builds submit --config=./env_setup/terraform-google-filestore-tpu/cloudbuild.yaml
-    wait
+    # create this resource if TPU is specified
+    if [[ ${_BUILD_ACTION} == "update"  &&  ${_TPU} == "true" ]] || [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]]
+    then
+      gcloud builds submit --config=./env_setup/terraform-google-tpu/terraform-google-tpu.yaml --substitutions _BUILD_ACTION=create
+      wait
+    # destroy this resource if TPU specified
+    elif [[ ${_BUILD_ACTION} == "destroy"  &&  ${_TPU} == "true" ]] || [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]]
+    then
+      gcloud builds submit --config=./env_setup/terraform-google-tpu/terraform-google-tpu.yaml --substitutions _BUILD_ACTION=destroy
+      wait 
+    # skip in all other conditions
+    fi 
 
+# Create MIG 
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: terraform-google-mig
+  waitFor:
+    - terraform-google-filestore
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    # create this resource if MIG is specified
+    if [[ ${_BUILD_ACTION} == "update"  &&  ${_MIG} == "true" ]] || [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]]
+    then
+      gcloud builds submit --config=./env_setup/terraform-google-mig/terraform-google-mig.yaml --substitutions _BUILD_ACTION=create
+      wait
+    # destroy this resource if MIG specified
+    elif [[ ${_BUILD_ACTION} == "destroy"  &&  ${_MIG} == "true" ]] || [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]]
+    then
+      gcloud builds submit --config=./env_setup/terraform-google-mig/terraform-google-mig.yaml --substitutions _BUILD_ACTION=destroy
+      wait 
+    # skip in all other conditions
+    fi 
 
+# Create SHARED_PD 
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: terraform-google-disk
+  waitFor:
+    - terraform-google-mig
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    # create this resource if SHARED_PD is specified
+    if [[ ${_BUILD_ACTION} == "update"  &&  ${_SHARED_PD} == "true" ]] || [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]]
+    then
+      gcloud builds submit --config=./env_setup/terraform-google-disk/terraform-google-disk.yaml --substitutions _BUILD_ACTION=create
+      wait
+    # destroy this resource if SHARED_PD specified
+    elif [[ ${_BUILD_ACTION} == "destroy"  &&  ${_SHARED_PD} == "true" ]] || [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]]
+    then
+      gcloud builds submit --config=./env_setup/terraform-google-disk/terraform-google-disk.yaml --substitutions _BUILD_ACTION=destroy
+      wait 
+    # skip in all other conditions
+    fi 
 
-
-      
 # # Load data to gcs
 # - id: load-scripts-to-gcs
 #   waitFor: 
