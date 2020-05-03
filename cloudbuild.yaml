@@ -6,6 +6,7 @@ steps:
   args:
   - '-c'
   - |
+    ls  /var/lib/docker
     # create this resource if TPU, MIG or _SHARED_PD is not specified
     if [[ ${_BUILD_ACTION} == "initialize" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]] 
     then
