@@ -1,0 +1,18 @@
+steps:
+# Create GCS Buckets
+- id: terraform-google-disk
+  name: hashicorp/terraform:0.12.16
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - |  
+      set -xe
+      source values.env
+      if [ ${_BUILD_ACTION} == 'create' ]
+      then
+         echo "CREATING SHARED PD AND MOUNTING IT TO INSTANCES"
+      fi 
+      if [ ${_BUILD_ACTION} == 'destroy' ]
+      then
+         echo "DETACHING SHARED POD AND DESTROYING"
+      fi 

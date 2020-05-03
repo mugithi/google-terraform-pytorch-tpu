@@ -1,0 +1,18 @@
+steps:
+# Create GCS Buckets
+- id: terraform-google-tpu
+  name: hashicorp/terraform:0.12.16
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - |  
+      set -xe
+      source values.env
+      if [ ${_BUILD_ACTION} == 'create' ]
+      then
+         echo "CREATING TPU and SETTING RUNTIME"
+      fi 
+      if [ ${_BUILD_ACTION} == 'destroy' ]
+      then
+         echo "DESTROYING TPU"
+      fi 

@@ -55,7 +55,6 @@ NAT_IP=$(${GCLOUD} compute instances describe ${INSTANCE_NAME} --format='get(net
 attempt_counter=0
 max_attempts=10
 until [ $(`ssh -q -o StrictHostKeyChecking=no ${USERNAME}@${NAT_IP} -i ./${KEYNAME}  exit` echo $?) == 0 ]; do
-# until [ "$(nmap -Pn ${NAT_IP} -p 22 | grep -i 22 | awk '{print $3}')" == "ssh" ]; do
     if [ ${attempt_counter} -eq ${max_attempts} ];then
       echo "Max attempts reached" 
       exit 1
