@@ -10,12 +10,10 @@ steps:
       source values.env
       function cleanup {
           if [ "$?" == "0" ]
-          then 
-            sed -i "s/SHARED_NFS_IP=none/SHARED_NFS_IP=$(terraform output nfs_ip)/g" ../../values.env 
-            cat ../../values.env | grep -i SHARED_NFS_IP
-            echo -e "$${GREEN}Succeeded creating filestore with share ip $(terraform output nfs_ip) $${NC}"
+          then
+            echo -e "$${GREEN}Succeeded with $${PROJECT_ID}-$${ENV_BUILD_NAME}-filestore build operations $${NC}"
           else 
-            echo -e "$${RED}Did not succeed in deleting the enviroment $${NC}"
+            echo -e "$${RED}Did not succeed with $${PROJECT_ID}-$${ENV_BUILD_NAME}-filestore build operations $${NC}"
             exit 0
           fi
       }
@@ -33,22 +31,23 @@ steps:
             -var="filestore_name=$${PROJECT_ID}-$${ENV_BUILD_NAME}-filestore" \
             -var="file_shares_name=$${SHARED_FS}" \
             -var="capacity_gb=$${SHARED_FS_CAPACITY}" \
-            -var="tier=$${SHARED_FS_TIER}" 
+            -var="tier=$${SHARED_FS_TIER}"
+          sed -i "s/SHARED_NFS_IP=.*/SHARED_NFS_IP=$(terraform output nfs_ip)/g" ../../values.env
       fi 
       if [ ${_BUILD_ACTION} == 'destroy' ]
       then
          cd env_setup/terraform-google-filestore
          terraform init \
-            -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tpu-backend" \
+            -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
             -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}"
-         terraform destroy target=module.filestore --auto-approve \
+         terraform destroy -target=module.filestore.google_filestore_instance.instance --auto-approve \
             -var="project_id=$${PROJECT_ID}" \
             -var="region=$${REGION}" \
             -var="zone=$${ZONE}" \
             -var="filestore_name=$${PROJECT_ID}-$${ENV_BUILD_NAME}-filestore" \
             -var="file_shares_name=$${SHARED_FS}" \
             -var="capacity_gb=$${SHARED_FS_CAPACITY}" \
-            -var="tier=$${SHARED_FS_TIER}" 
+            -var="tier=$${SHARED_FS_TIER}"
       fi
 
 - id: sync_workspace
@@ -60,6 +59,6 @@ steps:
   - '-c'
   - |
      source values.env
-     gsutil -m rsync -r /workspace gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/workspace
+     gsutil cp values.env gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/
      echo -e "$${GREEN} Synced /workpace with the gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace $${NC}"
 
