@@ -1,5 +1,17 @@
 steps:
 # Create GCS Buckets
+# Sync workplace to GCS bucket
+- id: initialize_workspace
+  name: 'gcr.io/cloud-builders/gsutil'
+  waitFor: ['-']
+  entrypoint: 'bash'
+  args: 
+  - '-c'
+  - |
+     source values.env
+     gsutil -m rsync -r gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace /workspace 
+     echo -e "$${GREEN} Synced /workpace with the gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace $${NC}"
+
 - id: terraform-google-gcs
   name: gcr.io/$PROJECT_ID/terraform:0.12.16
   entrypoint: 'sh'
@@ -8,17 +20,16 @@ steps:
   - |  
       set -xe
       source values.env
-      trap cleanup EXIT
-      mkdir -p vars/
       function cleanup {
           if [ "$?" == "0" ]
           then 
-            echo $(terraform output tf_backend_bucket_url) > /workspace/vars/tf_backend_bucket_url.vars
-            echo $(terraform output dataset_bucket_url) > /workspace/vars/dataset_bucket_url.vars
-            echo "Success! BUCKETS $(terraform output tf_backend_bucket_url), $(terraform output dataset_bucket_url) and $(terraform output dataset_bucket_url) have been created"
+            echo -e "$${GREEN}Succeeded in deleting the environment $${NC}"
+          elif 
+            echo -e "$${RED}Did not succeed in deleting the enviroment $${NC}"
             exit 0
           fi
       }
+      trap cleanup EXIT
       if [ ${_BUILD_ACTION} == 'destroy' ]
       then
         cd env_setup/terraform-google-gcs  

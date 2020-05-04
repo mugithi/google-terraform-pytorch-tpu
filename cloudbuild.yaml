@@ -21,13 +21,8 @@ steps:
   args:
   - '-c'
   - |
-    # create this resource if TPU, MIG or _SHARED_PD is not specified
-    if [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]] 
-    then
-      gcloud builds submit --config=./env_setup/terraform-google-gcs/terraform-google-gcs.yaml --substitutions _BUILD_ACTION=create
-      wait
     # destroy this resource if TPU, MIG or _SHARED_PD is not specified
-    elif [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]] 
+    if [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]] 
     then
       gcloud builds submit --config=./env_setup/terraform-google-gcs/terraform-google-gcs.yaml --substitutions _BUILD_ACTION=destroy
       wait 
