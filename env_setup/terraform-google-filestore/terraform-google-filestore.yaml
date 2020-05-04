@@ -1,5 +1,5 @@
 steps:
-# Create GCS Buckets
+# Create Filestore Buckets
 - id: terraform-google-filestore
   name: gcr.io/$PROJECT_ID/terraform:0.12.16
   entrypoint: 'sh'
@@ -8,11 +8,58 @@ steps:
   - |  
       # set -xe
       source values.env
+      function cleanup {
+          if [ "$?" == "0" ]
+          then 
+            sed -i "s/SHARED_NFS_IP=none/SHARED_NFS_IP=$(terraform output nfs_ip)/g" ../../values.env 
+            cat ../../values.env | grep -i SHARED_NFS_IP
+            echo -e "$${GREEN}Succeeded creating filestore with share ip $(terraform output nfs_ip) $${NC}"
+          else 
+            echo -e "$${RED}Did not succeed in deleting the enviroment $${NC}"
+            exit 0
+          fi
+      }
+      trap cleanup EXIT
       if [ ${_BUILD_ACTION} == 'create' ]
       then
-         echo "CREATING FILESTORE"
+         cd env_setup/terraform-google-filestore
+         terraform init \
+            -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
+            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}"
+         terraform apply --auto-approve \
+            -var="project_id=$${PROJECT_ID}" \
+            -var="region=$${REGION}" \
+            -var="zone=$${ZONE}" \
+            -var="filestore_name=$${PROJECT_ID}-$${ENV_BUILD_NAME}-filestore" \
+            -var="file_shares_name=$${SHARED_FS}" \
+            -var="capacity_gb=$${SHARED_FS_CAPACITY}" \
+            -var="tier=$${SHARED_FS_TIER}" 
       fi 
       if [ ${_BUILD_ACTION} == 'destroy' ]
       then
-         echo "DESTROYING FILESTORE"
-      fi 
+         cd env_setup/terraform-google-filestore
+         terraform init \
+            -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tpu-backend" \
+            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}"
+         terraform destroy target=module.filestore --auto-approve \
+            -var="project_id=$${PROJECT_ID}" \
+            -var="region=$${REGION}" \
+            -var="zone=$${ZONE}" \
+            -var="filestore_name=$${PROJECT_ID}-$${ENV_BUILD_NAME}-filestore" \
+            -var="file_shares_name=$${SHARED_FS}" \
+            -var="capacity_gb=$${SHARED_FS_CAPACITY}" \
+            -var="tier=$${SHARED_FS_TIER}" 
+      fi
+
+- id: sync_workspace
+  name: 'gcr.io/cloud-builders/gsutil'
+  waitFor: 
+  - terraform-google-filestore
+  entrypoint: 'bash'
+  args: 
+  - '-c'
+  - |
+     source values.env
+     gsutil -m rsync -r /workspace gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/workspace
+     echo -e "$${GREEN} Synced /workpace with the gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace $${NC}"
+

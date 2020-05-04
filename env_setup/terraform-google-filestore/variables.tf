@@ -13,16 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-variable "cidr_block" {
-  default = "10.2.0.0/29"
-}
 
 variable "filestore_name" {
   default = "filestore"
-}
-
-variable "tpu_name" {
-  default = "tpu"
 }
 
 variable "project_id" {
@@ -37,49 +30,22 @@ variable "zone" {
   default = ""
 }
 
-variable "pytorch_proj_name" {
-  default = ""
-}
-
 variable "network" {
   default = "default"
 }
 
-variable "accelerator_type" {
-  default = "v3-8"
-}
-
-variable "mount_point" {
-  default = ""
-}
-
-variable "nightly_image" {
-  description = "Specify the nightly image, in the format YYYYMMDD, for example 20191204. If you leave this field blank, the latest nightly image will be used"
-  default     = ""
-}
 variable "service_account_scopes" {
   default = ["cloud-platform", ]
 }
 
-variable "machine_type" {
-  default = "n1-standard-16"
-}
-
-variable "access_config" {
-  default = [{
-    nat_ip       = ""
-    network_tier = "PREMIUM"
-  }]
-}
-
-variable "dataset_bucket_url" {
+variable "file_shares_name" {
   default = ""
 }
 
-variable "tpu_shares_name" {
-  default = ""
+variable "capacity_gb" {
+  default=2560
 }
 
-variable "pytorch_version" {
-  default = ""
+variable "tier" {
+  default="STANDARD"
 }

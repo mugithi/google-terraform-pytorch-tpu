@@ -48,33 +48,8 @@ module "filestore" {
   project_id       = var.project_id
   zone             = var.zone
   filestore_name   = var.filestore_name
-  tier             = "PREMIUM"
-  capacity_gb      = 2560
-  file_shares_name = var.tpu_shares_name
+  tier             = var.tier
+  capacity_gb      = var.capacity_gb
+  file_shares_name = var.file_shares_name
   network          = var.network
-}
-
-### Create TPU 
-module "tpu" {
-  source           = "git::https://github.com/mugithi/terraform-google-tpu?ref=v1.0.2"
-  project_id       = var.project_id
-  zone             = var.zone
-  tpu_name         = var.tpu_name
-  accelerator_type = var.accelerator_type
-  network          = var.network
-  cidr_block       = var.cidr_block
-  pytorch_version  = var.pytorch_version
-  preemptible      = false
-}
-
-# Supporting module to create container metadata
-module "gce-container" {
-  source  = "git::https://github.com/terraform-google-modules/terraform-google-container-vm?ref=v2.0.0"
-  container = {
-  image = "${var.nightly_image == "" ? "gcr.io/tpu-pytorch/xla:nightly" : "gcr.io/tpu-pytorch/xla:nightly_${var.nightly_image}"}" }
-}
-
-## Project Metadata
-resource "google_compute_project_metadata" "default" {
-  metadata = merge(map("NFS_IP", module.filestore.filestore_ip), map("SHARED_FS", module.filestore.filestore_name), map("PROJECT_ID", var.project_id), map("ZONE", var.zone), map("MOUNT_POINT", var.mount_point), map("TPU_NAME", module.tpu.tpu_name), map("TPU_ACCELERATOR_TYPE", var.accelerator_type), map("SCRIPTS_URL", "gs://${var.dataset_bucket_url}/scripts"), map("IMAGE_NIGHTLY", var.nightly_image))
 }

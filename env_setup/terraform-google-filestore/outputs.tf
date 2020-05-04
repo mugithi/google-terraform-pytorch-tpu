@@ -13,19 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-output "tpu_project" {
-  value = split("/",module.tpu.id)[1]
-}
-
-output "tpu_zone" {
-  value = split("/",module.tpu.id)[3]
-}
-
-output "tpu_name" {
-  value = split("/",module.tpu.id)[5]
-}
-
 output "shared_fs" {
   value = module.filestore.filestore_name
 }
@@ -33,13 +20,3 @@ output "shared_fs" {
 output "nfs_ip" {
   value = module.filestore.filestore_ip
 }
-
-# output "dataset_bucket_url" {
-#   value = module.gcs_buckets.url
-# }
-
-output "default_account" {
-  value = data.google_compute_default_service_account.default.email
-}
-
-
