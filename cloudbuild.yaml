@@ -6,7 +6,6 @@ steps:
   args:
   - '-c'
   - |
-    ls  /var/lib/docker
     # create this resource if TPU, MIG or _SHARED_PD is not specified
     if [[ ${_BUILD_ACTION} == "initialize" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]] 
     then
@@ -164,7 +163,7 @@ steps:
 #         sed -i "s@\(TPU_POD_NAME =[ ']*\)[^']*\(.\)@\1$(cat /workspace/vars/tpu_name.vars)\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
 #         sed -i "s@\(NFS_IP =[ ']*\)[^']*\(.\)@\1$(cat /workspace/vars/nfs_ip.vars)\2@" scripts/PyTorch_RoBERTa_CloudTPU.ipynb
 
-#         gsutil -m cp -r scripts/* gs://${_PROJECT_ID}-${_TRAINING_RUN_NAME}-tpu-scripts
+#         gsutil -m cp -r scripts/* gs://${_PROJECT_ID}-${_ENV_BUILD_NAME}-tpu-scripts
 
 #     # TODO Replace remote-builder with custom workers currently in (alpha)[https://cloud.google.com/cloud-build/docs/custom-worker-pool] 
 # - id: tpu-docker-images-seed-nfs
@@ -180,7 +179,7 @@ steps:
 #     # Copy the Roberta files to dataset
 #     - COMMAND3=if [ -d "${_MOUNT_POINT}/code" ]; then echo "using existing ${_MOUNT_POINT}/code directory"; else sudo mkdir -p ${_MOUNT_POINT}/code && sudo git clone ${_CODE_REPO} ${_MOUNT_POINT}/code/; fi
 #     # Copy the PyTorch_RoBERTa_CloudTPU.ipynb files and setup_slaves.sh files
-#     - COMMAND4=if [ -d "${_MOUNT_POINT}/scripts" ]; then echo "using existing ${_MOUNT_POINT}/scripts directory"; else sudo mkdir -p ${_MOUNT_POINT}/scripts && sudo gsutil -m cp -r gs://${_PROJECT_ID}-${_TRAINING_RUN_NAME}-tpu-scripts ${_MOUNT_POINT}/scripts/; fi
+#     - COMMAND4=if [ -d "${_MOUNT_POINT}/scripts" ]; then echo "using existing ${_MOUNT_POINT}/scripts directory"; else sudo mkdir -p ${_MOUNT_POINT}/scripts && sudo gsutil -m cp -r gs://${_PROJECT_ID}-${_ENV_BUILD_NAME}-tpu-scripts ${_MOUNT_POINT}/scripts/; fi
 #     # Create the dataset folder and download the dataset
 #     - COMMAND5=if [ -d "${_MOUNT_POINT}/data" ]; then echo "using existing ${_MOUNT_POINT}/data directory"; else sudo mkdir -p ${_MOUNT_POINT}/data && sudo gsutil -m cp -r ${_GCS_DATASET} ${_MOUNT_POINT}/data/; fi && cat cat /etc/mtab | grep -i ${_MOUNT_POINT} |sudo tee -a /etc/fstab && sudo umount ${_MOUNT_POINT}
 #     # Create the docker NFS volume
@@ -211,7 +210,7 @@ steps:
 #         then 
 #           cd env_setup/terraform-google-filestore-tpu
 #           terraform init \
-#             -backend-config="bucket=${_PROJECT_ID}-${_TRAINING_RUN_NAME}-tpu-backend" \
+#             -backend-config="bucket=${_PROJECT_ID}-${_ENV_BUILD_NAME}-tpu-backend" \
 #             -backend-config="prefix=terraform-google-filestore-tpu"
 #           terraform destroy -auto-approve \
 #             -var="project_id=${_PROJECT_ID}" \
@@ -224,7 +223,7 @@ steps:
 #         then 
 #           cleanupnfstpu
 #           terraform init \
-#             -backend-config="bucket=${_PROJECT_ID}-${_TRAINING_RUN_NAME}-tpu-backend" \
+#             -backend-config="bucket=${_PROJECT_ID}-${_ENV_BUILD_NAME}-tpu-backend" \
 #             -backend-config="prefix=terraform-google-instances"
 #           terraform destroy -auto-approve \
 #             -var="project_id=${_PROJECT_ID}" \
@@ -245,7 +244,7 @@ steps:
 #       if [ -d "env_setup/terraform-google-instances/" ]; then
 #         cd env_setup/terraform-google-instances
 #         terraform init \
-#             -backend-config="bucket=${_PROJECT_ID}-${_TRAINING_RUN_NAME}-tpu-backend" \
+#             -backend-config="bucket=${_PROJECT_ID}-${_ENV_BUILD_NAME}-tpu-backend" \
 #             -backend-config="prefix=terraform-google-instances"
 #         terraform plan \
 #             -var="project_id=${_PROJECT_ID}" \
@@ -253,7 +252,7 @@ steps:
 #             -var="zone=${_ZONE}" \
 #             -var="pytorch_proj_name=${_PROJECT_ID}" \
 #             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
-#             -var="tpu_name=${_TRAINING_RUN_NAME}" \
+#             -var="tpu_name=${_ENV_BUILD_NAME}" \
 #             -var="nightly_image=${_DOCKER_IMAGE_VERSION}" \
 #             -var="machine_type=${_MACHINE_TYPE}" \
 #             -var="source_image_project=${_PROJECT_ID}" \
@@ -268,7 +267,7 @@ steps:
 #             -var="zone=${_ZONE}" \
 #             -var="pytorch_proj_name=${_PROJECT_ID}" \
 #             -var="accelerator_type=${_ACCELERATOR_TYPE}" \
-#             -var="tpu_name=${_TRAINING_RUN_NAME}" \
+#             -var="tpu_name=${_ENV_BUILD_NAME}" \
 #             -var="nightly_image=${_DOCKER_IMAGE_VERSION}" \
 #             -var="machine_type=${_MACHINE_TYPE}" \
 #             -var="source_image_project=${_PROJECT_ID}" \
@@ -289,8 +288,8 @@ steps:
 #     - |
 #         if [ "$(cat /workspace/vars/exit_status.vars)" != "exit 0" ]
 #         then
-#           gsutil rm -r gs://${_PROJECT_ID}-${_TRAINING_RUN_NAME}-tpu-backend
-#           gsutil rm -r gs://${_PROJECT_ID}-${_TRAINING_RUN_NAME}-tpu-scripts
+#           gsutil rm -r gs://${_PROJECT_ID}-${_ENV_BUILD_NAME}-tpu-backend
+#           gsutil rm -r gs://${_PROJECT_ID}-${_ENV_BUILD_NAME}-tpu-scripts
 #         else
 #           echo -e "\033[0;32m export NFS_IP=$(cat /workspace/vars/nfs_ip.vars) \033[0m"
 #           echo -e "\033[0;32m export TPU_POD_NAME=$(cat /workspace/vars/tpu_name.vars) \033[0m"
@@ -324,7 +323,7 @@ substitutions:
 #     _PORTS: '8888'
 #     _SOURCE_RANGES: 0.0.0.0/0
 #     _TAGS: jupyter
-#     _TRAINING_RUN_NAME: 'v20200428' # unique name, starts with a lowercase character
+#     _ENV_BUILD_NAME: 'v20200428' # unique name, starts with a lowercase character
     _BUILD_ACTION: default
     _TPU: default
     _MIG: default

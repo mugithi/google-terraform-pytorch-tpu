@@ -1,12 +1,12 @@
 steps:
 # Create GCS Buckets
 - id: terraform-google-disk
-  name: hashicorp/terraform:0.12.16
+  name: gcr.io/$PROJECT_ID/terraform:0.12.16
   entrypoint: 'sh'
   args: 
   - '-c'
   - |  
-      # set -xe
+      set -xe
       source values.env
       if [ ${_BUILD_ACTION} == 'create' ]
       then

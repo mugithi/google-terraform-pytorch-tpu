@@ -38,7 +38,7 @@ steps:
       if [ -d "env_setup/terraform-google-filestore-tpu/" ]; then
         cd env_setup/terraform-google-filestore-tpu
         terraform init \
-            -backend-config="bucket=${PROJECT_ID}-${TRAINING_RUN_NAME}-tpu-backend" \
+            -backend-config="bucket=${PROJECT_ID}-${ENV_BUILD_NAME}-tpu-backend" \
             -backend-config="prefix=terraform-google-filestore-tpu"
         terraform plan \
             -var="project_id=${PROJECT_ID}" \
@@ -46,13 +46,13 @@ steps:
             -var="zone=${ZONE}" \
             -var="pytorch_proj_name=${PROJECT_ID}" \
             -var="accelerator_type=${ACCELERATOR_TYPE}" \
-            -var="tpu_name=${PROJECT_ID}-${ACCELERATOR_TYPE}-${TRAINING_RUN_NAME}" \
-            -var="filestore_name=${PROJECT_ID}-${ACCELERATOR_TYPE}-${TRAINING_RUN_NAME}" \
+            -var="tpu_name=${PROJECT_ID}-${ACCELERATOR_TYPE}-${ENV_BUILD_NAME}" \
+            -var="filestore_name=${PROJECT_ID}-${ACCELERATOR_TYPE}-${ENV_BUILD_NAME}" \
             -var="pytorch_version=${PYTORCH_VERSION}" \
             -var="cidr_block=${TPU_CIDR_BLOCK}" \
             -var="nightly_image=${DOCKER_IMAGE_VERSION}" \
             -var="machine_type=${MACHINE_TYPE}" \
-            -var="script_bucket_url=${PROJECT_ID}-${TRAINING_RUN_NAME}-tpu-scripts" \
+            -var="script_bucket_url=${PROJECT_ID}-${ENV_BUILD_NAME}-tpu-scripts" \
             -var="tpu_shares_name=${SHARED_FS}"
         terraform apply -auto-approve \
             -var="project_id=${PROJECT_ID}" \
@@ -60,13 +60,13 @@ steps:
             -var="zone=${ZONE}" \
             -var="pytorch_proj_name=${PROJECT_ID}" \
             -var="accelerator_type=${ACCELERATOR_TYPE}" \
-            -var="tpu_name=${PROJECT_ID}-${ACCELERATOR_TYPE}-${TRAINING_RUN_NAME}" \
-            -var="filestore_name=${PROJECT_ID}-${ACCELERATOR_TYPE}-${TRAINING_RUN_NAME}" \
+            -var="tpu_name=${PROJECT_ID}-${ACCELERATOR_TYPE}-${ENV_BUILD_NAME}" \
+            -var="filestore_name=${PROJECT_ID}-${ACCELERATOR_TYPE}-${ENV_BUILD_NAME}" \
             -var="pytorch_version=${PYTORCH_VERSION}" \
             -var="cidr_block=${TPU_CIDR_BLOCK}" \
             -var="nightly_image=${DOCKER_IMAGE_VERSION}" \
             -var="machine_type=${MACHINE_TYPE}" \
-            -var="script_bucket_url=${PROJECT_ID}-${TRAINING_RUN_NAME}-tpu-scripts" \
+            -var="script_bucket_url=${PROJECT_ID}-${ENV_BUILD_NAME}-tpu-scripts" \
             -var="tpu_shares_name=${SHARED_FS}"
         echo "exit 0" > /workspace/vars/exit_status_nfs_tpu.vars
       fi 

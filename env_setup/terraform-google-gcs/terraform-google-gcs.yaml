@@ -1,18 +1,40 @@
 steps:
 # Create GCS Buckets
 - id: terraform-google-gcs
-  name: hashicorp/terraform:0.12.16
+  name: gcr.io/$PROJECT_ID/terraform:0.12.16
   entrypoint: 'sh'
   args: 
   - '-c'
   - |  
-      # set -xe
+      set -xe
       source values.env
-      if [ ${_BUILD_ACTION} == 'create' ]
-      then
-         echo "CREATING GCS BUCKET AND UPLOADING SCRIPTS"
-      fi 
+      trap cleanup EXIT
+      mkdir -p vars/
+      function cleanup {
+          if [ "$?" == "0" ]
+          then 
+            echo "Success! BUCKETS $(terraform output tf_backend_bucket_url), $(terraform output script_bucket_url) and $(terraform output dataset_bucket_url) have been created"
+            echo $(terraform output tf_backend_bucket_url) > /workspace/vars/tf_backend_bucket_url.vars
+            echo $(terraform output script_bucket_url) > /workspace/vars/script_bucket_url.vars
+            echo $(terraform output dataset_bucket_url) > /workspace/vars/dataset_bucket_url.vars
+            echo "exit 0" > /workspace/vars/exit_status.vars
+          else
+            echo "exit 1" > /workspace/vars/exit_status.vars
+            echo "exit 0" > /workspace/vars/exit_status_nfs_tpu.vars
+            exit 0
+          fi
+      }
       if [ ${_BUILD_ACTION} == 'destroy' ]
       then
-         echo "DESTROYING ALL GCS BUCKETS"
+        cd env_setup/terraform-google-gcs  
+        terraform init \
+            -var="project_id=$${PROJECT_ID}" \
+            -var="gcs_tf_backend=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
+            -var="gcs_scripts=$${PROJECT_ID}-$${ENV_BUILD_NAME}-scripts" \
+            -var="gcs_dataset=$${PROJECT_ID}-$${ENV_BUILD_NAME}-dataset"
+        terraform destroy -auto-approve \
+            -var="project_id=$${PROJECT_ID}" \
+            -var="gcs_tf_backend=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
+            -var="gcs_scripts=$${PROJECT_ID}-$${ENV_BUILD_NAME}-scripts" \
+            -var="gcs_dataset=$${PROJECT_ID}-$${ENV_BUILD_NAME}-dataset" 
       fi 

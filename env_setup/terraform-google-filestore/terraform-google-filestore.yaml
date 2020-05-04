@@ -1,7 +1,7 @@
 steps:
 # Create GCS Buckets
 - id: terraform-google-filestore
-  name: hashicorp/terraform:0.12.16
+  name: gcr.io/$PROJECT_ID/terraform:0.12.16
   entrypoint: 'sh'
   args: 
   - '-c'

@@ -34,16 +34,16 @@ module "gcs_buckets" {
   source          = "terraform-google-modules/cloud-storage/google"
   version         = "~> 1.3"
   project_id      = var.project_id
-  names           = ["${var.gcs_scripts}","${var.gcs_tf_backend}"]
+  names           = ["${var.gcs_scripts}","${var.gcs_tf_backend}","${var.gcs_dataset}"]
   set_admin_roles = true
   admins          = ["serviceAccount:${data.google_compute_default_service_account.default.email}"]
   prefix          = ""
   versioning = {
-    "${var.gcs_scripts}" = true
-    "${var.gcs_tf_backend}" = true
+    "${var.env_build_name}" = true
   }
   force_destroy = {
     "${var.gcs_scripts}" = true
-    "${var.gcs_tf_backend}" = false
+    "${var.gcs_tf_backend}"  = false
+    "${var.gcs_dataset}" = false
   }
 }

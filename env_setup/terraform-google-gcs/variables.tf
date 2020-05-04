@@ -20,7 +20,7 @@ variable "project_id" {
   default = ""
 }
 
-variable "pytorch_proj_name" {
+variable "env_build_name" {
   default = ""
 }
 
@@ -31,3 +31,8 @@ variable "gcs_tf_backend" {
 variable "gcs_scripts" {
   default = ""
 }
+
+variable "gcs_dataset" {
+  default = ""
+}
+
