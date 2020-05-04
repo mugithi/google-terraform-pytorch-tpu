@@ -1,0 +1,58 @@
+steps:
+# Create GCS Buckets
+- id: terraform-google-gcs
+  name: hashicorp/terraform:0.12.16
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - |  
+      set -xe
+      source values.env
+      trap cleanup EXIT
+      mkdir -p vars/
+      function cleanup {
+          if [ "$?" == "0" ]
+          then 
+            echo "Success! Configuration applied"
+            echo $(terraform output tf_backend_bucket_url) > /workspace/vars/tf_backend_bucket_url.vars
+            echo $(terraform output dataset_bucket_url) > /workspace/vars/dataset_bucket_url.vars
+            echo $(terraform output dataset_bucket_url) > /workspace/vars/dataset_bucket_url.vars
+            echo "exit 0" > /workspace/vars/exit_status.vars
+          else
+            echo "exit 1" > /workspace/vars/exit_status.vars
+            echo "exit 0" > /workspace/vars/exit_status_nfs_tpu.vars
+            exit 0
+          fi
+      }
+      if [ ${_BUILD_ACTION} == 'create' ]
+      then
+        cd env_setup/terraform-google-gcs  
+        terraform init \
+            -var="project_id=$${PROJECT_ID}" \
+            -var="env_build_name=$${PROJECT_ID}" \
+            -var="gcs_tf_backend=$${ENV_BUILD_NAME}-tf-backend" \
+            -var="gcs_workspace=$${ENV_BUILD_NAME}-workspace" 
+            -var="gcs_dataset=$${ENV_BUILD_NAME}-dataset"
+        terraform apply -auto-approve \
+            -var="project_id=$${PROJECT_ID}" \
+            -var="env_build_name=$${PROJECT_ID}" \
+            -var="gcs_tf_backend=$${ENV_BUILD_NAME}-tf-backend" \
+            -var="gcs_workspace=$${ENV_BUILD_NAME}-workspace" 
+            -var="gcs_dataset=$${ENV_BUILD_NAME}-dataset"
+      fi 
+      if [ ${_BUILD_ACTION} == 'destroy' ]
+      then
+        cd env_setup/terraform-google-gcs  
+        terraform init \
+            -var="project_id=$${PROJECT_ID}" \
+            -var="env_build_name=$${PROJECT_ID}" \
+            -var="gcs_tf_backend=$${ENV_BUILD_NAME}-tf-backend" \
+            -var="gcs_workspace=$${ENV_BUILD_NAME}-workspace" 
+            -var="gcs_dataset=$${ENV_BUILD_NAME}-dataset"
+        terraform destroy -auto-approve \
+            -var="project_id=$${PROJECT_ID}" \
+            -var="env_build_name=$${PROJECT_ID}" \
+            -var="gcs_tf_backend=$${ENV_BUILD_NAME}-tf-backend" \
+            -var="gcs_workspace=$${ENV_BUILD_NAME}-workspace" 
+            -var="gcs_dataset=$${ENV_BUILD_NAME}-dataset" 
+      fi 

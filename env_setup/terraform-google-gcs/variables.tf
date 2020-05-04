@@ -28,7 +28,7 @@ variable "gcs_tf_backend" {
   default = ""
 }
 
-variable "gcs_scripts" {
+variable "gcs_workspace" {
   default = ""
 }
 

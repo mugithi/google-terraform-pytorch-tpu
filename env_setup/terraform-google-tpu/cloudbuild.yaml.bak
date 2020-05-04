@@ -52,7 +52,7 @@ steps:
             -var="cidr_block=${TPU_CIDR_BLOCK}" \
             -var="nightly_image=${DOCKER_IMAGE_VERSION}" \
             -var="machine_type=${MACHINE_TYPE}" \
-            -var="script_bucket_url=${PROJECT_ID}-${ENV_BUILD_NAME}-tpu-scripts" \
+            -var="dataset_bucket_url=${PROJECT_ID}-${ENV_BUILD_NAME}-tpu-workspace" \
             -var="tpu_shares_name=${SHARED_FS}"
         terraform apply -auto-approve \
             -var="project_id=${PROJECT_ID}" \
@@ -66,7 +66,7 @@ steps:
             -var="cidr_block=${TPU_CIDR_BLOCK}" \
             -var="nightly_image=${DOCKER_IMAGE_VERSION}" \
             -var="machine_type=${MACHINE_TYPE}" \
-            -var="script_bucket_url=${PROJECT_ID}-${ENV_BUILD_NAME}-tpu-scripts" \
+            -var="dataset_bucket_url=${PROJECT_ID}-${ENV_BUILD_NAME}-tpu-workspace" \
             -var="tpu_shares_name=${SHARED_FS}"
         echo "exit 0" > /workspace/vars/exit_status_nfs_tpu.vars
       fi 

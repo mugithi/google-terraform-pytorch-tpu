@@ -34,7 +34,7 @@ output "nfs_ip" {
   value = module.filestore.filestore_ip
 }
 
-# output "script_bucket_url" {
+# output "dataset_bucket_url" {
 #   value = module.gcs_buckets.url
 # }
 

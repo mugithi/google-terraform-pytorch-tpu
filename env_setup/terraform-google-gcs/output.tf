@@ -20,10 +20,6 @@ output "tf_backend_bucket_url" {
   value = module.gcs_buckets.buckets[1].name
 }
 
-output "script_bucket_url" {
-  value = module.gcs_buckets.buckets[0].name
-}
-
 output "dataset_bucket_url" {
-  value = module.gcs_buckets.buckets[2].name
+  value = module.gcs_buckets.buckets[0].name
 }

@@ -24,36 +24,36 @@ steps:
   - '-c'
   - |
         source values.env
-        RED='\033[0;32m'
-        NC='\033[0m'
-        cd env_setup/terraform-google-gcs  
-        trap cleanup EXIT
         function cleanup {
           if [ "$?" == "0" ]
           then 
-            echo -e "$${RED} "Succeeded in creating the GCS buckets $${NC}"
-            exit 0
+            echo -e "$${GREEN}Succeeded in creating the $${ENV_BUILD_NAME} GCS buckets $${NC}"
           else
-            echo -e "$${RED} The enviroment marked by ENV_BUILD_NAME: $$ENV_BUILD_NAME has already been initialized and cannot be initialized again $${NC}"
-            echo -e "$${RED} "Please change this variable and try initializing again $${NC}"
-            exit 0
+            echo -e "$${RED}The enviroment marked by the values.env variable ENV_BUILD_NAME=$$ENV_BUILD_NAME has already been initialized and cannot be initialized again $${NC}"
+            echo -e "$${RED}Please change this variable and try running the initializing command.. $${NC}" 
+            echo -e "$${RED}command |-> gcloud builds submit --config=cloudbuild.yaml --substitutions _BUILD_ACTION=initialize $${NC}"
+            echo -e "$${RED}Please note that changing the values.env variable ENV_BUILD_NAME=$$ENV_BUILD_NAME will create a new training environment  $${NC}"
+            exit 0 
           fi
         }
-        if [ -d "modules/terraform-google-gcs/" ]; then
-          terraform init 
-          terraform apply -auto-approve \
-              -var="project_id=$${PROJECT_ID}" \
-              -var="gcs_tf_backend=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
-              -var="gcs_scripts=$${PROJECT_ID}-$${ENV_BUILD_NAME}-scripts" \
-              -var="gcs_dataset=$${PROJECT_ID}-$${ENV_BUILD_NAME}-dataset" 
-        fi
+        trap cleanup EXIT
+        cd env_setup/terraform-google-gcs
+        terraform init 
+        terraform apply -auto-approve \
+            -var="project_id=$${PROJECT_ID}" \
+            -var="gcs_tf_backend=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
+            -var="gcs_dataset=$${PROJECT_ID}-$${ENV_BUILD_NAME}-dataset" 
 
 # Sync workplace to GCS bucket
 - id: sync_tf_backend_with_workspace
   name: 'gcr.io/cloud-builders/gsutil'
+  waitFor:
+  - stage-create-gcs-buckets
   entrypoint: 'bash'
   args: 
   - '-c'
   - |
      source values.env
-     gsutil rsync -r '/workspace/' gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend
+     gsutil -m 
+     rsync -r /workspace gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace
+     echo -e "$${GREEN} Synced /workpace with the gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace $${NC}"

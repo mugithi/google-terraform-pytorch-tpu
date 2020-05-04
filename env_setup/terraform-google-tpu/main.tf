@@ -76,5 +76,5 @@ module "gce-container" {
 
 ## Project Metadata
 resource "google_compute_project_metadata" "default" {
-  metadata = merge(map("NFS_IP", module.filestore.filestore_ip), map("SHARED_FS", module.filestore.filestore_name), map("PROJECT_ID", var.project_id), map("ZONE", var.zone), map("MOUNT_POINT", var.mount_point), map("TPU_NAME", module.tpu.tpu_name), map("TPU_ACCELERATOR_TYPE", var.accelerator_type), map("SCRIPTS_URL", "gs://${var.script_bucket_url}/scripts"), map("IMAGE_NIGHTLY", var.nightly_image))
+  metadata = merge(map("NFS_IP", module.filestore.filestore_ip), map("SHARED_FS", module.filestore.filestore_name), map("PROJECT_ID", var.project_id), map("ZONE", var.zone), map("MOUNT_POINT", var.mount_point), map("TPU_NAME", module.tpu.tpu_name), map("TPU_ACCELERATOR_TYPE", var.accelerator_type), map("SCRIPTS_URL", "gs://${var.dataset_bucket_url}/scripts"), map("IMAGE_NIGHTLY", var.nightly_image))
 }

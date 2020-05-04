@@ -7,7 +7,7 @@ steps:
     - INSTANCE_ARGS=--image-project cos-cloud --image-family cos-stable
     - USERNAME=cloud-user
     # Run a script from the local build context in a Docker container
-    - COMMAND=docker run -v /home/cloud-user/workspace:/workspace ubuntu:16.04 bash -xe /workspace/test-scripts/no-op.sh
+    - COMMAND=docker run -v /home/cloud-user/workspace:/workspace ubuntu:16.04 bash -xe /workspace/test-workspace/no-op.sh
 - name: gcr.io/cloud-solutions-images/remote-builder:v0.3.0
   waitFor: ["-"]
   env:
@@ -16,4 +16,4 @@ steps:
     - INSTANCE_ARGS=--image-project cos-cloud --image-family cos-stable
     - USERNAME=cloud-user
     # Run a script from the local build context in a Docker container
-    - COMMAND=docker run -v /home/cloud-user/workspace:/workspace ubuntu:16.04 bash -xe /workspace/test-scripts/no-op.sh
+    - COMMAND=docker run -v /home/cloud-user/workspace:/workspace ubuntu:16.04 bash -xe /workspace/test-workspace/no-op.sh

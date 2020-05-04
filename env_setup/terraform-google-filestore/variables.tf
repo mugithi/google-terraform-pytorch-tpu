@@ -72,7 +72,7 @@ variable "access_config" {
   }]
 }
 
-variable "script_bucket_url" {
+variable "dataset_bucket_url" {
   default = ""
 }
 
