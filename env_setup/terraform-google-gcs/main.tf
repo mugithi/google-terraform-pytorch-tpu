@@ -16,16 +16,16 @@
 
 
 provider "google" {
-  version  = "~> 3.9.0"
+  version = "~> 3.9.0"
   project = var.project_id
 }
 
 provider "google-beta" {
-  version  = "~> 3.9.0"
+  version = "~> 3.9.0"
   project = var.project_id
 }
 
-data "google_compute_default_service_account" "default" { 
+data "google_compute_default_service_account" "default" {
   project = var.project_id
 }
 
@@ -34,17 +34,17 @@ module "gcs_buckets" {
   source          = "terraform-google-modules/cloud-storage/google"
   version         = "~> 1.3"
   project_id      = var.project_id
-  names           = ["${var.gcs_tf_backend}","${var.gcs_dataset}"]
+  names           = ["${var.gcs_tf_backend}", "${var.gcs_dataset}"]
   set_admin_roles = true
   admins          = ["serviceAccount:${data.google_compute_default_service_account.default.email}"]
   prefix          = ""
   versioning = {
-    "${var.gcs_tf_backend}"  = true
-    "${var.gcs_dataset}" = true
+    "${var.gcs_tf_backend}" = true
+    "${var.gcs_dataset}"    = true
 
   }
   force_destroy = {
-    "${var.gcs_tf_backend}"  = false
-    "${var.gcs_dataset}" = false
+    "${var.gcs_tf_backend}" = false
+    "${var.gcs_dataset}"    = false
   }
 }

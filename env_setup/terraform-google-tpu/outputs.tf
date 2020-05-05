@@ -15,15 +15,15 @@
  */
 
 output "tpu_project" {
-  value = split("/",module.tpu.id)[1]
+  value = split("/", module.tpu.id)[1]
 }
 
 output "tpu_zone" {
-  value = split("/",module.tpu.id)[3]
+  value = split("/", module.tpu.id)[3]
 }
 
 output "tpu_name" {
-  value = split("/",module.tpu.id)[5]
+  value = split("/", module.tpu.id)[5]
 }
 
 output "shared_fs" {

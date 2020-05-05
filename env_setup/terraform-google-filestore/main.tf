@@ -15,14 +15,14 @@
  */
 
 provider "google" {
-  version  = "~> 3.9.0"
+  version = "~> 3.9.0"
   project = var.project_id
   region  = var.region
   zone    = var.zone
 }
 
 provider "google-beta" {
-  version  = "~> 3.9.0"
+  version = "~> 3.9.0"
 }
 
 locals {

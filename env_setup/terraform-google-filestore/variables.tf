@@ -43,9 +43,9 @@ variable "file_shares_name" {
 }
 
 variable "capacity_gb" {
-  default=2560
+  default = 2560
 }
 
 variable "tier" {
-  default="STANDARD"
+  default = "STANDARD"
 }
