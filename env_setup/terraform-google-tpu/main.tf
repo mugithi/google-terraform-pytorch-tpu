@@ -25,6 +25,10 @@ provider "google-beta" {
   version = "~> 3.9.0"
 }
 
+provider "random" {
+  version = "~> 2.1.2"
+}
+
 locals {
   compute_service_account = {
     email  = "default"

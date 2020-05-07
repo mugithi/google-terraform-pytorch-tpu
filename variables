@@ -1,0 +1,36 @@
+module "mig_slave_template" {
+  source               = "./.terraform/modules/gce-mig/modules/instance_template"
+  machine_type         = var.machine_type
+  network              = var.network
+  service_account      = local.compute_service_account
+  name_prefix          = "${var.tpu_name}-tpu-slave"
+  source_image_family  = var.source_image_family
+  source_image_project = var.source_image_project
+  source_image         = var.source_image
+  tags                 = ["${var.tags}"]
+  startup_script       = "${file("../../scripts/setup_slaves.sh")}"
+  disk_size_gb  = var.disk_size_gb
+  access_config = var.access_config
+}
+
+## Create SLAVE
+module "mig-slave" {
+  source            = "./.terraform/modules/gce-mig/modules/mig"
+  instance_template = module.mig_slave_template.self_link
+  project_id        = var.project_id
+  region            = var.region
+  zone              = var.zone
+  hostname          = "${var.tpu_name}-tpu-slave"
+  target_size       = split("-", var.accelerator_type)[1] / 8
+  network           = var.network
+  subnetwork        = var.network
+}
+
+module "firewall" {
+  source        = "git::https://github.com/mugithi/terraform-google-firewall-rules.git"
+  network       = var.network
+  protocol      = var.protocol
+  ports         = ["${var.ports}"]
+  source_ranges = ["${var.source_ranges}"]
+  tags          = ["${var.tags}"]
+}

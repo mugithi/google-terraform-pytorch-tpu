@@ -1,64 +1,50 @@
 steps:
-# Create Filestore Buckets
-- id: terraform-google-filestore
+# Create tpu Buckets
+- id: terraform-google-tpu
   name: gcr.io/$PROJECT_ID/terraform:0.12.16
   entrypoint: 'sh'
   args: 
   - '-c'
   - |  
-      # set -xe
+      set -xe
       source values.env
       function cleanup {
           if [ "$?" == "0" ]
           then
-            echo -e "$${GREEN}Succeeded with $${PROJECT_ID}-$${ENV_BUILD_NAME}-filestore build operations $${NC}"
+            echo -e "$${GREEN}Succeeded with $${PROJECT_ID}-$${ENV_BUILD_NAME}-tpu build operations $${NC}"
           else 
-            echo -e "$${RED}Did not succeed with $${PROJECT_ID}-$${ENV_BUILD_NAME}-filestore build operations $${NC}"
+            echo -e "$${RED}Did not succeed with $${PROJECT_ID}-$${ENV_BUILD_NAME}-tpu build operations $${NC}"
             exit 0
           fi
       }
       trap cleanup EXIT
       if [ ${_BUILD_ACTION} == 'create' ]
       then
-         cd env_setup/terraform-google-filestore
+         cd env_setup/terraform-google-tpu
          terraform init \
             -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
-            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}"
-         terraform apply --auto-approve \
+            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-tpu"
+         terraform apply --auto-approve -lock=false \
             -var="project_id=$${PROJECT_ID}" \
             -var="region=$${REGION}" \
             -var="zone=$${ZONE}" \
-            -var="filestore_name=$${PROJECT_ID}-$${ENV_BUILD_NAME}-filestore" \
-            -var="file_shares_name=$${SHARED_FS}" \
-            -var="capacity_gb=$${SHARED_FS_CAPACITY}" \
-            -var="tier=$${SHARED_FS_TIER}"
-          sed -i "s/SHARED_NFS_IP=.*/SHARED_NFS_IP=$(terraform output nfs_ip)/g" ../../values.env
+            -var="tpu_name=$${ENV_BUILD_NAME}-tpu" \
+            -var="accelerator_type=$${TPU_ACCELERATOR_TYPE}" \
+            -var="cidr_block=$${TPU_CIDR_BLOCK}" \
+            -var="pytorch_version=$${TPU_PYTORCH_VERSION}" 
       fi 
       if [ ${_BUILD_ACTION} == 'destroy' ]
       then
-         cd env_setup/terraform-google-filestore
+         cd env_setup/terraform-google-tpu
          terraform init \
             -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
-            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}"
-         terraform destroy -target=module.filestore.google_filestore_instance.instance --auto-approve \
+            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-tpu"
+        terraform destroy --auto-approve -lock=false \
             -var="project_id=$${PROJECT_ID}" \
             -var="region=$${REGION}" \
             -var="zone=$${ZONE}" \
-            -var="filestore_name=$${PROJECT_ID}-$${ENV_BUILD_NAME}-filestore" \
-            -var="file_shares_name=$${SHARED_FS}" \
-            -var="capacity_gb=$${SHARED_FS_CAPACITY}" \
-            -var="tier=$${SHARED_FS_TIER}"
+            -var="tpu_name=$${ENV_BUILD_NAME}-tpu" \
+            -var="accelerator_type=$${TPU_ACCELERATOR_TYPE}" \
+            -var="cidr_block=$${TPU_CIDR_BLOCK}" \
+            -var="pytorch_version=$${TPU_PYTORCH_VERSION}" 
       fi
-
-- id: sync_workspace
-  name: 'gcr.io/cloud-builders/gsutil'
-  waitFor: 
-  - terraform-google-filestore
-  entrypoint: 'bash'
-  args: 
-  - '-c'
-  - |
-     source values.env
-     gsutil cp values.env gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/
-     echo -e "$${GREEN} Synced /workpace with the gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace $${NC}"
-

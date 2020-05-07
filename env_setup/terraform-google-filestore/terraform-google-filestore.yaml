@@ -6,7 +6,7 @@ steps:
   args: 
   - '-c'
   - |  
-      # set -xe
+      set -xe
       source values.env
       function cleanup {
           if [ "$?" == "0" ]
@@ -23,8 +23,8 @@ steps:
          cd env_setup/terraform-google-filestore
          terraform init \
             -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
-            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}"
-         terraform apply --auto-approve \
+            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-filestore"
+         terraform apply --auto-approve -lock=false \
             -var="project_id=$${PROJECT_ID}" \
             -var="region=$${REGION}" \
             -var="zone=$${ZONE}" \
@@ -39,8 +39,8 @@ steps:
          cd env_setup/terraform-google-filestore
          terraform init \
             -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
-            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}"
-         terraform destroy -target=module.filestore.google_filestore_instance.instance --auto-approve \
+            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-filestore"
+         terraform destroy -lock=false --auto-approve \
             -var="project_id=$${PROJECT_ID}" \
             -var="region=$${REGION}" \
             -var="zone=$${ZONE}" \

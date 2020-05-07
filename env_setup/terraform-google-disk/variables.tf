@@ -88,8 +88,6 @@ variable "update_policy" {
   ]
 }
 
-
-
 variable "protocol" {
   description = "tcp/udp/icmp"
   default     = "tcp"
@@ -119,5 +117,9 @@ variable "accelerator_type" {
 }
 
 variable "startup_script" {
+  default =""
+}
+
+variable "disk_type" {
   default =""
 }

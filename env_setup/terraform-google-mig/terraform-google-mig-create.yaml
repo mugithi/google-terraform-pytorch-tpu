@@ -1,0 +1,84 @@
+steps:
+# Create GCS Buckets
+- id: terraform-google-mig
+  name: gcr.io/$PROJECT_ID/terraform:0.12.16
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - |  
+      # set -xe
+      source values.env
+      function cleanup {
+          if [ "$?" == "0" ]
+          then
+            echo -e "$${GREEN}Succeeded with $${PROJECT_ID}-$${ENV_BUILD_NAME}-mig build operations $${NC}"
+          else 
+            echo -e "$${RED}Did not succeed with $${PROJECT_ID}-$${ENV_BUILD_NAME}-mig build operations $${NC}"
+            exit 0
+          fi
+      }
+      trap cleanup EXIT
+
+      if [[ "$${TPU_PYTORCH_VERSION}" == "pytorch-nightly" && ! -z "$${GCE_IMAGE_VERSION}" ]]
+      then
+         echo -e "$${GREEN}Creating $${TPU_PYTORCH_VERSION} image using $${GCE_IMAGE_VERSION} $${NC}"
+         cd env_setup/terraform-google-mig
+         terraform init \
+            -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
+            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-mig"
+         terraform apply --auto-approve \
+            -var="project_id=$${PROJECT_ID}" \
+            -var="region=$${REGION}" \
+            -var="zone=$${ZONE}" \
+            -var="machine_type=$${MACHINE_TYPE}" \
+            -var="name_prefix=$${MACHINE_TYPE}-$${ENV_BUILD_NAME}" \
+            -var="source_image_family=$${SOURCE_IMAGE_FAMILY}" \
+            -var="source_image_project=$${SOURCE_IMAGE_PROJECT}" \
+            -var="source_image=$${SOURCE_IMAGE_BASE}-v$${GCE_IMAGE_VERSION}" \
+            -var="disk_size_gb=$${DISK_SIZE_GB}" \
+            -var="network=$${NETWORK}" \
+            -var="protocol=$${PROTOCOL}" \
+            -var="ports=$${PORTS}" \
+            -var="source_ranges=$${SOURCE_RANGES}" \
+            -var="tags=$${TAGS}" \
+            -var="startup_script=$${MIG_SETUP_SCRIPT}" \
+            -var="accelerator_type=$${TPU_ACCELERATOR_TYPE}"
+      elif [[ "$${TPU_PYTORCH_VERSION}" != "pytorch-nightly" ]] || [[ -z "$${GCE_IMAGE_VERSION}" ]]
+      then
+         echo -e "$${GREEN}Creating $${TPU_PYTORCH_VERSION} image $${NC}"
+         cd env_setup/terraform-google-mig
+         terraform init \
+            -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
+            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-mig"
+         terraform apply --auto-approve \
+            -var="project_id=$${PROJECT_ID}" \
+            -var="region=$${REGION}" \
+            -var="zone=$${ZONE}" \
+            -var="machine_type=$${MACHINE_TYPE}" \
+            -var="name_prefix=$${MACHINE_TYPE}-$${ENV_BUILD_NAME}" \
+            -var="source_image_family=$${SOURCE_IMAGE_FAMILY}" \
+            -var="source_image_project=$${SOURCE_IMAGE_PROJECT}" \
+            -var="disk_size_gb=$${DISK_SIZE_GB}" \
+            -var="network=$${NETWORK}" \
+            -var="protocol=$${PROTOCOL}" \
+            -var="ports=$${PORTS}" \
+            -var="source_ranges=$${SOURCE_RANGES}" \
+            -var="tags=$${TAGS}" \
+            -var="startup_script=$${MIG_SETUP_SCRIPT}" \
+            -var="accelerator_type=$${TPU_ACCELERATOR_TYPE}"
+      fi
+      sed -i "s/MIG_MASTER=.*/MIG_MASTER=$(terraform output compute_instances_slave_0)/g" ../../values.env
+
+ #GCE Image Version=takes the form YYYYMMDD
+- id: sync_workspace
+  name: 'gcr.io/cloud-builders/gsutil'
+  waitFor: 
+  - terraform-google-mig
+  entrypoint: 'bash'
+  args: 
+  - '-c'
+  - |
+     source values.env
+     gsutil cp values.env gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/
+     echo -e "$${GREEN} Synced /workpace with the gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace $${NC}"
+

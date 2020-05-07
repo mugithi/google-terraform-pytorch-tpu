@@ -14,17 +14,7 @@
  * limitations under the License.
  */
 
-output "tpu_project" {
-  value = split("/", module.tpu.id)[1]
+
+output "compute_instances_slave_0" {
+  value = split("/","${tolist(data.google_compute_instance_group.slave.instances)[0]}")[10]
 }
-
-output "tpu_zone" {
-  value = split("/", module.tpu.id)[3]
-}
-
-output "tpu_name" {
-  value = split("/", module.tpu.id)[5]
-}
-
-
-
