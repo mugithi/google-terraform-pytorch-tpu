@@ -51,7 +51,7 @@ data "google_compute_default_service_account" "default" {
 
 # Supporting module pull the GCE MIG MODULE to be used in Main.tf file
 module "gce-mig" {
-  source = "git::https://github.com/mugithi/terraform-google-vm?ref=v1.3.9"
+  source = "git::https://github.com/mugithi/terraform-google-vm?ref=v1.4.2"
 }
 
 ## Created shared disk
@@ -82,7 +82,7 @@ module "mig_slave_template" {
   additional_disks  = [
   { 
     source = google_compute_disk.auto_created.name
-    auto_delete  = "true"
+    auto_delete  = "false"
     boot         = "false"
     mode         = "READ_ONLY"
   }
