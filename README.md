@@ -1,18 +1,30 @@
 # Introduction 
 
-This module builds off [](https://github.com/pytorch/xla) and enables you to do build a  TPU PyTorch Distributed training enviroment using [PyTorch/XLA](https://github.com/pytorch/xla) to perform training using the RoBERTa Fairseq models. 
+This module builds off [](https://github.com/pytorch/xla) and enables you to do build a  TPU PyTorch Distributed training enviroment using [PyTorch/XLA](https://github.com/pytorch/xla) using Google Cloud Builder.
 
 ### What this module does
 This module does the following 
 
-1. Creates Cloud TPU pod
-2. Creates a NFS share to allow share your dataset between your compute instances 
-3. Seeds the NFS Share with training dataset specified GCS bucket
-4. Builds an XLA docker container with Fairseq modules and pushes it to GCR
-5. Starts a GCE instance with Fairseq docker containers pre-loaded
+1. Creates Cloud TPU pod 
+2. Creates a NFS share to allow for the sharing of code between compute instances 
+3. Allows user to specify a script that is used to customize the image in the instance group
+4. Create a shared persistant that is used to host the data used for training
+5. Allows you to resize, refresh  Shared persistant disk without having to reload all the instances 
+
+|Build|Cloud Build Command|
+| Initialize the enviroment  |`gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize`|
+| Build the entire enviroment |`gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=create`|
+| Destroy the entire enviroment |`gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy`|
+| Update/create the TPU e.g move from v3-32, v3-128 |`gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_TPU=true`|
+| destroy the Cloud TPU  |`gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_TPU=true`|
+| Update/create the Managed Instance Group i.e #of instances, size of shared PD |`gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_MIG=true`|
+| destroy just the Cloud MIG including the Shared_PD  |`gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_MIG=true`|
+| update both Cloud TPU and MIG |`gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_TPU=true,_MIG=true`|
+| destroy both Cloud TPU and MIG |`gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_TPU=true,_MIG=true`|
+
 
 ### Deployment Architecture Diagram
-![Terraform Cloud TPU deployment Architecture ](https://github.com/mugithi/google-terraform-pytorch-tpu/blob/master/scripts/tf_cloudtpu_pytorch_provisioning.png?raw=true "Deployment Architecture Diagram")
+<!-- ![Terraform Cloud TPU deployment Architecture ](https://github.com/mugithi/google-terraform-pytorch-tpu/blob/master/scripts/tf_cloudtpu_pytorch_provisioning.png?raw=true "Deployment Architecture Diagram") -->
 
 ## Getting started
 
@@ -44,86 +56,46 @@ gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_E
 gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_EMAIL  --role='roles/tpu.admin'
 ```
 
-### 3.  Configure the environment: Cloud Builder 
+### 3. Initializing the environment 
 
-Seed the remote-builder container using cloudbuild. 
+In order to begin training, you first have to initiaze the environmnet using the comamnd `gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize`
 
-```
-cd remote-builder
-gcloud builds submit --config=cloudbuild.yaml .
-```
-### 4. Configure the enviroment: Cloud TPU  
+Initializing the enviroment creates GCS bucket to store both the configuration information and training information as follows
 
-Navigate to the root directory and modify the `cloudbuild.yml` file  variables below to configure the PyTorch TPU enviroment  
-```
-cd .. 
-vi cloudbuild.yml
-_USERNAME: <username>
-_MOUNT_POINT: /mnt/common
-_SHARED_FS: <file_system_name> #n eeds to be between 7 - 16 characters
-_ZONE: europe-west4-a
-_REGION: europe-west4
-_PROJECT_ID: <project_id>
-_IMAGE_NIGHTLY: ""
-_PYTORCH_PROJ_NAME: ${PYTORCH_PROJ_NAME}
-_ACCELERATOR_TYPE: v3-8
-_MACHINE_TYPE: n1-standard-8
-```
+- config_build: TF state for filestore, cloud tpu, managed instance group 
+- config_build: Workspace to store enviromental variables used by Cloud Buld
+- config_build: Scripts used to modify the instnace group
+- config_trainig: Scripts that are loaded at start time to configure the instance group for training for a particular model. It comes preloaded with RoBERTa on Fairseq
+- models: model specific training scripts
+- dataset: bucket to store the training dataset
 
-### 5. Configure the enviroment: GCS bucket and Github Repo
+Each version of the environment is tracked using the variable `ENV_BUILD_NAME=20200428` that is required to be unique to each build. In order to create seperate enviroments, a unique value in the `ENV_BUILD_NAME` is required. You can then run the initalization command again and build a new enviroment. 
 
-Modify the variables with the source of the training dataset and the code repo to be used in the training VM.
+It is recomended that you keep seperate versions of the cloned repo for each build. 
 
-```
-_GCS_DATASET: gs://<gcs_bucket_with_training_dataset>
-_CODE_REPO: https://github.com/taylanbil/fairseq.git
-```
+### 4. Build the entire enviroment 
 
-### 6. Deploying the enviroment: Cloud Build 
-To deploy the enviroment, execute cloud build from the command line 
+You can then create the enviroment using the command `gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=create` and destroy it using the command `gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy`  Running this command creates Filestore, Cloud TPU and Managed Instance Group (MIG)
 
-```
-gcloud builds submit --config=cloudbuild.yaml .
-```
+Please note that destroying does not remove the GCS buckets. You can recreate the training enviroment by reruning the `create` command.
 
-This will launch cloud build, you can monitor the deployment in the Gcloud Cloud bashboard in this [link](https://console.cloud.google.com/cloud-build/builds?) 
+### 4. Update/Create the enviroment: Cloud TPU  
 
-A succesfull deplyment of the enviroment will result in the following output
+You can update or create a new Cloud TPU using the command `gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_TPU=true`. When this comamnd is run, a new Cloud TPU pod is created if non exists, or existing one is updated if one exits. The update command comes in handy for situations where one needs to move from a v3-8 to a v3-128 by changing the by changing the `TPU_ACCELERATOR_TYPE="v3-32"` variable, or change the Cloud TPU PyTorch version, by changing cloud tpu version by moving from a pytorch-1.5 to pytorch-nightly  `TPU_PYTORCH_VERSION="pytorch-1.5"` variable or simply want to recreate the Cloud TPU after destroying it using the `gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_TPU=true` command
 
-```
-Step #5 - "clean-up-gcs": Already have image (with digest): gcr.io/cloud-builders/gsutil
-Step #5 - "clean-up-gcs":  export NFS_IP=10.232.62.106 
-Step #5 - "clean-up-gcs":  export TPU_POD_NAME=pytorch-tpu-new-tpu-v3-32 
-Step #5 - "clean-up-gcs":  export MOUNT_POINT=/mnt/common 
-Step #5 - "clean-up-gcs":  export SHARED_FS=tpushare 
-Step #5 - "clean-up-gcs":  export BUILD=b3484b2e-7b3a-40f8-bc53-15da7e98e57a 
-Step #5 - "clean-up-gcs":  export PYTORCH_PROJ_NAME=pytorch-tpu-new 
-Step #5 - "clean-up-gcs":  Jupyter URL:http://35.204.4xx8.xxx:8888
-Step #5 - "clean-up-gcs":  Jupyter PASSWORD:b3484b2e-7b3a-40f8-bc53-15da7e98e57a 
-Finished Step #5 - "clean-up-gcs"
-```
+TODO: If you specify a specific GCE torch-nightly version denoted by the variable `GCE_IMAGE_VERSION="20200427"`, cloud build will configure the Cloud TPU runtime to match the MIG GCE image version. If no value is called out in the variable `GCE_IMAGE_VERSION=""`, the latest nightly version is used.
 
-### Diagram: How it works
+Please note that updating the Cloud TPU enviroment does not modify the Managed instance group size. In order changes in paralle to Cloud TPU and MIG, you would also need to use include both the TPU and MIG in the cloud build substitation as follows `_BUILD_ACTION=update,_TPU=true,_MIG=true`
 
-![Terraform Cloud TPU deployment Architecture ](https://github.com/mugithi/google-terraform-pytorch-tpu/blob/master/scripts/tf_cloudtpu_pytorch_distributed_training_v1.png?raw=true "Deployment Architecture Diagram")
+### 5. Update/Create the enviroment: Cloud TPU  
 
-### 7. Log into the enviroment: Run Cloud Build
+You can update or create a new Cloud TPU using the command `gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_MIG=true`. When this comamnd is run, a new Cloud TPU pod is created if non exists, or existing one is updated if one exits. 
 
-Click on the **URL** generated by a succesfull deployment to access Jupyter Lab Notebook and use the generated **PASSWORD** to access the Jupyter lab. Navigate to the [Jupyter notebook](https://github.com/mugithi/google-terraform-pytorch-tpu/blob/master/scripts/PyTorch_RoBERTa_CloudTPU.ipynb) called `PyTorch_RoBERTa_CloudTPU.ipynb`
+The update command comes in handy for situations where one needs to change the size of the managed instance group that is set by changing the by changing the `TPU_ACCELERATOR_TYPE="v3-32"` variable or change the size of the shared persistant disk that stores the training data that is mounted RO and is set by the variable `SHARED_PD_SIZE='1024'` 
+
+If you specify a specific GCE torch-nightly version denoted by the variable `GCE_IMAGE_VERSION="20200427"` and set the pytorch version to nightly in the `TPU_PYTORCH_VERSION="pytorch-1.5"`, cloudbuild will provision a MIG using the torch-nightly specified GCE_IMAGE version. In all other cases, cloud build will use the latest nightly versionn.
+
+Please note, in order changes in parallel to Cloud TPU and MIG, you would also need to use include both the TPU and MIG in the cloud build substitation as follows `_BUILD_ACTION=update,_TPU=true,_MIG=true`oying it using the `gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_TPU=true` command
 
 
-### 8. Clean up the enviroment : Re-run Cloud Build
 
-Once you are ready to clean up the enviroment, re-run `cloudbuild`. This will cause a tear down of the environment created in the intial run. 
- 
-```
-gcloud builds submit --config=cloudbuild.yaml .
-```
-
-## TODO:
-
-- Setup configurable TPU image runtime
-- Switch from GCE instance with docker image to  GKE instances
-
-
- 
