@@ -11,7 +11,9 @@ This module does the following
 4. Create a shared persistant that is used to host the data used for training
 5. Allows you to resize, refresh  Shared persistant disk without having to reload all the instances 
 
+
 |Build|Cloud Build Command|
+|:----------|:-------------|
 | Initialize the enviroment  |`gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize`|
 | Build the entire enviroment |`gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=create`|
 | Destroy the entire enviroment |`gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy`|
