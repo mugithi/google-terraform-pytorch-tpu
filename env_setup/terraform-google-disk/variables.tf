@@ -123,3 +123,11 @@ variable "startup_script" {
 variable "disk_type" {
   default =""
 }
+
+variable "shared_pd_size" {
+  default =""
+}
+
+variable "shared_pd_name" {
+  default =""
+}

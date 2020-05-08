@@ -62,7 +62,7 @@ resource "google_compute_disk" "auto_created" {
   labels = {
     environment = "shared-pd"
   }
-  size = 1024
+  size = var.shared_pd_size
 }
 
 ## Create SLAVE MIG TEMPLATE
