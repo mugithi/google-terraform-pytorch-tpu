@@ -65,7 +65,7 @@ gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_E
 
 ## 4. Configure the environment: Modify the variables file
 
-All the build variables are stored in the file `[values.env](values.env)`. Modify this values to customize the enviromnment  
+All the build variables are stored in the file [values.env](values.env). Modify this values to customize the enviromnment  
 
 
 ## 3. Initializing the environment `_BUILD_ACTION=initialize`
