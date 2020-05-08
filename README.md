@@ -13,7 +13,7 @@ This module does the following
 4. Create a shared persistant disk (PD) that is used to host the dataset used for training
 
 
-## Build Commands
+# Build Commands
 
 |Build Action |Cloud Build Command|
 |:----------|:-------------|
@@ -31,7 +31,7 @@ This module does the following
 <!-- ## Deployment Architecture Diagram -->
 <!-- ![Terraform Cloud TPU deployment Architecture ](https://github.com/mugithi/google-terraform-pytorch-tpu/blob/master/scripts/tf_cloudtpu_pytorch_provisioning.png?raw=true "Deployment Architecture Diagram") -->
 
-### 1. Getting started
+## 1. Getting started
 
 Clone the repo to your local enviroment. 
 ```
@@ -39,7 +39,7 @@ git clone https://github.com/mugithi/google-terraform-pytorch-tpu.git
 cd google-terraform-pytorch-tpu
 ```
 
-### 2. Configure the environment: Enable the following services
+## 2. Configure the environment: Enable the following services
 ```
 gcloud services enable cloudbuild.googleapis.com \
                        compute.googleapis.com \
@@ -48,7 +48,7 @@ gcloud services enable cloudbuild.googleapis.com \
                        file.googleapis.com 
 ```
 
-### 3. Configure the environment: IAM Permissions 
+## 3. Configure the environment: IAM Permissions 
 
 ```
 export PROJECT=$(gcloud info --format='value(config.project)')
@@ -63,17 +63,17 @@ gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_E
 gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_EMAIL  --role='roles/tpu.admin'
 ```
 
-### 4. Configure the environment: Modify the variables file
+## 4. Configure the environment: Modify the variables file
 
-All the build variables are stored in the file `[values.env](values.env)`
+All the build variables are stored in the file `[values.env](values.env)`. Modify this values to customize the enviromnment  
 
 
-### 3. Initializing the environment `_BUILD_ACTION=initialize`
+## 3. Initializing the environment `_BUILD_ACTION=initialize`
 
 In order to begin training, you first have to initiaze the environmnet using the comamnd `gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize`
 
 
-#### What happens when you initialize the enviroment 
+### 3a. What happens when you initialize the enviroment 
 
 Initializing the enviroment creates GCS bucket to store both the configuration information and training information as follows
 
@@ -88,7 +88,7 @@ Each version of the environment is tracked using the variable `ENV_BUILD_NAME` t
 
 It is recomended that you keep seperate versions of the cloned cloud build repo for each build. 
 
-### 4. Build the entire enviroment `_BUILD_ACTION=create`
+## 4. Build the entire enviroment `_BUILD_ACTION=create`
 
 You can  create the enviroment using the command `gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=create` and destroy it using the command `gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy`  
 
@@ -98,7 +98,7 @@ Running this command creates Filestore, Cloud TPU and MIG
 
 Please note that destroying the environment does not remove the GCS buckets. You can recreate the training enviroment by reruning the `_BUILD_ACTION=create` command.
 
-### 5. Update/Create Cloud TPU  `_BUILD_ACTION=update,_TPU=true`
+## 5. Update/Create Cloud TPU  `_BUILD_ACTION=update,_TPU=true`
 
 You can update or create a new Cloud TPU using the command `gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_TPU=true`. 
 
@@ -114,7 +114,7 @@ TODO: If you specify a specific GCE torch-nightly version denoted by the variabl
 
 Please note that updating the Cloud TPU enviroment does not modify the MIGsize. In order changes in paralle to Cloud TPU and MIG, you would also need to use include both the TPU and MIG in the cloud build substitation as follows `_BUILD_ACTION=update,_TPU=true,_MIG=true`
 
-### 6. Update/Create Cloud MIG  `_BUILD_ACTION=update,_MIG=true`
+## 6. Update/Create Cloud MIG  `_BUILD_ACTION=update,_MIG=true`
 
 You can update or create a new Cloud MIG using the command `gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_MIG=true`.  
 
