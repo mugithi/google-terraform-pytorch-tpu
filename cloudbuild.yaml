@@ -6,8 +6,8 @@ steps:
   args:
   - '-c'
   - |
-    # create this resource if TPU, MIG or _SHARED_PD is not specified
-    if [[ ${_BUILD_ACTION} == "initialize" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]] 
+    # create this resource if TPU, MIG is not specified
+    if [[ ${_BUILD_ACTION} == "initialize" && ${_TPU} == "default" && ${_MIG} == "default" ]] 
     then
       gcloud builds submit --config=./env_setup/initialize/initialize.yaml 
       wait
@@ -21,8 +21,8 @@ steps:
   args:
   - '-c'
   - |
-    # destroy this resource if TPU, MIG or _SHARED_PD is not specified
-    if [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]] 
+    # destroy this resource if TPU, MIG is not specified
+    if [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" ]] 
     then
       gcloud builds submit --config=./env_setup/terraform-google-gcs/terraform-google-gcs.yaml --substitutions _BUILD_ACTION=destroy
       wait 
@@ -38,13 +38,13 @@ steps:
   args:
   - '-c'
   - |
-    # create this resource if TPU, MIG or _SHARED_PD is not specified
-    if [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]] 
+    # create this resource if TPU, MIG is not specified
+    if [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" ]] 
     then
       gcloud builds submit --config=./env_setup/terraform-google-filestore/terraform-google-filestore.yaml --substitutions _BUILD_ACTION=create
       wait
-    # destroy this resource if TPU, MIG or _SHARED_PD is not specified
-    elif [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]]
+    # destroy this resource if TPU, MIG is not specified
+    elif [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" ]]
     then
       gcloud builds submit --config=./env_setup/terraform-google-filestore/terraform-google-filestore.yaml --substitutions _BUILD_ACTION=destroy
       wait 
@@ -61,19 +61,19 @@ steps:
   - '-c'
   - |
     # create this resource if TPU is specified
-    if [[ ${_BUILD_ACTION} == "update"  &&  ${_TPU} == "true" ]] || [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]]
+    if [[ ${_BUILD_ACTION} == "update"  &&  ${_TPU} == "true" ]] || [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" ]]
     then
       gcloud builds submit --config=./env_setup/terraform-google-tpu/terraform-google-tpu.yaml --substitutions _BUILD_ACTION=create
       wait
     # destroy this resource if TPU specified
-    elif [[ ${_BUILD_ACTION} == "destroy"  &&  ${_TPU} == "true" ]] || [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]]
+    elif [[ ${_BUILD_ACTION} == "destroy"  &&  ${_TPU} == "true" ]] || [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" ]]
     then
       gcloud builds submit --config=./env_setup/terraform-google-tpu/terraform-google-tpu.yaml --substitutions _BUILD_ACTION=destroy
       wait 
     # skip in all other conditions
     fi 
 
-# Create SHARED_PD 
+# Create MIG
 - name: 'gcr.io/cloud-builders/gcloud'
   id: terraform-google-disk
   waitFor:
@@ -82,13 +82,13 @@ steps:
   args:
   - '-c'
   - |
-    # create this resource if SHARED_PD is specified
-    if [[ ${_BUILD_ACTION} == "update"  &&  ${_SHARED_PD} == "true" ]] || [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]]
+    # create this resource if MIG is specified
+    if [[ ${_BUILD_ACTION} == "update"  &&  ${_MIG} == "true" ]] || [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" ]]
     then
       gcloud builds submit --config=./env_setup/terraform-google-disk/terraform-google-disk-create.yaml 
       wait
-    # destroy this resource if SHARED_PD specified
-    elif [[ ${_BUILD_ACTION} == "destroy"  &&  ${_SHARED_PD} == "true" ]] || [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_SHARED_PD} == "default" ]]
+    # destroy this resource if MIG specified
+    elif [[ ${_BUILD_ACTION} == "destroy"  &&  ${_MIG} == "true" ]] || [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" ]]
     then
       gcloud builds submit --config=./env_setup/terraform-google-disk/terraform-google-disk-destroy.yaml
       wait 
@@ -99,7 +99,6 @@ substitutions:
     _BUILD_ACTION: default
     _TPU: default
     _MIG: default
-    _SHARED_PD: default
 timeout: 4000s
 
 
