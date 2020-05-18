@@ -67,9 +67,7 @@ variable "disk_size_gb" {
 variable "update_policy" {
   description = "The rolling update policy. https://www.terraform.io/docs/providers/google/r/compute_region_instance_group_manager.html#rolling_update_policy"
   type = list(object({
-    max_surge_fixed         = number
     max_surge_percent       = number
-    max_unavailable_fixed   = number
     max_unavailable_percent = number
     min_ready_sec           = number
     minimal_action          = string
@@ -77,9 +75,7 @@ variable "update_policy" {
   }))
   default = [ 
     { 
-      max_surge_fixed         = 0
-      max_unavailable_fixed   = 256 
-      max_surge_percent       = 0
+      max_surge_percent       = 100
       max_unavailable_percent = 100
       min_ready_sec           = 0 
       minimal_action          = "REPLACE"
@@ -121,13 +117,5 @@ variable "startup_script" {
 }
 
 variable "disk_type" {
-  default =""
-}
-
-variable "shared_pd_size" {
-  default =""
-}
-
-variable "shared_pd_name" {
   default =""
 }
