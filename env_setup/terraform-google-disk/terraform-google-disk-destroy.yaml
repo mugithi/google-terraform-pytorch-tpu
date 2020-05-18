@@ -42,7 +42,7 @@ steps:
             -var="tags=$${TAGS}" \
             -var="startup_script=$${MIG_SETUP_SCRIPT}" \
             -var="shared_pd_name=$${PROJECT_ID}-$${ENV_BUILD_NAME}-shared-pd" \
-            -var="shared_pd_size=$${SHARED_PD_SIZE}" \            
+            -var="shared_pd_size=$${SHARED_PD_SIZE}" \
             -var="accelerator_type=$${TPU_ACCELERATOR_TYPE}"
       elif [[ "$${TPU_PYTORCH_VERSION}" != "pytorch-nightly" ]] || [[ -z "$${GCE_IMAGE_VERSION}" ]]
       then
@@ -68,7 +68,7 @@ steps:
             -var="tags=$${TAGS}" \
             -var="startup_script=$${MIG_SETUP_SCRIPT}" \
             -var="shared_pd_name=$${PROJECT_ID}-$${ENV_BUILD_NAME}-shared-pd" \
-            -var="shared_pd_size=$${SHARED_PD_SIZE}" \            
+            -var="shared_pd_size=$${SHARED_PD_SIZE}" \
             -var="accelerator_type=$${TPU_ACCELERATOR_TYPE}"
       fi      
 

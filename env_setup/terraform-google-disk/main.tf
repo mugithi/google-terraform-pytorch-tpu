@@ -56,7 +56,7 @@ module "gce-mig" {
 
 ## Created shared disk
 resource "google_compute_disk" "auto_created" {
-  name  = "shared-pd"
+  name  = "shared-pd-1"
   type  = "pd-ssd"
   zone  = var.zone
   labels = {
