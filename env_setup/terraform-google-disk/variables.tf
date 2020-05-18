@@ -116,6 +116,14 @@ variable "startup_script" {
   default =""
 }
 
-variable "disk_type" {
+variable "shared_pd_disk_name" {
+  default =""
+}
+
+variable "shared_pd_disk_type" {
+  default =""
+}
+
+variable "shared_pd_disk_size" {
   default =""
 }

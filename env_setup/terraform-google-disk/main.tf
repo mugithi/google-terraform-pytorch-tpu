@@ -56,13 +56,13 @@ module "gce-mig" {
 
 ## Created shared disk
 resource "google_compute_disk" "auto_created" {
-  name  = "shared-pd"
-  type  = "pd-ssd"
+  name = var.shared_pd_disk_name
+  type = var.shared_pd_disk_type
   zone  = var.zone
   labels = {
     environment = "shared-pd"
   }
-  size = 1026
+  size = var.shared_pd_disk_size
 }
 
 ## Create SLAVE MIG TEMPLATE

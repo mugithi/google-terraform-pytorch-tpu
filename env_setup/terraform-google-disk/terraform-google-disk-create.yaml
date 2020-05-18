@@ -7,7 +7,6 @@ steps:
   - '-c'
   - |  
       set -xe
-      TF_LOG=DEBUG
       source values.env
       function cleanup {
           if [ "$?" == "0" ]
@@ -35,13 +34,16 @@ steps:
             -var="source_image_family=$${SOURCE_IMAGE_FAMILY}" \
             -var="source_image_project=$${SOURCE_IMAGE_PROJECT}" \
             -var="source_image=$${SOURCE_IMAGE_BASE}-v$${GCE_IMAGE_VERSION}" \
-            -var="disk_size_gb=$${DISK_SIZE_GB}" \
+            -var="disk_size_gb=$${BOOT_DISK_SIZE_GB}" \
             -var="network=$${NETWORK}" \
             -var="protocol=$${PROTOCOL}" \
             -var="ports=$${PORTS}" \
             -var="source_ranges=$${SOURCE_RANGES}" \
             -var="tags=$${TAGS}" \
             -var="startup_script=$${MIG_SETUP_SCRIPT}" \
+            -var="shared_pd_disk_name=$${SHARED_PD_DISK_TYPE}-$${SHARED_PD_DISK_SIZE}-$${ENV_BUILD_NAME}" \
+            -var="shared_pd_disk_size=$${SHARED_PD_DISK_SIZE}" \
+            -var="shared_pd_disk_type=$${SHARED_PD_DISK_TYPE}" \
             -var="accelerator_type=$${TPU_ACCELERATOR_TYPE}"
       elif [[ "$${TPU_PYTORCH_VERSION}" != "pytorch-nightly" ]] || [[ -z "$${GCE_IMAGE_VERSION}" ]]
       then
@@ -58,13 +60,16 @@ steps:
             -var="name_prefix=$${MACHINE_TYPE}-$${ENV_BUILD_NAME}" \
             -var="source_image_family=$${SOURCE_IMAGE_FAMILY}" \
             -var="source_image_project=$${SOURCE_IMAGE_PROJECT}" \
-            -var="disk_size_gb=$${DISK_SIZE_GB}" \
+            -var="disk_size_gb=$${BOOT_DISK_SIZE_GB}" \
             -var="network=$${NETWORK}" \
             -var="protocol=$${PROTOCOL}" \
             -var="ports=$${PORTS}" \
             -var="source_ranges=$${SOURCE_RANGES}" \
             -var="tags=$${TAGS}" \
             -var="startup_script=$${MIG_SETUP_SCRIPT}" \
+            -var="shared_pd_disk_name=$${SHARED_PD_DISK_TYPE}-$${SHARED_PD_DISK_SIZE}-$${ENV_BUILD_NAME}" \
+            -var="shared_pd_disk_size=$${SHARED_PD_DISK_SIZE}" \
+            -var="shared_pd_disk_type=$${SHARED_PD_DISK_TYPE}" \
             -var="accelerator_type=$${TPU_ACCELERATOR_TYPE}"
       fi
       sed -i "s/MIG_MASTER=.*/MIG_MASTER=$(terraform output compute_instances_slave_0)/g" ../../values.env
