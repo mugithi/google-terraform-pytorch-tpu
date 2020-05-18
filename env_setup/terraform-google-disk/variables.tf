@@ -78,7 +78,7 @@ variable "update_policy" {
       max_surge_percent       = 100
       max_unavailable_percent = 100
       min_ready_sec           = 0 
-      minimal_action          = "REPLACE"
+      minimal_action          = "RESTART"
       type                    = "PROACTIVE"
     }
   ]
