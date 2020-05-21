@@ -3,7 +3,6 @@ steps:
   name: 'gcr.io/cloud-builders/docker'
   args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/remote-builder', '.' ]
   dir: env_setup/initialize
-
 - id: stage-harshicorp-image
   name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'bash'
@@ -15,7 +14,7 @@ steps:
       TF_VER=0.12.16 
       docker pull hashicorp/terraform:$$TF_VER
       docker tag hashicorp/terraform:0.12.16 gcr.io/$PROJECT_ID/terraform:$$TF_VER
-
+      docker push gcr.io/$PROJECT_ID/terraform:$$TF_VER
 # Create GCS Buckets
 - id: stage-create-gcs-buckets
   name: gcr.io/$PROJECT_ID/terraform:0.12.16
@@ -43,7 +42,6 @@ steps:
             -var="project_id=$${PROJECT_ID}" \
             -var="gcs_tf_backend=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
             -var="gcs_dataset=$${PROJECT_ID}-$${ENV_BUILD_NAME}-dataset" 
-
 # Sync workplace to GCS bucket
 - id: sync_tf_backend_with_workspace
   name: 'gcr.io/cloud-builders/gsutil'
@@ -56,3 +54,4 @@ steps:
      source values.env
      gsutil -m rsync -r /workspace gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/workspace
      echo -e "$${GREEN} Synced /workpace with the gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace $${NC}"
+images: ['gcr.io/$PROJECT_ID/remote-builder']

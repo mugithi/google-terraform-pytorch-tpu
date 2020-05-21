@@ -51,18 +51,7 @@ data "google_compute_default_service_account" "default" {
 
 # Supporting module pull the GCE MIG MODULE to be used in Main.tf file
 module "gce-mig" {
-  source = "git::https://github.com/mugithi/terraform-google-vm?ref=v1.4.3"
-}
-
-## Created shared disk
-resource "google_compute_disk" "auto_created" {
-  name = var.shared_pd_disk_name
-  type = var.shared_pd_disk_type
-  zone  = var.zone
-  labels = {
-    environment = "shared-pd"
-  }
-  size = var.shared_pd_disk_size
+  source = "git::https://github.com/mugithi/terraform-google-vm?ref=v1.4.4"
 }
 
 ## Create SLAVE MIG TEMPLATE
@@ -81,10 +70,11 @@ module "mig_slave_template" {
   access_config = var.access_config
   additional_disks  = [
   { 
-    source = google_compute_disk.auto_created.name
+    source = var.shared_pd_disk_name
     auto_delete  = "false"
     boot         = "false"
     mode         = "READ_ONLY"
+    device_name  = "shared-pd"
   }
 ]
 }
@@ -101,13 +91,4 @@ module "mig-slave" {
   network           = var.network
   subnetwork        = var.network
   update_policy     = var.update_policy
-}
-
-module "firewall" {
-  source        = "git::https://github.com/mugithi/terraform-google-firewall-rules.git"
-  network       = var.network
-  protocol      = var.protocol
-  ports         = ["${var.ports}"]
-  source_ranges = ["${var.source_ranges}"]
-  tags          = ["${var.tags}"]
 }

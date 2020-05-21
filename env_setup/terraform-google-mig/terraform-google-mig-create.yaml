@@ -1,6 +1,6 @@
 steps:
 # Create GCS Buckets
-- id: terraform-google-disk
+- id: terraform-google-mig
   name: gcr.io/$PROJECT_ID/terraform:0.12.16
   entrypoint: 'sh'
   args: 
@@ -11,9 +11,9 @@ steps:
       function cleanup {
           if [ "$?" == "0" ]
           then
-            echo -e "$${GREEN}Succeeded with $${PROJECT_ID}-$${ENV_BUILD_NAME}-disk build operations $${NC}"
+            echo -e "$${GREEN}Succeeded with $${PROJECT_ID}-$${ENV_BUILD_NAME}-mig build operations $${NC}"
           else 
-            echo -e "$${RED}Did not succeed with $${PROJECT_ID}-$${ENV_BUILD_NAME}-disk build operations $${NC}"
+            echo -e "$${RED}Did not succeed with $${PROJECT_ID}-$${ENV_BUILD_NAME}-mig build operations $${NC}"
             exit 0
           fi
       }
@@ -21,10 +21,10 @@ steps:
       if [[ "$${TPU_PYTORCH_VERSION}" == "pytorch-nightly" && ! -z "$${GCE_IMAGE_VERSION}" ]]
       then
          echo -e "$${GREEN}Creating $${TPU_PYTORCH_VERSION} image using $${GCE_IMAGE_VERSION} $${NC}"
-         cd env_setup/terraform-google-disk
+         cd env_setup/terraform-google-mig
          terraform init \
             -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
-            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-disk"
+            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-mig"
          terraform apply --auto-approve \
             -var="project_id=$${PROJECT_ID}" \
             -var="region=$${REGION}" \
@@ -48,10 +48,10 @@ steps:
       elif [[ "$${TPU_PYTORCH_VERSION}" != "pytorch-nightly" ]] || [[ -z "$${GCE_IMAGE_VERSION}" ]]
       then
          echo -e "$${GREEN}Creating $${TPU_PYTORCH_VERSION} image $${NC}"
-         cd env_setup/terraform-google-disk
+         cd env_setup/terraform-google-mig
          terraform init \
             -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
-            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-disk"
+            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-mig"
          terraform apply --auto-approve \
             -var="project_id=$${PROJECT_ID}" \
             -var="region=$${REGION}" \
@@ -78,7 +78,7 @@ steps:
 - id: sync_workspace
   name: 'gcr.io/cloud-builders/gsutil'
   waitFor: 
-  - terraform-google-disk
+  - terraform-google-mig
   entrypoint: 'bash'
   args: 
   - '-c'

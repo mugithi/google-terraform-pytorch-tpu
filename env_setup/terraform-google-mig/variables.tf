@@ -33,6 +33,7 @@ variable "nightly_image" {
   description = "Specify the nightly image, in the format YYYYMMDD, for example 20191204. If you leave this field blank, the latest nightly image will be used"
   default     = ""
 }
+
 variable "service_account_scopes" {
   default = ["cloud-platform", ]
 }
