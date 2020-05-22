@@ -17,7 +17,11 @@
 set -xe
 # Set Variables
 
-sudo gsutil cp gs://pytorch-tpu-new-20200430-tf-backend/workspace/values.env . 
+PROJECT=
+ENV_BUILD_NAME=
+
+sudo gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/values.env . 
+
 source values.env
 
 ## Update NFS mountpoint 

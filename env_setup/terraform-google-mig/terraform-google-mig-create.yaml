@@ -20,6 +20,8 @@ steps:
       trap cleanup EXIT
       if [[ "$${TPU_PYTORCH_VERSION}" == "pytorch-nightly" && ! -z "$${GCE_IMAGE_VERSION}" ]]
       then
+         sed -i "s/PROJECT_ID=.*/PROJECT_ID=$PROJECT_ID/g" env_setup/scripts/setup_master.sh
+         sed -i "s/ENV_BUILD_NAME=.*/ENV_BUILD_NAME=$PROJECT_ID/g" env_setup/scripts/setup_master.sh
          echo -e "$${GREEN}Creating $${TPU_PYTORCH_VERSION} image using $${GCE_IMAGE_VERSION} $${NC}"
          cd env_setup/terraform-google-mig
          terraform init \
@@ -47,6 +49,8 @@ steps:
             -var="accelerator_type=$${TPU_ACCELERATOR_TYPE}"
       elif [[ "$${TPU_PYTORCH_VERSION}" != "pytorch-nightly" ]] || [[ -z "$${GCE_IMAGE_VERSION}" ]]
       then
+         sed -i "s/PROJECT_ID=.*/PROJECT_ID=$PROJECT_ID/g" env_setup/scripts/setup_master.sh
+         sed -i "s/ENV_BUILD_NAME=.*/ENV_BUILD_NAME=$PROJECT_ID/g" env_setup/scripts/setup_master.sh
          echo -e "$${GREEN}Creating $${TPU_PYTORCH_VERSION} image $${NC}"
          cd env_setup/terraform-google-mig
          terraform init \
@@ -74,16 +78,4 @@ steps:
       fi
       sed -i "s/MIG_MASTER=.*/MIG_MASTER=$(terraform output compute_instances_slave_0)/g" ../../values.env
 
- #GCE Image Version=takes the form YYYYMMDD
-- id: sync_workspace
-  name: 'gcr.io/cloud-builders/gsutil'
-  waitFor: 
-  - terraform-google-mig
-  entrypoint: 'bash'
-  args: 
-  - '-c'
-  - |
-     source values.env
-     gsutil cp values.env gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/
-     echo -e "$${GREEN} Synced /workpace with the gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace $${NC}"
 

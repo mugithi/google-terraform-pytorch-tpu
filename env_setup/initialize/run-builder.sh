@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash -xe 
 source values.env 
 USERNAME=${USERNAME:-admin}
 REMOTE_WORKSPACE=${REMOTE_WORKSPACE:-/home/${USERNAME}/workspace}

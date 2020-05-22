@@ -73,16 +73,4 @@ steps:
             -var="accelerator_type=$${TPU_ACCELERATOR_TYPE}"
       fi      
 
- #GCE Image Version=takes the form YYYYMMDD
-- id: sync_workspace
-  name: 'gcr.io/cloud-builders/gsutil'
-  waitFor: 
-  - terraform-google-mig
-  entrypoint: 'bash'
-  args: 
-  - '-c'
-  - |
-     source values.env
-     gsutil cp values.env gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/
-     echo -e "$${GREEN} Synced /workpace with the gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace $${NC}"
 

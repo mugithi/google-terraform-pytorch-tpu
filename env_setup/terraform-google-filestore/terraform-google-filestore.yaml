@@ -58,6 +58,7 @@ steps:
   args: 
   - '-c'
   - |
+     set -xe 
      source values.env
      gsutil cp values.env gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/
      echo -e "$${GREEN} Synced /workpace with the gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace $${NC}"

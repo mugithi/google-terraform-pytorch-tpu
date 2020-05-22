@@ -7,9 +7,23 @@ steps:
   - '-c'
   - |
     # create this resource if TPU, MIG is not specified
-    if [[ ${_BUILD_ACTION} == "initialize" && ${_TPU} == "default" && ${_MIG} == "default" ]] 
+    if [[ ${_BUILD_ACTION} == "initialize" && ${_TPU} == "default" && ${_MIG} == "default" && ${_DISK} == "default" ]] 
     then
       gcloud builds submit --config=./env_setup/initialize/initialize.yaml 
+      wait
+    # skip in all other conditions
+    fi
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: terraform-google-disk
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    # create this resource if TPU, MIG is not specified
+    if [[ ${_BUILD_ACTION} == "initialize" && ${_TPU} == "default" && ${_MIG} == "default" && ${_DISK} == "true" ]] 
+    then
+      gcloud builds submit --config=./env_setup/terraform_google_disk/terraform_google_disk.yaml 
       wait
     # skip in all other conditions
     fi
@@ -22,7 +36,7 @@ steps:
   - '-c'
   - |
     # destroy this resource if TPU, MIG is not specified
-    if [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" ]] 
+    if [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_DISK} == "default" ]] 
     then
       gcloud builds submit --config=./env_setup/terraform-google-gcs/terraform-google-gcs.yaml --substitutions _BUILD_ACTION=destroy
       wait 
@@ -39,12 +53,12 @@ steps:
   - '-c'
   - |
     # create this resource if TPU, MIG is not specified
-    if [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" ]] 
+    if [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" && ${_DISK} == "default" ]] 
     then
       gcloud builds submit --config=./env_setup/terraform-google-filestore/terraform-google-filestore.yaml --substitutions _BUILD_ACTION=create
       wait
     # destroy this resource if TPU, MIG is not specified
-    elif [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" ]]
+    elif [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_DISK} == "default" ]]
     then
       gcloud builds submit --config=./env_setup/terraform-google-filestore/terraform-google-filestore.yaml --substitutions _BUILD_ACTION=destroy
       wait 
@@ -61,12 +75,12 @@ steps:
   - '-c'
   - |
     # create this resource if TPU is specified
-    if [[ ${_BUILD_ACTION} == "update"  &&  ${_TPU} == "true" ]] || [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" ]]
+    if [[ ${_BUILD_ACTION} == "update"  &&  ${_TPU} == "true" ]] || [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" && ${_DISK} == "default" ]]
     then
       gcloud builds submit --config=./env_setup/terraform-google-tpu/terraform-google-tpu.yaml --substitutions _BUILD_ACTION=create
       wait
     # destroy this resource if TPU specified
-    elif [[ ${_BUILD_ACTION} == "destroy"  &&  ${_TPU} == "true" ]] || [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" ]]
+    elif [[ ${_BUILD_ACTION} == "destroy"  &&  ${_TPU} == "true" ]] || [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_DISK} == "default" ]]
     then
       gcloud builds submit --config=./env_setup/terraform-google-tpu/terraform-google-tpu.yaml --substitutions _BUILD_ACTION=destroy
       wait 
@@ -77,18 +91,19 @@ steps:
 - name: 'gcr.io/cloud-builders/gcloud'
   id: terraform-google-mig
   waitFor:
-    - terraform-google-gcs
+    - terraform-google-filestore
+    - terraform-google-disk
   entrypoint: 'bash'
   args:
   - '-c'
   - |
     # create this resource if MIG is specified
-    if [[ ${_BUILD_ACTION} == "update"  &&  ${_MIG} == "true" ]] || [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" ]]
+    if [[ ${_BUILD_ACTION} == "update"  &&  ${_MIG} == "true" ]] || [[ ${_BUILD_ACTION} == "create" && ${_TPU} == "default" && ${_MIG} == "default" && ${_DISK} == "default" ]]
     then
       gcloud builds submit --config=./env_setup/terraform-google-mig/terraform-google-mig-create.yaml 
       wait
     # destroy this resource if MIG specified
-    elif [[ ${_BUILD_ACTION} == "destroy"  &&  ${_MIG} == "true" ]] || [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" ]]
+    elif [[ ${_BUILD_ACTION} == "destroy"  &&  ${_MIG} == "true" ]] || [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_DISK} == "default" ]]
     then
       gcloud builds submit --config=./env_setup/terraform-google-mig/terraform-google-mig-destroy.yaml
       wait 
@@ -99,6 +114,7 @@ substitutions:
     _BUILD_ACTION: default
     _TPU: default
     _MIG: default
+    _DISK: default 
 timeout: 4000s
 
 
