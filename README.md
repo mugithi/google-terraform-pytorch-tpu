@@ -100,7 +100,6 @@ Each version of the environment is tracked using the variable `ENV_BUILD_NAME` u
 
 It is recomended that you keep seperate versions of the cloned cloud build repo for each environment to easily allow to easily version your scripts and [variable](values.env) file. 
 
-
 #### 5. Initialize the shared persistent disk 
 
 ```
@@ -148,8 +147,7 @@ The update command can also be used to recreate the Cloud TPU after destroying i
 
 TODO: If you specify a specific GCE torch-nightly version using the `GCE_IMAGE_VERSION="20200427"` [variable](values.env), cloud build will configure the Cloud TPU runtime to match the MIG GCE image version. If no value is called out in the [variable](values.env) `GCE_IMAGE_VERSION=""`, the latest nightly version is used.
 
-Please note that updating the Cloud TPU enviroment does not modify the MIG size. In order to change both the Cloud TPU and MIG, they both need to be explicity included in the cloud build substitation as follows `_BUILD_ACTION=update,_TPU=true,_MIG=true`
-
+Please note that updating the Cloud TPU pod does not modify the MIG. In order to change both the Cloud TPU and MIG, they both need to be explicity included in the cloud build substitation as follows `_BUILD_ACTION=update,_TPU=true,_MIG=true`
 
 #### 2. Updating the Shared Persitant Disk 
 
@@ -184,7 +182,6 @@ gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=up
 When this comamnd is run, a new MIG is created created or existing one is updated.
 
 The update command can be used to change the number of VMs in the MIG by changing the `TPU_ACCELERATOR_TYPE="v3-32"` [variable](values.env) or size of the shared persistent disk that stores the training data by changing the   `SHARED_PD_SIZE='1024'` [variable](values.env)
-
 
 #### *3b. Modifying the GCE Image version*
 
