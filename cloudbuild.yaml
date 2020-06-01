@@ -25,6 +25,11 @@ steps:
     then
       gcloud builds submit --config=./env_setup/terraform-google-disk/terraform-google-disk.yaml 
       wait
+    # update this resource if TPU is not specified
+    elif [[ ${_BUILD_ACTION} == "update" && ${_TPU} == "default" && ${_MIG} == "true" && ${_DISK} == "true" ]]
+    then
+      gcloud builds submit --config=./env_setup/terraform-google-disk/terraform-google-disk.yaml 
+      wait 
     # skip in all other conditions
     fi
 

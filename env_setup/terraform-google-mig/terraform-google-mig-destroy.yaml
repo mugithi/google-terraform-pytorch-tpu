@@ -40,7 +40,7 @@ steps:
             -var="ports=$${PORTS}" \
             -var="source_ranges=$${SOURCE_RANGES}" \
             -var="tags=$${TAGS}" \
-            -var="startup_script=$${MIG_SETUP_SCRIPT}" \
+            -var="startup_script=../../$${MIG_SETUP_SCRIPT}" \
             -var="shared_pd_disk_name=$${SHARED_PD_DISK_TYPE}-$${SHARED_PD_DISK_SIZE}-$${ENV_BUILD_NAME}" \
             -var="shared_pd_disk_size=$${SHARED_PD_DISK_SIZE}" \
             -var="shared_pd_disk_type=$${SHARED_PD_DISK_TYPE}" \
@@ -66,7 +66,7 @@ steps:
             -var="ports=$${PORTS}" \
             -var="source_ranges=$${SOURCE_RANGES}" \
             -var="tags=$${TAGS}" \
-            -var="startup_script=$${MIG_SETUP_SCRIPT}" \
+            -var="startup_script=../../$${MIG_SETUP_SCRIPT}" \
             -var="shared_pd_disk_name=$${SHARED_PD_DISK_TYPE}-$${SHARED_PD_DISK_SIZE}-$${ENV_BUILD_NAME}" \
             -var="shared_pd_disk_size=$${SHARED_PD_DISK_SIZE}" \
             -var="shared_pd_disk_type=$${SHARED_PD_DISK_TYPE}" \

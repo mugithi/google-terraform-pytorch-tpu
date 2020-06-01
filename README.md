@@ -19,6 +19,7 @@ This module does the following
 |Build Action |Cloud Build Command|
 |:----------|:-------------|
 | Initialize the enviroment  | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize* |
+| Initialize the shared disk  | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize,_DISK=true* |
 | Create the enviroment | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=create* |
 | Destroy the enviroment | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy* |
 | Update Cloud TPU |*gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_TPU=true* |
@@ -27,6 +28,7 @@ This module does the following
 | Destroy Cloud MIG | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_MIG=true* |
 | Update both Cloud TPU and MIG | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_TPU=true,_MIG=true* |
 | Destroy both Cloud TPU and MIG | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_TPU=true,_MIG=true* |
+| Updating shared disk | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true* |
 
 
 <!-- ## Deployment Architecture Diagram -->
@@ -85,7 +87,7 @@ gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=in
 
 #### *4a. What happens when you initialize the enviroment* 
 
-Initializing the enviroment creates GCS bucket to store both the configuration information and training information as follows
+Initializing the traning enviroment creates GCS bucket to store both the configuration information and training information as follows
 
 - tf_backend: TF state for filestore, cloud tpu, mig
 - tf_backend/workspace: Workspace to store enviromental variables used by Cloud Buld in values.env
@@ -97,6 +99,13 @@ Initializing the enviroment creates GCS bucket to store both the configuration i
 Each version of the environment is tracked using the variable `ENV_BUILD_NAME` unique to each environment. In order to create seperate enviroments, a specify a new `ENV_BUILD_NAME`.
 
 It is recomended that you keep seperate versions of the cloned cloud build repo for each environment to easily allow to easily version your scripts and [variable](values.env) file. 
+
+
+#### 4. Initialize the shared disk 
+
+Initializing the shared disk, creates a shared training disk and seeds it using data from a GCS bucket. 
+
+
 
 #### 5. Create the enviroment 
 ---

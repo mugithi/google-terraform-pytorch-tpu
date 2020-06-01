@@ -38,8 +38,10 @@ steps:
     waitFor: 
     - terraform-google-disk-seed 
     env:
-      # Configure SSH 
-      - COMMAND1=bash -xe  /tmp/scripts/seed_shared_disk_pd.sh
+      ## Use this script to parepare the data
+      - COMMAND1=bash -xe  /tmp/scripts/data_prep_script.sh
+      ## Upload the data to GCS - DO NOT MODIFY
+      - COMMAND2=bash -xe  /tmp/scripts/seed_shared_disk_pd.sh
 
   - id: terraform-google-disk-cleanup
     name: gcr.io/$PROJECT_ID/terraform:0.12.16
