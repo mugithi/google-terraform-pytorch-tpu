@@ -31,8 +31,8 @@ This module does the following
 | Updating shared persistent disk | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true* |
 
 
-<!-- ## Deployment Architecture Diagram -->
-<!-- ![Terraform Cloud TPU deployment Architecture ](https://github.com/mugithi/google-terraform-pytorch-tpu/blob/master/scripts/tf_cloudtpu_pytorch_provisioning.png?raw=true "Deployment Architecture Diagram") -->
+## Deployment Architecture Diagram
+![Terraform Cloud TPU deployment Architecture](docs/pytorch_gce_instances.png "Deployment Architecture Diagram")
 
 # Getting Started 
 
