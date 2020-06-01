@@ -78,7 +78,7 @@ Modify the [values.env](values.env) file to customize the enviromnment.
 vi values.env
 ```
 
-#### 4. Initialize the environment 
+#### 4. Initialize the training environment 
 ---
 
 ```
@@ -101,20 +101,26 @@ Each version of the environment is tracked using the variable `ENV_BUILD_NAME` u
 It is recomended that you keep seperate versions of the cloned cloud build repo for each environment to easily allow to easily version your scripts and [variable](values.env) file. 
 
 
-#### 4. Initialize the shared disk 
+#### 5. Initialize the shared disk 
 
-Initializing the shared disk, creates a shared training disk and seeds it using data from a GCS bucket. 
+```
+gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize,_DISK=true
+```
 
+#### *5a. What happens when you initialize the shared disk* 
 
+Initializing the shared disk, creates a shared disk and seeds it with read only training using data from a GCS bucket. This shared disk will be later mounted to all the GCE instances that are created
 
-#### 5. Create the enviroment 
+You also have the option of running a [data prepation script](env_setup/data_prep_script.sh) on the data before it is seeded to the shared persistant disk. 
+
+#### 6. Create the enviroment 
 ---
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=create
 ``` 
 
-#### *5a. What happens when you build create the enviroment*
+#### *6a. What happens when you build create the enviroment*
 
 Running this command creates Filestore, Cloud TPU and MIG using values in the [variable](values.env) file. 
 
@@ -140,24 +146,41 @@ The update command can also be used to recreate the Cloud TPU after destroying i
 
 #### *1b. Modifying the Cloud TPU runtime*
 
-TODO: If you specify a specific GCE torch-nightly version using the `GCE_IMAGE_VERSION="20200427"`  [variable](values.env), cloud build will configure the Cloud TPU runtime to match the MIG GCE image version. If no value is called out in the  [variable](values.env) `GCE_IMAGE_VERSION=""`, the latest nightly version is used.
+TODO: If you specify a specific GCE torch-nightly version using the `GCE_IMAGE_VERSION="20200427"` [variable](values.env), cloud build will configure the Cloud TPU runtime to match the MIG GCE image version. If no value is called out in the  [variable](values.env) `GCE_IMAGE_VERSION=""`, the latest nightly version is used.
 
 Please note that updating the Cloud TPU enviroment does not modify the MIG size. In order to change both the Cloud TPU and MIG, they both need to be explicity included in the cloud build substitation as follows `_BUILD_ACTION=update,_TPU=true,_MIG=true`
 
-#### 2. Updating the Managed Instance Group MIG
+
+#### 2. Updating the Shared Persitant Disk 
+
+```
+gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_TPU=true,_MIG=true
+``` 
+
+#### *2a. What happens when you update the Shared Persistant Disk*
+
+When you run this command, the shared persistant disk is destroyd and a new one is created. The shared persistant disk is then mounted to the managed instance group as read only volume. 
+
+The update command can be used to reload new training data into the shared persistant disk. 
+
+Please note that changes to the shared persitant disk will only take place if you change its changing the `SHARED_PD_DISK_SIZE="XXXX"` [variable](values.env). If you do not change the size of the persistant disk, you will see the error.
+
+`Step #1 - "terraform-google-disk": Step #0 - "terraform-google-disk-seed": Error: Error creating instance: googleapi: Error 400: The disk resource 'projects/xxxx' is already being used by 'projects/xxxx', resourceInUseByAnotherResource`
+
+#### 3. Updating the Managed Instance Group MIG
 ---
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_MIG=true.
 ```  
 
-#### *2a. What happens when you update the MIG*
+#### *3a. What happens when you update the MIG*
 When this comamnd is run, a new MIG is created created or existing one is updated.
 
 The update command can be used to change the number of VMs in the MIG by changing the `TPU_ACCELERATOR_TYPE="v3-32"` [variable](values.env) or size of the shared persistant disk that stores the training data by changing the   `SHARED_PD_SIZE='1024'` [variable](values.env)
 
 
-#### *2b. Modifying the GCE Image version*
+#### *3b. Modifying the GCE Image version*
 
 If you specify a specific GCE torch-nightly using the  [variable](values.env) `GCE_IMAGE_VERSION="20200427"` and set the pytorch version in the  [variable](values.env) `TPU_PYTORCH_VERSION="pytorch-1.5"`, cloudbuild will provision a MIG using the torch-nightly specified GCE_IMAGE version. In all other cases, cloud build will use the latest nightly versionn.
 
