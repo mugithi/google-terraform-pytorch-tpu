@@ -95,7 +95,7 @@ Each version of the environment is tracked using the variable `ENV_BUILD_NAME` u
 It is recomended that you keep seperate versions of the cloned cloud build repo for each environment to easily allow to easily version your scripts and [variable](values.env) file. 
 
 #### 4. Initialize the shared persistent disk 
-
+---
 Modify [values file](values.env) and set the *__shared persistent disk__* and *__gcs training dataset__* parameters. Initialize the shared persistent disk using the command below.
 
 ```
@@ -123,6 +123,7 @@ Running this command creates Filestore, Cloud TPU and Managed Instance Group usi
 
 
 #### 6. Destroy the enviroment 
+---
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy
@@ -154,6 +155,7 @@ TODO: If you specify a specific GCE torch-nightly version using the `GCE_IMAGE_V
 Please note that updating the Cloud TPU pod does not modify the MIG. In order to change both the Cloud TPU and MIG, they both need to be explicity included in the cloud build substitation as follows `_BUILD_ACTION=update,_TPU=true,_MIG=true`
 
 #### 2. Updating the Shared Persitant Disk 
+---
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true
