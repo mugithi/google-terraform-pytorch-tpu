@@ -19,17 +19,16 @@ This module does the following
 
 |Build Action |Cloud Build Command|
 |:----------|:-------------|
-| Initialize the enviroment  | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize* |
-| Initialize the shared persistent disk  | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize,_DISK=true* |
-| Create the enviroment | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=create* |
-| Destroy the enviroment | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy* |
-| Update Cloud TPU |*gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_TPU=true* |
-| Destroy Cloud TPU  | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_TPU=true* |
-| Update the MIG | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_MIG=true* |
-| Destroy Cloud MIG | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_MIG=true* |
-| Update both Cloud TPU and MIG | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_TPU=true,_MIG=true* |
-| Destroy both Cloud TPU and MIG | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_TPU=true,_MIG=true* |
-| Updating shared persistent disk | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true* |
+| Initialize the enviroment  | ***gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize*** |
+| Initialize the shared persistent disk  | ***gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize,_DISK=true*** |
+| Create the enviroment | ***gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=create*** |
+| Destroy the enviroment | ***gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy*** |
+| Update Cloud TPU | ***gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_TPU=true*** |
+| Destroy Cloud TPU  | ***gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_TPU=true*** |
+| Update the MIG | ***gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_MIG=true*** |
+| Destroy the MIG | ***gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_MIG=true*** |
+| Update both Cloud TPU and MIG | ***gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_TPU=true,_MIG=true*** |
+| Updating shared persistent disk | ***gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true*** |
 
 
 # Deployment Architecture Diagram
@@ -74,7 +73,7 @@ gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_E
 #### 3. Initialize the training environment 
 ---
 
-Modify [values file](values.env) and set the __training environment build id__ and __project values__. Initialize the enviroment using the command below. 
+Modify [values file](values.env) and set the *__training environment build id__* and *__project values__*. Initialize the enviroment using the command below. 
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize
