@@ -73,7 +73,7 @@ gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_E
 #### 3. Initialize the training environment 
 ---
 
-Modify [values file](values.env) and set the `**`training environment build id`**` and `**`project values`**`. Initialize the enviroment using the command below. 
+Modify [values file](values.env) and set the __training environment build id__ and __project values__. Initialize the enviroment using the command below. 
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize
@@ -96,7 +96,7 @@ It is recomended that you keep seperate versions of the cloned cloud build repo 
 
 #### 4. Initialize the shared persistent disk 
 
-Modify [values file](values.env) and set the `**`shared persistent disk`**` and `**`gcs training dataset`**` parameters. Initialize the shared persistent disk using the command below.
+Modify [values file](values.env) and set the *__shared persistent disk__* and *__gcs training dataset__* parameters. Initialize the shared persistent disk using the command below.
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize,_DISK=true
@@ -111,7 +111,7 @@ You also have the option of running a [data prepation script](env_setup/data_pre
 #### 5. Create the enviroment 
 ---
 
-Modify [values file](values.env) and set the `**`cloud TPU`**`, `**`managed instance group`**` and `**`shared nfs`**` parameters. Create the training enviroment using the command below. 
+Modify [values file](values.env) and set the *__cloud TPU__*, *__managed instance group__* and *__shared nfs__* parameters. Create the training enviroment using the command below. 
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=create
