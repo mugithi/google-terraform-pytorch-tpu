@@ -31,7 +31,7 @@ This module does the following
 | Updating shared persistent disk | *gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true* |
 
 
-## Deployment Architecture Diagram
+# Deployment Architecture Diagram
 ![Terraform Cloud TPU deployment Architecture](docs/pytorch_gce_instances.png "Deployment Architecture Diagram")
 
 # Getting Started 
@@ -70,7 +70,7 @@ gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_E
 ```
 
 
-#### 4. Initialize the training environment 
+#### 3. Initialize the training environment 
 ---
 
 Modify [values file](values.env) and set the *training environment build id* and *project values* 
@@ -79,7 +79,7 @@ Modify [values file](values.env) and set the *training environment build id* and
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize
 ```
 
-#### *4a. What happens when you initialize the enviroment* 
+#### *3a. What happens when you initialize the enviroment* 
 
 Initializing the traning enviroment creates GCS bucket to store both the configuration information and training information as follows
 
@@ -94,7 +94,7 @@ Each version of the environment is tracked using the variable `ENV_BUILD_NAME` u
 
 It is recomended that you keep seperate versions of the cloned cloud build repo for each environment to easily allow to easily version your scripts and [variable](values.env) file. 
 
-#### 5. Initialize the shared persistent disk 
+#### 4. Initialize the shared persistent disk 
 
 Modify [values file](values.env) and set the *shared persistant disk* and *gcs training dataset* parameters. 
 
@@ -102,13 +102,13 @@ Modify [values file](values.env) and set the *shared persistant disk* and *gcs t
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize,_DISK=true
 ```
 
-#### *5a. What happens when you initialize the shared persistent disk* 
+#### *4a. What happens when you initialize the shared persistent disk* 
 
 Initializing the shared persistnat  disk, creates a shared persistent disk and seeds it with read only training using data from a GCS bucket specified by the `GCS_DATASET="gs://xxxxx/dataset/*` [variable](values.env) . This shared persistent disk is then mounted to all the GCE instances that are created in step 6
 
 You also have the option of running a [data prepation script](env_setup/data_prep_script.sh) on the data before it is seeded to the shared persistent disk. 
 
-#### 6. Create the enviroment 
+#### 5. Create the enviroment 
 ---
 
 Modify [values file](values.env) and set the *cloud TPU*, *managed instance group* and *shared nfs* parameters 
@@ -117,7 +117,7 @@ Modify [values file](values.env) and set the *cloud TPU*, *managed instance grou
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=create
 ``` 
 
-#### *6a. What happens when you build create the enviroment*
+#### *5a. What happens when you build create the enviroment*
 
 Running this command creates Filestore, Cloud TPU and MIG using values in the [variable](values.env) file. 
 
