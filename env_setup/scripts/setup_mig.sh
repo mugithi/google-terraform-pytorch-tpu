@@ -17,7 +17,7 @@
 set -xe
 # Set Variables
 
-PROJECT=
+PROJECT_ID=
 ENV_BUILD_NAME=
 
 sudo gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/values.env . 

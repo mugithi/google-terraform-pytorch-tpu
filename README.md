@@ -119,10 +119,16 @@ gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=cr
 
 #### *5a. What happens when you build create the enviroment*
 
-Running this command creates Filestore, Cloud TPU and MIG using values in the [variable](values.env) file. 
+Running this command creates Filestore, Cloud TPU and Managed Instance Group using values in the [variable](values.env) file. 
 
-Please note that destroying the environment using `_BUILD_ACTION=create` does not remove the GCS buckets. You can recreate the training enviroment by reruning the `_BUILD_ACTION=create` command.
 
+#### 6. Destroy the enviroment 
+
+```
+gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy
+``` 
+
+Please note that destroying the environment using does not remove the GCS buckets. You can recreate the training enviroment by reruning the `_BUILD_ACTION=create` command.
 
 # Updating the environment 
 
@@ -150,7 +156,7 @@ Please note that updating the Cloud TPU pod does not modify the MIG. In order to
 #### 2. Updating the Shared Persitant Disk 
 
 ```
-gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_TPU=true,_MIG=true
+gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true
 ``` 
 
 #### *2a. What happens when you update the Shared persistent Disk*
