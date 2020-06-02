@@ -154,7 +154,7 @@ TODO: If you specify a specific GCE torch-nightly version using the `GCE_IMAGE_V
 
 Please note that updating the Cloud TPU pod does not modify the MIG. In order to change both the Cloud TPU and MIG, they both need to be explicity included in the cloud build substitation as follows `_BUILD_ACTION=update,_TPU=true,_MIG=true`
 
-#### 2. Updating the Shared Persitant Disk 
+#### 2. Updating the Shared Persistent Disk 
 ---
 
 ```
@@ -173,7 +173,7 @@ The update command can be used to reload new training data into the shared persi
 
 #### *2c. Troubleshooting Shared persistent Disk*
 
-Please note that updates to the shared persitant disk will only take place if you change its changing the `SHARED_PD_DISK_SIZE="XXXX"` [variable](values.env). If you do not change the size of the persistent disk when running an update, you will see the error.
+Please note that updates to the shared persistent disk will only take place if you change its changing the `SHARED_PD_DISK_SIZE="XXXX"` [variable](values.env). If you do not change the size of the persistent disk when running an update, you will see the error.
 
 `Step #1 - "terraform-google-disk": Step #0 - "terraform-google-disk-seed": Error: Error creating instance: googleapi: Error 400: The disk resource 'projects/xxxx' is already being used by 'projects/xxxx', resourceInUseByAnotherResource`
 

@@ -24,7 +24,7 @@ steps:
          terraform init \
             -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
             -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-filestore"
-         terraform apply --auto-approve -lock=false \
+         terraform apply --auto-approve \
             -var="project_id=$${PROJECT_ID}" \
             -var="region=$${REGION}" \
             -var="zone=$${ZONE}" \
@@ -40,7 +40,7 @@ steps:
          terraform init \
             -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
             -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-filestore"
-         terraform destroy -lock=false --auto-approve \
+         terraform destroy --auto-approve \
             -var="project_id=$${PROJECT_ID}" \
             -var="region=$${REGION}" \
             -var="zone=$${ZONE}" \
