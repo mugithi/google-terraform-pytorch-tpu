@@ -73,7 +73,7 @@ gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_E
 #### 3. Initialize the training environment 
 ---
 
-Modify [values file](values.env) and set the **training environment build id** and **project values**. Initialize the enviroment using the command below. 
+Modify [values file](values.env) and set the `**`training environment build id`**` and `**`project values`**`. Initialize the enviroment using the command below. 
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize
@@ -96,7 +96,7 @@ It is recomended that you keep seperate versions of the cloned cloud build repo 
 
 #### 4. Initialize the shared persistent disk 
 
-Modify [values file](values.env) and set the **shared persistant disk** and **gcs training dataset** parameters. Initialize the shared persistent disk using the command below.
+Modify [values file](values.env) and set the `**`shared persistent disk`**` and `**`gcs training dataset`**` parameters. Initialize the shared persistent disk using the command below.
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize,_DISK=true
@@ -104,14 +104,14 @@ gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=in
 
 #### *4a. What happens when you initialize the shared persistent disk* 
 
-Initializing the shared persistnat  disk, creates a shared persistent disk and seeds it with read only training using data from a GCS bucket specified by the `GCS_DATASET="gs://xxxxx/dataset/*` [variable](values.env) . This shared persistent disk is then mounted to all the GCE instances that are created in step 6
+Initializing the shared persistent  disk, creates a shared persistent disk and seeds it with read only training using data from a GCS bucket specified by the `GCS_DATASET="gs://xxxxx/dataset/*` [variable](values.env) . This shared persistent disk is then mounted to all the GCE instances that are created in step 6
 
 You also have the option of running a [data prepation script](env_setup/data_prep_script.sh) on the data before it is seeded to the shared persistent disk. 
 
 #### 5. Create the enviroment 
 ---
 
-Modify [values file](values.env) and set the **cloud TPU**, **managed instance group** and **shared nfs** parameters. Create the training enviroment using the command below. 
+Modify [values file](values.env) and set the `**`cloud TPU`**`, `**`managed instance group`**` and `**`shared nfs`**` parameters. Create the training enviroment using the command below. 
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=create
@@ -163,7 +163,7 @@ When you run this command,
 
 The update command can be used to reload new training data into the shared persistent disk. 
 
-#### *2c. Troubleshooting Shared Persistant Disk*
+#### *2c. Troubleshooting Shared persistent Disk*
 
 Please note that updates to the shared persitant disk will only take place if you change its changing the `SHARED_PD_DISK_SIZE="XXXX"` [variable](values.env). If you do not change the size of the persistent disk when running an update, you will see the error.
 
