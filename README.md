@@ -1,6 +1,6 @@
 # Introduction 
 
-This module builds off [PyTorch/XLA](https://github.com/pytorch/xla) and enables you to do build a TPU PyTorch Distributed training enviroment using [PyTorch/XLA](https://github.com/pytorch/xla) using Google Cloud Builder.
+This module builds off [PyTorch/XLA](https://github.com/pytorch/xla) and enables you to reliabliy instatiate a  [PyTorch Distributed Cloud TPU training enviroment](https://github.com/pytorch/xla#-how-to-run-on-tpu-pods-distributed-training) using Google Cloud Builder.
 
 ### What this module does
 ---
@@ -12,6 +12,7 @@ This module does the following
 3. Creates a GCE Managed Instance Group (MIG) based on size of Cloud TPU pod
 3. Allows user to specify a script that is used to customize the image in the instance group
 4. Create a shared persistent disk (PD) that is used to host the dataset used for training
+5. Allows the user to specificy a script to prepare the data before loading it to the shared persistant disk
 
 
 # Build Commands
