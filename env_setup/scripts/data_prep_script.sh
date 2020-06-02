@@ -26,4 +26,4 @@
 
 source /tmp/values.env
 
-echo -e "${RED}Hello World${NC}"
+echo -e "${RED}Hello World from the dataprep script${NC}"

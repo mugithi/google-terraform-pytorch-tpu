@@ -69,17 +69,11 @@ gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_E
 gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_EMAIL  --role='roles/tpu.admin'
 ```
 
-#### 3. Modify the build environment variables file
----
-
-Modify the [values.env](values.env) file to customize the enviromnment.
-
-```
-vi values.env
-```
 
 #### 4. Initialize the training environment 
 ---
+
+Modify [values file](values.env) and set the *training environment build id* and *project values* 
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize
@@ -102,6 +96,8 @@ It is recomended that you keep seperate versions of the cloned cloud build repo 
 
 #### 5. Initialize the shared persistent disk 
 
+Modify [values file](values.env) and set the *shared persistant disk* and *gcs training dataset* parameters. 
+
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize,_DISK=true
 ```
@@ -114,6 +110,8 @@ You also have the option of running a [data prepation script](env_setup/data_pre
 
 #### 6. Create the enviroment 
 ---
+
+Modify [values file](values.env) and set the *cloud TPU*, *managed instance group* and *shared nfs* parameters 
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=create
