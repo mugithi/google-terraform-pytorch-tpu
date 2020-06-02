@@ -24,9 +24,9 @@ This module does the following
 | Create the enviroment | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=create](https://github.com/mugithi/google-terraform-pytorch-tpu#5-create-the-enviroment)* |
 | Destroy the enviroment | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy](https://github.com/mugithi/google-terraform-pytorch-tpu#6-destroy-the-enviroment)* |
 | Update Cloud TPU | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_TPU=true](https://github.com/mugithi/google-terraform-pytorch-tpu#1-updating-cloud-tpu-pod)* |
-| Destroy Cloud TPU  | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_TPU=true]((https://github.com/mugithi/google-terraform-pytorch-tpu#1-updating-cloud-tpu-pod))* |
+| Destroy Cloud TPU  | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_TPU=true](https://github.com/mugithi/google-terraform-pytorch-tpu#1-updating-cloud-tpu-pod)* |
 | Update the MIG | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_MIG=true](https://github.com/mugithi/google-terraform-pytorch-tpu#3-updating-the-managed-instance-group-mig)* |
-| Destroy the MIG | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_MIG=true]((https://github.com/mugithi/google-terraform-pytorch-tpu#3-updating-the-managed-instance-group-mig))* |
+| Destroy the MIG | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_MIG=true](https://github.com/mugithi/google-terraform-pytorch-tpu#3-updating-the-managed-instance-group-mig)* |
 | Updating shared persistent disk | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true](https://github.com/mugithi/google-terraform-pytorch-tpu#2-updating-the-shared-persistent-disk)* |
 
 
