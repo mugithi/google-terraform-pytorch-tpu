@@ -17,6 +17,7 @@ steps:
 - name: 'gcr.io/cloud-builders/gcloud'
   id: terraform-google-disk
   entrypoint: 'bash'
+  timeout: 4000s
   args:
   - '-c'
   - |
