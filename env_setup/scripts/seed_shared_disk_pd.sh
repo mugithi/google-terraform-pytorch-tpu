@@ -14,6 +14,7 @@
 # * limitations under the License.
 
 source /tmp/values.env
+source /tmp/values.env.auto
 
 if [ -z "$(findmnt /dev/disk/by-id/google-shared-pd)" ] 
 then 

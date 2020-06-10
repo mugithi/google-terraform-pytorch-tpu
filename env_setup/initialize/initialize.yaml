@@ -23,6 +23,7 @@ steps:
   - '-c'
   - |
         source values.env
+        source values.env.auto
         function cleanup {
           if [ "$?" == "0" ]
           then 
@@ -52,6 +53,7 @@ steps:
   - '-c'
   - |
      source values.env
-     gsutil -m rsync -r /workspace gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/workspace
+     source values.env.auto
+     gsutil -m rsync -r /workspace gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/
      echo -e "$${GREEN} Synced /workpace with the gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace $${NC}"
 images: ['gcr.io/$PROJECT_ID/remote-builder']

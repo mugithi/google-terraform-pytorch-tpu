@@ -21,8 +21,10 @@ PROJECT_ID=
 ENV_BUILD_NAME=
 
 sudo gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/values.env . 
+sudo gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/values.env.auto . 
 
 source values.env
+source values.env.auto
 
 ## Update NFS mountpoint 
 sudo apt-get -y update 
@@ -37,7 +39,6 @@ sudo mkdir -p $MOUNT_POINT/shared_pd
 sudo mount -o discard,defaults /dev/disk/by-id/google-shared-pd ${MOUNT_POINT}/shared_pd
 
 
-## Setup anaconda env
-echo "*  soft    nofile       100000" | sudo tee -a /etc/security/limits.conf
-echo "*  hard    nofile       100000" | sudo tee -a /etc/security/limits.conf 
-
+## Setup Training Model 
+gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/models/roberta/env_setup/roberta_setup.sh /tmp/train/
+bash -xe /tmp/train/roberta_setup.sh

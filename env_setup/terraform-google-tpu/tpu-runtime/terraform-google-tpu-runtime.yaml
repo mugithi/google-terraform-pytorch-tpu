@@ -7,20 +7,21 @@ steps:
     - |  
         set -xe
         source values.env
+        source values.env.auto
         function cleanup {
             if [ "$?" == "0" ]
             then
-              echo -e "$${GREEN}Succeeded with $${PROJECT_ID}-$${ENV_BUILD_NAME}-disk build operations $${NC}"
+              echo -e "$${GREEN}Succeeded in configuring the TPU: $${ENV_BUILD_NAME}-tpu with the $${GCE_IMAGE_VERSION} runtime $${NC}"
             else 
-              echo -e "$${RED}Did not succeed with $${PROJECT_ID}-$${ENV_BUILD_NAME}-disk build operations $${NC}"
+              echo -e "$${RED}Did not succeed with $${PROJECT_ID}-$${ENV_BUILD_NAME}-tpu-runtime build operations $${NC}"
               exit 0
             fi
         }
         trap cleanup EXIT
-        cd env_setup/terraform-google-disk
+        cd env_setup/terraform-google-tpu/tpu-runtime
         terraform init \
             -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
-            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-disk"
+            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-tpu-runtime"
         terraform apply --auto-approve \
             -var="project_id=$${PROJECT_ID}" \
             -var="region=$${REGION}" \
@@ -38,12 +39,10 @@ steps:
     waitFor: 
     - terraform-google-tpu-version 
     env:
-      ## Use this script to parepare the data
-      - COMMAND1=bash -xe  /tmp/scripts/data_prep_script.sh
-      ## Upload the data to GCS - DO NOT MODIFY
-      - COMMAND2=bash -xe  /tmp/scripts/seed_shared_disk_pd.sh
+      ## Set the TPU runtime
+      - COMMAND1=bash -xe  /tmp/scripts/change_tpu_runtime.sh
 
-  - id: terraform-google-disk-cleanup
+  - id: tpu-runtime-cleanup
     name: gcr.io/$PROJECT_ID/terraform:0.12.16
     waitFor: 
       - remote-builder-tpu-version 
@@ -53,21 +52,22 @@ steps:
     - |  
         set -xe
         source values.env
+        source values.env.auto
         function cleanup {
             if [ "$?" == "0" ]
             then
-              echo -e "$${GREEN}Succeeded with $${PROJECT_ID}-$${ENV_BUILD_NAME}-disk build operations $${NC}"
+              echo -e "$${GREEN}Succeeded with $${PROJECT_ID}-$${ENV_BUILD_NAME}-tpu-runtime build operations $${NC}"
             else 
-              echo -e "$${RED}Did not succeed with $${PROJECT_ID}-$${ENV_BUILD_NAME}-disk build operations $${NC}"
+              echo -e "$${RED}Did not succeed with $${PROJECT_ID}-$${ENV_BUILD_NAME}-tpu-runtime build operations $${NC}"
               exit 0
             fi
         }
         trap cleanup EXIT
-        cd env_setup/terraform-google-disk
+        cd env_setup/terraform-google-tpu/tpu-runtime
         terraform init \
             -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
-            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-disk"
-        terraform destroy --auto-approve -target=google_compute_instance.disk_instance -target=module.firewall.google_compute_firewall.allow_fw \
+            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-tpu-runtime"
+        terraform destroy --auto-approve \
             -var="project_id=$${PROJECT_ID}" \
             -var="region=$${REGION}" \
             -var="zone=$${ZONE}" \

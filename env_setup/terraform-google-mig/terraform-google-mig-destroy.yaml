@@ -8,6 +8,7 @@ steps:
   - |  
       set -xe
       source values.env
+      source values.env.auto
       function cleanup {
           if [ "$?" == "0" ]
           then

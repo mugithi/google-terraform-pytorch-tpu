@@ -1,4 +1,3 @@
-#!/bin/bash
 #  Copyright 2018 Google LLC
 #
 # * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +13,12 @@
 # * limitations under the License.
 # 
 # Use with "pytorch-nightly" TPU version only
-source /anaconda3/etc/profile.d/conda.sh
-conda activate torch-xla-1.5 
-source /tmp/values.env
-source /tmp/values.env.auto
-python /tmp/scripts/change_tpu_runtime.py --tpu-name=${ENV_BUILD_NAME}-tpu --target-version=$GCE_IMAGE_VERSION
+from cloud_tpu_client import Client
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--tpu-name', type=str, required=True, help='Name of the TPU Instance')
+parser.add_argument('--target-version', type=str, required=True, help='Target TPU Runtime version')
+args = parser.parse_args()
+c = Client(args.tpu_name)
+c.configure_tpu_version(args.target_version)
+c.wait_for_healthy()

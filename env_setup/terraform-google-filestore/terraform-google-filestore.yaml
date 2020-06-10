@@ -8,6 +8,7 @@ steps:
   - |  
       set -xe
       source values.env
+      source values.env.auto
       function cleanup {
           if [ "$?" == "0" ]
           then
@@ -32,7 +33,7 @@ steps:
             -var="file_shares_name=$${SHARED_FS}" \
             -var="capacity_gb=$${SHARED_FS_CAPACITY}" \
             -var="tier=$${SHARED_FS_TIER}"
-          sed -i "s/SHARED_NFS_IP=.*/SHARED_NFS_IP=$(terraform output nfs_ip)/g" ../../values.env
+          sed -i "s/SHARED_NFS_IP=.*/SHARED_NFS_IP=$(terraform output nfs_ip)/g" ../../values.env.auto
       fi 
       if [ ${_BUILD_ACTION} == 'destroy' ]
       then
@@ -60,6 +61,6 @@ steps:
   - |
      set -xe 
      source values.env
-     gsutil cp values.env gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/
+     gsutil cp values.env.auto gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/
      echo -e "$${GREEN} Synced /workpace with the gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace $${NC}"
 

@@ -74,6 +74,7 @@ steps:
 # Create CLOUD TPU 
 - name: 'gcr.io/cloud-builders/gcloud'
   id: terraform-google-tpu
+  timeout: 4000s
   waitFor:
     - terraform-google-gcs
   entrypoint: 'bash'
@@ -121,7 +122,7 @@ substitutions:
     _TPU: default
     _MIG: default
     _DISK: default 
-timeout: 4000s
+timeout: 6000s
 
 
 # TODO: Ability to set TPU Runtime when specified 

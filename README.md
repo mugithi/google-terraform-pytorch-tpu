@@ -149,7 +149,7 @@ The update command can also be used to recreate the Cloud TPU after destroying i
 
 #### *1b. Modifying the Cloud TPU runtime*
 
-TODO: If you specify a specific GCE torch-nightly version using the `GCE_IMAGE_VERSION="20200427"` [variable](values.env), cloud build will configure the Cloud TPU runtime to match the MIG GCE image version. If no value is called out in the [variable](values.env) `GCE_IMAGE_VERSION=""`, the latest nightly version is used.
+If you specify a specific GCE torch-nightly version using the `GCE_IMAGE_VERSION="20200427"` [variable](values.env), cloud build will configure the Cloud TPU runtime to match the MIG GCE image version. If no value is called out in the [variable](values.env) `GCE_IMAGE_VERSION=""`, the latest nightly version is used.
 
 Please note that updating the Cloud TPU pod does not modify the MIG. In order to change both the Cloud TPU and MIG, they both need to be explicity included in the cloud build substitation as follows `_BUILD_ACTION=update,_TPU=true,_MIG=true`
 
