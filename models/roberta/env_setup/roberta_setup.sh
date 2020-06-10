@@ -32,7 +32,7 @@ then
 
     # Pull the models scripts
     mkdir -p $MOUNT_POINT/nfs_share/train
-    gsutil cp gs://pytorch-tpu-new-20200428-tf-backend/workspace/models $MOUNT_POINT/nfs_share/train/ 
+    gsutil cp gs://pytorch-tpu-new-20200428-tf-backend/workspace/models/* $MOUNT_POINT/nfs_share/train/ 
 
 fi 
 

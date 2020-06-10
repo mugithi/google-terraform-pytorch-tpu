@@ -1,23 +1,7 @@
 steps:
-# Create GCS Buckets
-# Sync workplace to GCS bucket
-# - id: initialize_workspace
-#   name: 'gcr.io/cloud-builders/gsutil'
-#   waitFor: ['-']
-#   entrypoint: 'bash'
-#   args: 
-#   - '-c'
-#   - |
-#      source values.env
-#      source values.env.auto
-#      gsutil -m rsync -r gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/ /workspace
-#      echo -e "$${GREEN} Synced /workpace with the gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace $${NC}"
-
 - id: terraform-google-gcs
   name: gcr.io/$PROJECT_ID/terraform:0.12.16
   entrypoint: 'sh'
-  # waitFor:
-  # - initialize_workspace 
   args: 
   - '-c'
   - |  

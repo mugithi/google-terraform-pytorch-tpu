@@ -31,6 +31,11 @@ steps:
     then
       gcloud builds submit --config=./env_setup/terraform-google-disk/terraform-google-disk.yaml 
       wait 
+    # destroy this resource when destroying everything else
+    elif [[ ${_BUILD_ACTION} == "destroy" && ${_TPU} == "default" && ${_MIG} == "default" && ${_DISK} == "default" ]]
+    then
+      gcloud builds submit --config=./env_setup/terraform-google-disk/terraform-google-disk-destroy.yaml
+      wait
     # skip in all other conditions
     fi
 

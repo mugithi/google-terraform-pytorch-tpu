@@ -56,21 +56,24 @@ steps:
   args:
   - '-c'
   - |
-      source values.env
-      source values.env.auto
-      function cleanup {
-         if [ "$?" == "0" ]
-          then
-            echo -e "$${GREEN}Succeeded in changing the Cloud TPU runtime to $${GCE_IMAGE_VERSION} $${NC}"
-          else 
-            echo -e "$${RED}Did not succeed in changing the Cloud TPU runtime to $${GCE_IMAGE_VERSION} $${NC}"
-            exit 0
-         fi
-      }
-      # Change TPU runtime if CLOUD TPU is spefified 
-      if [[ "$${TPU_PYTORCH_VERSION}" == "pytorch-nightly" && ! -z "$${GCE_IMAGE_VERSION}" ]]
+      if [ ${_BUILD_ACTION} == 'create' ]
       then 
-         echo -e "$${GREEN}Changing the Cloud TPU runtime to $${GCE_IMAGE_VERSION} $${NC}"
-         gcloud builds submit --config=./env_setup/terraform-google-tpu/tpu-runtime/terraform-google-tpu-runtime.yaml
-      fi
+         source values.env
+         source values.env.auto
+         function cleanup {
+            if [ "$?" == "0" ]
+            then
+               echo -e "$${GREEN}Succeeded in changing the Cloud TPU runtime to $${GCE_IMAGE_VERSION} $${NC}"
+            else 
+               echo -e "$${RED}Did not succeed in changing the Cloud TPU runtime to $${GCE_IMAGE_VERSION} $${NC}"
+               exit 0
+            fi
+         }
+         # Change TPU runtime if CLOUD TPU is spefified 
+         if [[ "$${TPU_PYTORCH_VERSION}" == "pytorch-nightly" && ! -z "$${GCE_IMAGE_VERSION}" ]]
+         then 
+            echo -e "$${GREEN}Changing the Cloud TPU runtime to $${GCE_IMAGE_VERSION} $${NC}"
+            gcloud builds submit --config=./env_setup/terraform-google-tpu/tpu-runtime/terraform-google-tpu-runtime.yaml
+         fi
+      fi 
 timeout: 4000s

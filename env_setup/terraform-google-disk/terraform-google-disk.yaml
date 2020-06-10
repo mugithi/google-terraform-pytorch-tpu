@@ -45,7 +45,6 @@ steps:
       ## Upload the data to GCS - DO NOT MODIFY
       - COMMAND2=bash -xe  /tmp/scripts/seed_shared_disk_pd.sh
     
-
   - id: terraform-google-disk-cleanup
     name: gcr.io/$PROJECT_ID/terraform:0.12.16
     waitFor: 

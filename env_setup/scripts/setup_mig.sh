@@ -40,5 +40,6 @@ sudo mount -o discard,defaults /dev/disk/by-id/google-shared-pd ${MOUNT_POINT}/s
 
 
 ## Setup Training Model 
-gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/models/roberta/env_setup/roberta_setup.sh /tmp/train/
-bash -xe /tmp/train/roberta_setup.sh
+gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/models/roberta/env_setup/roberta_setup.sh
+gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/models/roberta/env_setup/roberta_setup.sh /tmp/
+bash -xe /tmp/roberta_setup.sh
