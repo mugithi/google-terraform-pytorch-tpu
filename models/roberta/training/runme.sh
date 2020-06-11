@@ -19,20 +19,22 @@ source /tmp/values.env.auto
 
 TPU_POD_NAME=${ENV_BUILD_NAME}-tpu
 
+source /anaconda3/etc/profile.d/conda.sh
 
-logfile="$(date +%Y%m%d)-roberta-podrun-8.txt"
-nshards=1
+conda activate torch-xla-nightly
+
+logfile=/tmp/"$(date +%Y%m%d)-roberta-podrun-8.txt"
+nshards=0
 num_cores=8
-MOUNT_POINT=/mnt/common
-data_path="$MOUNT_POINT/shared_pd/" #EDIT ME AS PER DATASET LOCATION
+data_path="$MOUNT_POINT/shared_pd" #EDIT ME AS PER DATASET LOCATION
 DATABIN=$(seq 0 $nshards | xargs -I{} echo $data_path/shard{} | tr "\n" ":")
-checkpoints_out=$MOUNT_POINT/checkpoints-roberta-$1
+checkpoints_out=$MOUNT_POINT/nfs_share/models/roberta/checkpoints-roberta-$1
 
 python -m torch_xla.distributed.xla_dist \
-        --tpu=nyc-tpu-v3-8 \
+        --tpu=$TPU_POD_NAME \
         --conda-env=torch-xla-nightly\
         --env XLA_USE_BF16=1 \
-        -- python $MOUNT_POINT/code/fairseq/train.py \
+        -- python $MOUNT_POINT/nfs_share/code/fairseq/trainer.py
         $DATABIN \
         --save-dir $checkpoints_out \
         --arch roberta_large \
