@@ -21,10 +21,10 @@ PROJECT_ID=
 ENV_BUILD_NAME=
 
 sudo gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/values.env /tmp/ 
-sudo gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/values.env.auto /tmp/ 
 
 source /tmp/values.env
-source /tmp/values.env.auto
+
+SHARED_NFS_IP=$(gcloud filestore instances describe $PROJECT_ID-$ENV_BUILD_NAME-filestore --zone $ZONE --format="value(networks.ipAddresses[0])")
 
 ## Update NFS mountpoint 
 sudo apt-get -y update 
@@ -44,5 +44,3 @@ df -kh
 mkdir -p $MOUNT_POINT/nfs_share/models/
 chmod go+rw $MOUNT_POINT/nfs_share/models/ 
 gsutil cp -r gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/models/* $MOUNT_POINT/nfs_share/models/
-
-

@@ -54,6 +54,6 @@ steps:
   - |
      source values.env
      source values.env.auto
-     gsutil -m rsync -u -r /workspace gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/
+     gsutil -m rsync -u -r -P /workspace gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/
      echo -e "$${GREEN} Synced /workpace with the gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace $${NC}"
 images: ['gcr.io/$PROJECT_ID/remote-builder']

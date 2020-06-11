@@ -16,27 +16,40 @@
 set -xe
 # Set Variables
 source /tmp/values.env
-
 MIG=$MACHINE_TYPE-$ENV_BUILD_NAME-mig
-MIG_MASTER=$(gcloud compute instance-groups list-instances $MIG --zone $ZONE --format="value(instance.scope().segment(2))" --limit=1)
+# MIG_MASTER=$(gcloud compute instance-groups list-instances $MIG --zone $ZONE --format="value(instance.scope().segment(2))" --limit=1)
 
-## Things that only run in Master
-if [ $HOSTNAME == $MIG_MASTER ]
+
+## Things that only run in one host 
+# Get fairseq and checkout roberta-tpu branch
+
+if [[ ! -d $MOUNT_POINT/nfs_share/code ]]
 then 
-    ## Download and run 
-    # Get fairseq and checkout roberta-tpu branch
     mkdir -p $MOUNT_POINT/nfs_share/code
     chmod go+rw $MOUNT_POINT/nfs_share/code
     git clone https://github.com/taylanbil/fairseq.git $MOUNT_POINT/nfs_share/code
     cd $MOUNT_POINT/nfs_share/code
     git fetch
     git checkout roberta-tpu
-    ## Things that run in all the MIG instances
-    # Install fairseq and pyarrow to default conda-env
-    # All the training runs will be executed in this environment
-    cd $MOUNT_POINT/nfs_share/code
-    source /anaconda3/etc/profile.d/conda.sh
-    conda activate torch-xla-nightly
-    pip install --editable .
-    pip install pyarrow
-fi 
+fi
+
+
+## Things that only run in all the hosts 
+COMMAND="cd '$MOUNT_POINT'/nfs_share/code && \
+    source /anaconda3/etc/profile.d/conda.sh && \
+    conda activate torch-xla-nightly && \
+    pip install --editable . && \
+    pip install pyarrow"
+
+for instance in $(gcloud --project=${PROJECT_ID} \
+    compute instance-groups managed list-instances ${MIG} \
+    --zone=${ZONE} \
+    --format='value(NAME)[terminator=" "]')
+do  
+    gcloud compute ssh "$instance" \
+    --project=${PROJECT_ID} \
+    --zone=$ZONE \
+    --internal-ip \
+    --command="$COMMAND" \
+    --quiet 
+done

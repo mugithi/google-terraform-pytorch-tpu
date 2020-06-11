@@ -14,14 +14,9 @@
 # * limitations under the License.
 # 
 
-# if [ -z "$1" ];
-# then
-#   echo "arg empty";
-#   exit
-# fi
+source /anaconda3/etc/profile.d/conda.sh
 
-source /tmp/values.env
-source /tmp/values.env.auto
+conda activate torch-xla-nightly
 
 TPU_POD_NAME=${ENV_BUILD_NAME}-tpu
 

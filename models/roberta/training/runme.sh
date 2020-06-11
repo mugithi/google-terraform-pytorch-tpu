@@ -15,7 +15,6 @@
 # 
 
 source /tmp/values.env
-source /tmp/values.env.auto
 
 TPU_POD_NAME=${ENV_BUILD_NAME}-tpu
 
