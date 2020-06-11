@@ -20,11 +20,11 @@ set -xe
 PROJECT_ID=
 ENV_BUILD_NAME=
 
-sudo gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/values.env . 
-sudo gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/values.env.auto . 
+sudo gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/values.env /tmp/ 
+sudo gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/values.env.auto /tmp/ 
 
-source values.env
-source values.env.auto
+source /tmp/values.env
+source /tmp/values.env.auto
 
 ## Update NFS mountpoint 
 sudo apt-get -y update 
@@ -35,11 +35,14 @@ echo "${SHARED_NFS_IP}:/${SHARED_FS} $MOUNT_POINT/nfs_share nfs      defaults   
 sudo chmod go+rw $MOUNT_POINT/nfs_share
 
 ## Update shared pd mountpoint 
-sudo mkdir -p $MOUNT_POINT/shared_pd
-sudo mount -o discard,defaults /dev/disk/by-id/google-shared-pd ${MOUNT_POINT}/shared_pd
+mkdir -p $MOUNT_POINT/shared_pd
+mount -o discard,defaults /dev/disk/by-id/google-shared-pd ${MOUNT_POINT}/shared_pd
+
+df -kh
+
+## Copy the Models to the NFS share
+mkdir -p $MOUNT_POINT/nfs_share/models/
+chmod go+rw $MOUNT_POINT/nfs_share/models/ 
+gsutil cp -r gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/models/* $MOUNT_POINT/nfs_share/models/
 
 
-## Setup Training Model 
-gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/models/roberta/env_setup/roberta_setup.sh
-gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/models/roberta/env_setup/roberta_setup.sh /tmp/
-bash -xe /tmp/roberta_setup.sh

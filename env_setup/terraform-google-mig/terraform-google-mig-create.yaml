@@ -8,9 +8,8 @@ steps:
   - |
      set -xe 
      source values.env
-     gsutil cp gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/values.env.auto values.env.auto
+     gsutil rsync -u -P gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/ /workspace/
      echo -e "$${GREEN} Synced gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace with /workpace $${NC}"
-
 - id: terraform-google-mig
   name: gcr.io/$PROJECT_ID/terraform:0.12.16
   waitFor: 
@@ -90,18 +89,5 @@ steps:
             -var="shared_pd_disk_type=$${SHARED_PD_DISK_TYPE}" \
             -var="accelerator_type=$${TPU_ACCELERATOR_TYPE}"
       fi
-      sed -i "s/MIG_MASTER=.*/MIG_MASTER=$(terraform output compute_instances_slave_0)/g" ../../values.env.auto
-- id: sync_workplace_gcs
-  name: 'gcr.io/cloud-builders/gsutil'
-  waitFor: 
-  - terraform-google-mig
-  entrypoint: 'bash'
-  args: 
-  - '-c'
-  - |
-     set -xe 
-     source values.env
-     gsutil cp values.env.auto gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/
-     echo -e "$${GREEN} Synced /workpace with the gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace $${NC}"
 
 

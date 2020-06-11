@@ -14,17 +14,17 @@
 # * limitations under the License.
 # 
 
-# if [ -z "$1" ];
-# then
-#   echo "arg empty";
-#   exit
-# fi
+source /tmp/values.env
+source /tmp/values.env.auto
+
+TPU_POD_NAME=${ENV_BUILD_NAME}-tpu
+
 
 logfile="$(date +%Y%m%d)-roberta-podrun-8.txt"
 nshards=1
 num_cores=8
 MOUNT_POINT=/mnt/common
-data_path="$MOUNT_POINT/data/" #EDIT ME AS PER DATASET LOCATION
+data_path="$MOUNT_POINT/shared_pd/" #EDIT ME AS PER DATASET LOCATION
 DATABIN=$(seq 0 $nshards | xargs -I{} echo $data_path/shard{} | tr "\n" ":")
 checkpoints_out=$MOUNT_POINT/checkpoints-roberta-$1
 

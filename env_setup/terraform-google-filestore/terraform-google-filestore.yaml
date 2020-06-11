@@ -33,6 +33,14 @@ steps:
             -var="file_shares_name=$${SHARED_FS}" \
             -var="capacity_gb=$${SHARED_FS_CAPACITY}" \
             -var="tier=$${SHARED_FS_TIER}"
+         terraform refresh \
+            -var="project_id=$${PROJECT_ID}" \
+            -var="region=$${REGION}" \
+            -var="zone=$${ZONE}" \
+            -var="filestore_name=$${PROJECT_ID}-$${ENV_BUILD_NAME}-filestore" \
+            -var="file_shares_name=$${SHARED_FS}" \
+            -var="capacity_gb=$${SHARED_FS_CAPACITY}" \
+            -var="tier=$${SHARED_FS_TIER}"
           sed -i "s/SHARED_NFS_IP=.*/SHARED_NFS_IP=$(terraform output nfs_ip)/g" ../../values.env.auto
       fi 
       if [ ${_BUILD_ACTION} == 'destroy' ]

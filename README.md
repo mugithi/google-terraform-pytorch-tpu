@@ -27,7 +27,8 @@ This module does the following
 | Destroy Cloud TPU  | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_TPU=true](https://github.com/mugithi/google-terraform-pytorch-tpu#1-updating-cloud-tpu-pod)* |
 | Update the MIG | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_MIG=true](https://github.com/mugithi/google-terraform-pytorch-tpu#3-updating-the-managed-instance-group-mig)* |
 | Destroy the MIG | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_MIG=true](https://github.com/mugithi/google-terraform-pytorch-tpu#3-updating-the-managed-instance-group-mig)* |
-| Updating shared persistent disk | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true](https://github.com/mugithi/google-terraform-pytorch-tpu#2-updating-the-shared-persistent-disk)* |
+| Update shared persistent disk | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true](https://github.com/mugithi/google-terraform-pytorch-tpu#2-updating-the-shared-persistent-disk)* |
+| Destroy shared persistent disk | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_DISK=true](https://github.com/mugithi/google-terraform-pytorch-tpu#2-updating-the-shared-persistent-disk)* |
 
 
 # Deployment Architecture Diagram
