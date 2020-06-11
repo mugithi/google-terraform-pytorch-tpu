@@ -14,7 +14,7 @@
 # * limitations under the License.
 # 
 
-set -xe
+# set -xe
 # Set Variables
 
 PROJECT_ID=

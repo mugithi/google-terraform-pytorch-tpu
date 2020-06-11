@@ -6,7 +6,7 @@ steps:
   args: 
   - '-c'
   - |  
-      set -xe
+      # set -xe
       source values.env
       source values.env.auto
       trap cleanup EXIT

@@ -129,7 +129,26 @@ Running this command creates Filestore, Cloud TPU and Managed Instance Group usi
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy
 ``` 
 
-Please note that destroying the environment using does not remove the GCS buckets. You can recreate the training enviroment by reruning the `_BUILD_ACTION=create` command.
+Please note that destroying the environment using does not remove the GCS buckets and shared persistent disk. You can recreate the training enviroment by simply reruning the `_BUILD_ACTION=create` command.
+
+#### *6a. Destroying the entire environment ie. Starting Over*
+
+In order to completly destroy the entire enviroment, you need to run the above step and then destroy the shared persistant disk and GCS buckets
+
+In order to delete the shared persistant disk run the command below 
+
+```
+gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_DISK=true
+``` 
+
+In order to delete the GCS buckets, navigate to the GCS in the [Google Cloud Console](https://console.cloud.google.com/storage?_ga=2.77017180.85729593.1591821429-1948326961.1590547304) and delete the buckets titled 
+
+- your_project_id*-dataset 
+- your_project_id*-tf-backend
+
+
+
+#### *6b. Destroying GCS buckets*
 
 # Updating the environment 
 

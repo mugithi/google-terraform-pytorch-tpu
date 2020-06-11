@@ -13,7 +13,7 @@
 #* See the License for the specific language governing permissions and
 # * limitations under the License.
 # 
-set -xe
+# set -xe
 # Set Variables
 source /tmp/values.env
 MIG=$MACHINE_TYPE-$ENV_BUILD_NAME-mig
