@@ -13,18 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-output "tpu_project" {
-  value = split("/", module.tpu.id)[1]
-}
-
-output "tpu_zone" {
-  value = split("/", module.tpu.id)[3]
-}
-
-output "tpu_name" {
-  value = split("/", module.tpu.id)[5]
-}
-
-
-

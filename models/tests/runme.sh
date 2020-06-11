@@ -14,6 +14,8 @@
 # * limitations under the License.
 # 
 
+source /tmp/values.env 
+
 source /anaconda3/etc/profile.d/conda.sh
 
 conda activate torch-xla-nightly

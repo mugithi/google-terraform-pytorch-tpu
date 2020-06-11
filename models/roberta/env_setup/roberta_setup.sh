@@ -35,7 +35,8 @@ fi
 
 
 ## Things that only run in all the hosts 
-COMMAND="cd '$MOUNT_POINT'/nfs_share/code && \
+COMMAND="sudo chown -R $USER:$USER '$MOUNT_POINT'/nfs_share/ && \
+    cd '$MOUNT_POINT'/nfs_share/code && \
     source /anaconda3/etc/profile.d/conda.sh && \
     conda activate torch-xla-nightly && \
     pip install --editable . && \

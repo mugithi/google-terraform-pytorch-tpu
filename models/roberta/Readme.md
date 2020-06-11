@@ -9,7 +9,7 @@ There are two steps that need to be completed
 
 ## 1. Configuring the enviroment to train RoBERTa 
 
-Use the `roberta_setup_script' to prepare the enviroment for training 
+Use the `roberta_setup_script` to prepare the enviroment for training 
 
 ```
 source /tmp/values.env
@@ -26,7 +26,7 @@ bash -xe $MOUNT_POINT/nfs_share/models/roberta/env_setup/roberta_setup.sh
 Start the training by running this command 
 
 ```
-bash -xe $MOUNT_POINT/nfs_share/models/roberta/training/runme.sh
+bash -xe $MOUNT_POINT/nfs_share/models/roberta/training/runme.sh &
 ```
 
 #### 2b. This script will do the following

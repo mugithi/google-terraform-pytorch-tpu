@@ -29,25 +29,14 @@ provider "random" {
   version = "~> 2.1.2"
 }
 
-locals {
-  compute_service_account = {
-    email  = "default"
-    scopes = "${var.service_account_scopes}"
-  }
-}
-
 ## Backend Initalize
 terraform {
   backend "gcs" {}
 }
 
-data "google_compute_default_service_account" "default" {
-  project = var.project_id
-}
-
 ### Create TPU 
 module "tpu" {
-  source           = "git::https://github.com/mugithi/terraform-google-tpu?ref=v1.0.2"
+  source           = "git::https://github.com/mugithi/terraform-google-tpu?ref=v1.0.4"
   project_id       = var.project_id
   zone             = var.zone
   tpu_name         = var.tpu_name
