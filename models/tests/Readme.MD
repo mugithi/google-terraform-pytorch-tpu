@@ -12,16 +12,16 @@ bash -xe $MOUNT_POINT/nfs_share/models/tests/runme.sh
 ```
 
 
-*####This script will do the following*
+#### 1. This script will do the following
 
 - Set the conda enviroment to *`torch-xla-nightly`*
 - Kick off a *`torch_xla.distributed.xla_dis`* distributed training using all the instances in the managed instance group with the following options
     - Use `/usr/share/torch-xla-nightly/pytorch/xla/test/test_train_imagenet.py` test imagenet script 
     - Use fake data 
 
-#### Monitoring Expected output 
+#### 2. Monitoring Expected output 
 
-#### a. You should observe *`torch_xla.distributed.xla_dis`* connect to all the instances, example below
+#### 2a. You should observe *`torch_xla.distributed.xla_dis`* connect to all the instances, example below
 
 ```json
 python -m torch_xla.distributed.xla_dist --tpu=20200430-tpu --conda-env=torch-xla-nightly --env=XLA_USE_BF16=1 -- python /usr/share/torch-xla-nightly/pytorch/xla/test/test_train_imagenet.py --fake_data
@@ -29,7 +29,7 @@ python -m torch_xla.distributed.xla_dist --tpu=20200430-tpu --conda-env=torch-xl
 2020-06-11 20:48:38  [] Cluster configuration: {client_workers: [{10.164.15.222, n1-standard-32, europe-west4-a, n1-standard-32-20200430-5dpf}, {10.164.0.11, n1-standard-32, europe-west4-a, n1-standard-32-20200430-0pvm}, {10.164.15.221, n1-standard-32, europe-west4-a, n1-standard-32-20200430-1zqq}, {10.164.15.223, n1-standard-32, europe-west4-a, n1-standard-32-20200430-4sxl}], service_workers: [{10.69.26.141, 8470, v3-32, europe-west4-a, pytorch-nightly, 20200430-tpu}, {10.69.26.139, 8470, v3-32, europe-west4-a, pytorch-nightly, 20200430-tpu}, {10.69.26.140, 8470, v3-32, europe-west4-a, pytorch-nightly, 20200430-tpu}, {10.69.26.138, 8470, v3-32, europe-west4-a, pytorch-nightly, 20200430-tpu}]}
 ```
 
-#### b. You should observe training results stream to the console, example below
+#### 2b. You should observe training results stream to the console, example below
 
 ```json
 ....
