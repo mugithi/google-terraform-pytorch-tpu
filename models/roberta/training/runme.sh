@@ -27,7 +27,8 @@ nshards=0
 num_cores=8
 data_path="$MOUNT_POINT/shared_pd" #EDIT ME AS PER DATASET LOCATION
 DATABIN=$(seq 0 $nshards | xargs -I{} echo $data_path/shard{} | tr "\n" ":")
-checkpoints_out=$MOUNT_POINT/nfs_share/models/roberta/checkpoints-roberta-$1
+checkpoints_out=/tmp/checkpoints-roberta-$1
+#checkpoints_out=$MOUNT_POINT/nfs_share/models/roberta/checkpoints-roberta-$1
 
 cd $MOUNT_POINT/nfs_share/code/
 
@@ -35,7 +36,7 @@ python -m torch_xla.distributed.xla_dist \
         --tpu=$TPU_POD_NAME \
         --conda-env=torch-xla-nightly\
         --env XLA_USE_BF16=1 \
-        -- python $MOUNT_POINT/nfs_share/code/fairseq/train.py \
+        -- python $MOUNT_POINT/nfs_share/code/train.py \
         $DATABIN \
         --save-dir $checkpoints_out \
         --arch roberta_large \
