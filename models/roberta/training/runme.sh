@@ -27,8 +27,8 @@ nshards=0
 num_cores=8
 data_path="$MOUNT_POINT/shared_pd" #EDIT ME AS PER DATASET LOCATION
 DATABIN=$(seq 0 $nshards | xargs -I{} echo $data_path/shard{} | tr "\n" ":")
-checkpoints_out=/tmp/checkpoints-roberta-$1
-#checkpoints_out=$MOUNT_POINT/nfs_share/models/roberta/checkpoints-roberta-$1
+# checkpoints_out=/tmp/checkpoints-roberta-$1
+checkpoints_out=$MOUNT_POINT/nfs_share/models/roberta/checkpoints-roberta-$1
 
 cd $MOUNT_POINT/nfs_share/code/
 
@@ -41,7 +41,7 @@ python -m torch_xla.distributed.xla_dist \
         --save-dir $checkpoints_out \
         --arch roberta_large \
         --optimizer adam \
-        --adam-betas "(0.9, 0.98)" \
+        --adam-betas '(0.9, 0.98)' \
         --adam-eps 1e-06 \
         --clip-norm 1.0 \
         --lr-scheduler polynomial_decay \
@@ -71,4 +71,4 @@ python -m torch_xla.distributed.xla_dist \
         --num_cores=8 \
         --metrics_debug \
         --suppress_loss_report \
-        --log_steps=1 &> $logfile #logstep=1  
+        --log_steps=10 &> $logfile #logstep=1 

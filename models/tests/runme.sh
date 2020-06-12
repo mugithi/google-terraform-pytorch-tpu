@@ -22,9 +22,10 @@ conda activate torch-xla-nightly
 
 TPU_POD_NAME=${ENV_BUILD_NAME}-tpu
 
+cd /usr/share/torch-xla-nightly/pytorch/xla/test/
 python -m torch_xla.distributed.xla_dist \
         --tpu=$TPU_POD_NAME \
         --conda-env=torch-xla-nightly \
         --env=XLA_USE_BF16=1 \
-        -- python /usr/share/torch-xla-nightly/pytorch/xla/test/test_train_imagenet.py --fake_data
+        -- sudo python /usr/share/torch-xla-nightly/pytorch/xla/test/test_train_imagenet.py --fake_data
 

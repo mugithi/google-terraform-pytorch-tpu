@@ -18,4 +18,4 @@ source /anaconda3/etc/profile.d/conda.sh
 conda activate torch-xla-1.5 
 source /tmp/values.env
 source /tmp/values.env.auto
-python /tmp/scripts/change_tpu_runtime.py --tpu-name=${ENV_BUILD_NAME}-tpu --target-version=pytorch-dev$GCE_IMAGE_VERSION
+python /tmp/scripts/change_tpu_runtime.py --tpu-name="${ENV_BUILD_NAME}"-tpu --target-version=pytorch-0.5-dev${GCE_IMAGE_VERSION}
