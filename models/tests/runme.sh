@@ -27,5 +27,27 @@ python -m torch_xla.distributed.xla_dist \
         --tpu=$TPU_POD_NAME \
         --conda-env=torch-xla-nightly \
         --env=XLA_USE_BF16=1 \
-        -- sudo python /usr/share/torch-xla-nightly/pytorch/xla/test/test_train_imagenet.py --fake_data
+        -- python /usr/share/torch-xla-nightly/pytorch/xla/test/test_train_imagenet.py --fake_data
 
+## Clean up any running docker containers 
+# COMMAND="docker rm $(docker ps -qa)"
+
+# for instance in $(gcloud --project=${PROJECT_ID} \
+#     compute instance-groups managed list-instances ${MIG} \
+#     --zone=${ZONE} \
+#     --format='value(NAME)[terminator=" "]')
+# do  
+#     gcloud compute ssh "$instance" \
+#     --project=${PROJECT_ID} \
+#     --zone=$ZONE \
+#     --internal-ip \
+#     --command="$COMMAND" \
+#     --quiet 
+# done
+
+
+# python -m torch_xla.distributed.xla_dist \
+#         --tpu=$TPU_POD_NAME --docker-image=gcr.io/tpu-pytorch/xla:nightly_3.6 
+#         --docker-run-flag=--rm=true --docker-run-flag=--shm-size=50GB 
+#         --env=XLA_USE_BF16=1 
+#         -- python /pytorch/xla/test/test_train_imagenet.py --fake_data
