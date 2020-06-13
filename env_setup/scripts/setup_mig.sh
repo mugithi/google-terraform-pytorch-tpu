@@ -38,14 +38,5 @@ sudo chmod go+rw $MOUNT_POINT/nfs_share
 mkdir -p $MOUNT_POINT/shared_pd
 mount -o discard,defaults /dev/disk/by-id/google-shared-pd ${MOUNT_POINT}/shared_pd
 
-df -kh
-
-## Copy the Models to the NFS share
-mkdir -p $MOUNT_POINT/nfs_share/models/
-chmod go+rw $MOUNT_POINT/nfs_share/models/ 
-gsutil cp -r gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/models/* $MOUNT_POINT/nfs_share/models/
-
-
 ## Download Docker Containers 
-
 #docker pull gcr.io/tpu-pytorch/xla:nightly_3.6

@@ -28,7 +28,7 @@ num_cores=8
 data_path="$MOUNT_POINT/shared_pd" #EDIT ME AS PER DATASET LOCATION
 DATABIN=$(seq 0 $nshards | xargs -I{} echo $data_path/shard{} | tr "\n" ":")
 # checkpoints_out=/tmp/checkpoints-roberta-$1
-checkpoints_out=$MOUNT_POINT/nfs_share/models/roberta/checkpoints-roberta-$1
+checkpoints_out=$MOUNT_POINT/nfs_share/models/roberta/checkpoints-roberta-${ENV_BUILD_NAME}
 
 cd $MOUNT_POINT/nfs_share/code/
 

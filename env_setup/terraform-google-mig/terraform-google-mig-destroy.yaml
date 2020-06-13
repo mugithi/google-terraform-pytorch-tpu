@@ -45,6 +45,7 @@ steps:
             -var="shared_pd_disk_name=$${SHARED_PD_DISK_TYPE}-$${SHARED_PD_DISK_SIZE}-$${ENV_BUILD_NAME}" \
             -var="shared_pd_disk_size=$${SHARED_PD_DISK_SIZE}" \
             -var="shared_pd_disk_type=$${SHARED_PD_DISK_TYPE}" \
+            -var="shared_pd_disk_create=$${SHARED_PD_DISK_CREATE}" \
             -var="accelerator_type=$${TPU_ACCELERATOR_TYPE}"
       elif [[ "$${TPU_PYTORCH_VERSION}" != "pytorch-nightly" ]] || [[ -z "$${GCE_IMAGE_VERSION}" ]]
       then
@@ -71,6 +72,7 @@ steps:
             -var="shared_pd_disk_name=$${SHARED_PD_DISK_TYPE}-$${SHARED_PD_DISK_SIZE}-$${ENV_BUILD_NAME}" \
             -var="shared_pd_disk_size=$${SHARED_PD_DISK_SIZE}" \
             -var="shared_pd_disk_type=$${SHARED_PD_DISK_TYPE}" \
+            -var="shared_pd_disk_create=$${SHARED_PD_DISK_CREATE}" \
             -var="accelerator_type=$${TPU_ACCELERATOR_TYPE}"
       fi      
 

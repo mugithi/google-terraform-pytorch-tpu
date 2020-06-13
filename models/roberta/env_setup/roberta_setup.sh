@@ -19,28 +19,65 @@ source /tmp/values.env
 MIG=$MACHINE_TYPE-$ENV_BUILD_NAME-mig
 # MIG_MASTER=$(gcloud compute instance-groups list-instances $MIG --zone $ZONE --format="value(instance.scope().segment(2))" --limit=1)
 
+##### Variables 
 
-## Things that only run in one host 
-# Get fairseq and checkout roberta-tpu branch
+## ENV SETUP GITHUB REPO 
+ENV_SETUP_REPO=' https://github.com/mugithi/google-terraform-pytorch-tpu.git'
+ENV_SETUP_BRANCH='master'
 
-if [[ ! -d $MOUNT_POINT/nfs_share/code ]]
+## MODEL CODE REPO 
+MODEL_CODE_REPO="https://github.com/taylanbil/fairseq.git"
+MODEL_CODE_BRANCH='synth-data-roberta'
+
+############################################################
+#####  Things that only run in one host ####################
+############################################################
+
+## Fix permissions in the NFS share 
+sudo chown -R $USER:$USER $MOUNT_POINT/nfs_share/
+
+
+# Clone the Enviroment SETUP code to the NFS share, for example for RoBERTa 
+if [[ -d $MOUNT_POINT/nfs_share/env ]]
 then 
-    mkdir -p $MOUNT_POINT/nfs_share/code
-    chmod go+rw $MOUNT_POINT/nfs_share/code
-    git clone https://github.com/taylanbil/fairseq.git $MOUNT_POINT/nfs_share/code
-    cd $MOUNT_POINT/nfs_share/code
-    git fetch
-    git checkout roberta-tpu
+    rm -rf $MOUNT_POINT/nfs_share/env
 fi
 
+mkdir -p $MOUNT_POINT/nfs_share/env
+chmod go+rw $MOUNT_POINT/nfs_share/env
+cd $MOUNT_POINT/nfs_share/env
+git clone $ENV_SETUP_REPO . 
+git fetch 
+git checkout $ENV_SETUP_BRANCH 
 
-## Things that only run in all the hosts 
-COMMAND="sudo chown -R $USER:$USER '$MOUNT_POINT'/nfs_share/ && \
-    cd '$MOUNT_POINT'/nfs_share/code && \
-    source /anaconda3/etc/profile.d/conda.sh && \
-    conda activate torch-xla-nightly && \
-    pip install --editable . && \
-    pip install pyarrow"
+
+## Clone the MODEL code to the NFS share, for example fairseq  
+if [[ -d $MOUNT_POINT/nfs_share/model_code ]]
+then 
+    rm -rf $MOUNT_POINT/nfs_share/model_code
+fi
+mkdir -p $MOUNT_POINT/nfs_share/model_code
+chmod go+rw $MOUNT_POINT/nfs_share/model_code
+cd $MOUNT_POINT/nfs_share/model_code
+git clone $MODEL_CODE_REPO .
+cd $MOUNT_POINT/nfs_share/model_code
+git fetch
+git checkout $MODEL_CODE_BRANCH
+
+
+############################################################
+#####  Things that only on all the hosts ###################
+############################################################
+
+# Model specific dependancies 
+
+COMMAND="
+cd '$MOUNT_POINT'/nfs_share/model_code && \
+source /anaconda3/etc/profile.d/conda.sh && \
+conda activate torch-xla-nightly && \
+pip install --editable . && \
+pip install pyarrow
+"
 
 for instance in $(gcloud --project=${PROJECT_ID} \
     compute instance-groups managed list-instances ${MIG} \

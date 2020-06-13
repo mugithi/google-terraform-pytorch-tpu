@@ -128,3 +128,8 @@ variable "shared_pd_disk_type" {
 variable "shared_pd_disk_size" {
   default =""
 }
+
+variable "shared_pd_disk_create" {
+  default = "false"
+  description = "If set to create a shared pd, mount shaared pd to instance shared pd, else do not mount"
+}

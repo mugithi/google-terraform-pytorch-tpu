@@ -51,7 +51,7 @@ data "google_compute_default_service_account" "default" {
 
 # Supporting module pull the GCE MIG MODULE to be used in Main.tf file
 module "gce-mig" {
-  source = "git::https://github.com/mugithi/terraform-google-vm?ref=v1.4.4"
+  source = "git::https://github.com/mugithi/terraform-google-vm?ref=v1.4.7"
 }
 
 ## Create SLAVE MIG TEMPLATE
@@ -67,6 +67,7 @@ module "mig_slave_template" {
   tags                 = ["${var.tags}"]
   startup_script       = "${file(var.startup_script)}"
   disk_size_gb  = var.disk_size_gb
+  disk_type = "pd-ssd"
   access_config = var.access_config
   additional_disks  = [
   { 
