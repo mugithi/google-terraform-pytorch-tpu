@@ -51,7 +51,7 @@ data "google_compute_default_service_account" "default" {
 
 # Supporting module pull the GCE MIG MODULE to be used in Main.tf file
 module "gce-mig" {
-  source = "git::https://github.com/mugithi/terraform-google-vm?ref=v1.4.7"
+  source = "git::https://github.com/mugithi/terraform-google-vm?ref=v1.5.1"
 }
 
 ## Create SLAVE MIG TEMPLATE

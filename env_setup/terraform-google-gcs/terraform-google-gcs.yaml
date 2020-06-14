@@ -26,7 +26,7 @@ steps:
             -var="gcs_tf_backend=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
             -var="gcs_workspace=$${PROJECT_ID}-$${ENV_BUILD_NAME}-workspace" \
             -var="gcs_dataset=$${PROJECT_ID}-$${ENV_BUILD_NAME}-dataset"
-        terraform destroy -auto-approve \
+        terraform destroy -lock=false -auto-approve \
             -var="project_id=$${PROJECT_ID}" \
             -var="gcs_tf_backend=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
             -var="gcs_workspace=$${PROJECT_ID}-$${ENV_BUILD_NAME}-workspace" \

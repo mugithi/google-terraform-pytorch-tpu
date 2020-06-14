@@ -39,7 +39,7 @@ steps:
         trap cleanup EXIT
         cd env_setup/terraform-google-gcs
         terraform init 
-        terraform apply -auto-approve \
+        terraform apply -lock=false -auto-approve \
             -var="project_id=$${PROJECT_ID}" \
             -var="gcs_tf_backend=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
             -var="gcs_dataset=$${PROJECT_ID}-$${ENV_BUILD_NAME}-dataset" 

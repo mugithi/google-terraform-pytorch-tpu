@@ -22,7 +22,7 @@ steps:
         terraform init \
             -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
             -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-disk"
-        terraform destroy --auto-approve -target=google_compute_disk.auto_created \
+        terraform destroy -lock=false --auto-approve -target=google_compute_disk.auto_created \
             -var="project_id=$${PROJECT_ID}" \
             -var="region=$${REGION}" \
             -var="zone=$${ZONE}" \

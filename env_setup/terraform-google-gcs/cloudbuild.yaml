@@ -34,7 +34,7 @@ steps:
             -var="gcs_tf_backend=$${ENV_BUILD_NAME}-tf-backend" \
             -var="gcs_workspace=$${ENV_BUILD_NAME}-workspace" 
             -var="gcs_dataset=$${ENV_BUILD_NAME}-dataset"
-        terraform apply -auto-approve \
+        terraform apply -lock=false -auto-approve \
             -var="project_id=$${PROJECT_ID}" \
             -var="env_build_name=$${PROJECT_ID}" \
             -var="gcs_tf_backend=$${ENV_BUILD_NAME}-tf-backend" \
@@ -50,7 +50,7 @@ steps:
             -var="gcs_tf_backend=$${ENV_BUILD_NAME}-tf-backend" \
             -var="gcs_workspace=$${ENV_BUILD_NAME}-workspace" 
             -var="gcs_dataset=$${ENV_BUILD_NAME}-dataset"
-        terraform destroy -auto-approve \
+        terraform destroy -lock=false -auto-approve \
             -var="project_id=$${PROJECT_ID}" \
             -var="env_build_name=$${PROJECT_ID}" \
             -var="gcs_tf_backend=$${ENV_BUILD_NAME}-tf-backend" \
