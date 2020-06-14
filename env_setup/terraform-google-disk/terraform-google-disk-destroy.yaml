@@ -1,36 +1,36 @@
 steps:
-  - id: terraform-google-disk-destroy
-    name: gcr.io/$PROJECT_ID/terraform:0.12.16
-    entrypoint: 'sh'
-    args: 
-    - '-c'
-    - |  
-        # set -xe
-        source values.env
-        source values.env.auto
-        function cleanup {
-            if [ "$?" == "0" ]
-            then
-              echo -e "$${GREEN}Succeeded with $${PROJECT_ID}-$${ENV_BUILD_NAME}-disk build operations $${NC}"
-            else 
-              echo -e "$${RED}Did not succeed with $${PROJECT_ID}-$${ENV_BUILD_NAME}-disk build operations $${NC}"
-              exit 0
-            fi
-        }
-        trap cleanup EXIT
-        cd env_setup/terraform-google-disk
-        terraform init \
-            -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
-            -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-disk"
-        terraform destroy -lock=false --auto-approve -target=google_compute_disk.auto_created \
-            -var="project_id=$${PROJECT_ID}" \
-            -var="region=$${REGION}" \
-            -var="zone=$${ZONE}" \
-            -var="network=$${NETWORK}" \
-            -var="shared_pd_disk_name=$${SHARED_PD_DISK_TYPE}-$${SHARED_PD_DISK_SIZE}-$${ENV_BUILD_NAME}" \
-            -var="shared_pd_disk_size=$${SHARED_PD_DISK_SIZE}" \
-            -var="shared_pd_disk_type=$${SHARED_PD_DISK_TYPE}" \
-            -var="protocol=$${PROTOCOL}" \
-            -var="ports=$${PORTS}" \
-            -var="source_ranges=$${SOURCE_RANGES}" \
-            -var="tags=$${TAGS}"  
+- id: terraform-google-disk-destroy
+  name: gcr.io/$PROJECT_ID/terraform:0.12.16
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - |  
+      # set -xe
+      source values.env
+      source values.env.auto
+      function cleanup {
+          if [ "$?" == "0" ]
+          then
+            echo -e "$${GREEN}Succeeded with $${PROJECT_ID}-$${ENV_BUILD_NAME}-disk build operations $${NC}"
+          else 
+            echo -e "$${RED}Did not succeed with $${PROJECT_ID}-$${ENV_BUILD_NAME}-disk build operations $${NC}"
+            exit 0
+          fi
+      }
+      trap cleanup EXIT
+      cd env_setup/terraform-google-disk
+      terraform init \
+          -backend-config="bucket=$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend" \
+          -backend-config="prefix=terraform-google-$${ENV_BUILD_NAME}-disk"
+      terraform destroy -lock=false --auto-approve -target=google_compute_disk.auto_created \
+          -var="project_id=$${PROJECT_ID}" \
+          -var="region=$${REGION}" \
+          -var="zone=$${ZONE}" \
+          -var="network=$${NETWORK}" \
+          -var="shared_pd_disk_name=$${SHARED_PD_DISK_TYPE}-$${SHARED_PD_DISK_SIZE}-$${ENV_BUILD_NAME}" \
+          -var="shared_pd_disk_size=$${SHARED_PD_DISK_SIZE}" \
+          -var="shared_pd_disk_type=$${SHARED_PD_DISK_TYPE}" \
+          -var="protocol=$${PROTOCOL}" \
+          -var="ports=$${PORTS}" \
+          -var="source_ranges=$${SOURCE_RANGES}" \
+          -var="tags=$${TAGS}"  
