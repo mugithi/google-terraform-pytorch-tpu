@@ -1,6 +1,18 @@
 steps:
+- id: sync_gcs_workplace
+  name: 'gcr.io/cloud-builders/gsutil'
+  entrypoint: 'bash'
+  args: 
+  - '-c'
+  - |
+     # set -xe 
+     source values.env
+     gsutil rsync -u -P -r /workspace/ gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/ 
+     echo -e "$${GREEN} Synced gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace with /workpace $${NC}"
 - id: terraform-google-disk-seed
   name: gcr.io/$PROJECT_ID/terraform:0.12.16
+  waitFor: 
+  - sync_gcs_workplace
   entrypoint: 'sh'
   args: 
   - '-c'
@@ -41,7 +53,7 @@ steps:
   - terraform-google-disk-seed 
   env:
     # Data prepare and seed disk
-    - COMMAND1=bash -xe /tmp/$${MIG_SEED_DATA_PREP_SCRIPT}
+    - COMMAND1=source /tmp/values.env && bash -xe /tmp/$${MIG_SEED_DATA_PREP_SCRIPT}
 - id: terraform-google-disk-cleanup
   name: gcr.io/$PROJECT_ID/terraform:0.12.16
   waitFor: 
