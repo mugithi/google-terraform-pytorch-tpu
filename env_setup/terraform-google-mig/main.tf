@@ -79,7 +79,7 @@ module "mig_slave_template" {
   disk_size_gb  = var.disk_size_gb
   disk_type = "pd-ssd"
   access_config = var.access_config
-  additional_disks = "${var.shared_pd_disk_create ? local.additional_disks : [] }"
+  additional_disks = "${var.shared_pd_disk_attach ? local.additional_disks : [] }"
 
 }
 

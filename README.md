@@ -94,21 +94,8 @@ Each version of the environment is tracked using the variable `ENV_BUILD_NAME` u
 
 It is recomended that you keep seperate versions of the cloned cloud build repo for each environment to easily allow to easily version your scripts and [variable](values.env) file. 
 
-#### 4. Initialize the shared persistent disk 
----
-Modify [values file](values.env) and set the *__shared persistent disk__* and *__gcs training dataset__* parameters. Initialize the shared persistent disk using the command below.
 
-```
-gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize,_DISK=true
-```
-
-#### *4a. What happens when you initialize the shared persistent disk* 
-
-Initializing the shared persistent  disk, creates a shared persistent disk and seeds it with read only training using data from a GCS bucket specified by the `GCS_DATASET="gs://xxxxx/dataset/*` [variable](values.env) . This shared persistent disk is then mounted to all the GCE instances that are created in step 6
-
-You also have the option of running a [data prepation script](env_setup/data_prep_script.sh) on the data before it is seeded to the shared persistent disk. 
-
-#### 5. Create the enviroment 
+#### 4. Create the enviroment 
 ---
 
 Modify [values file](values.env) and set the *__cloud TPU__*, *__managed instance group__* and *__shared nfs__* parameters. Create the training enviroment using the command below. 
@@ -117,9 +104,33 @@ Modify [values file](values.env) and set the *__cloud TPU__*, *__managed instanc
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=create
 ``` 
 
-#### *5a. What happens when you build create the enviroment*
+#### *4a. What happens when you build create the enviroment*
 
 Running this command creates Filestore, Cloud TPU and Managed Instance Group using values in the [variable](values.env) file. 
+
+
+#### 5. Training
+---
+
+After Step 4, you can bigin training your PyTorch models on Cloud TPU. The following models are made avaiable for you to start with as part of this repo
+
+- [Test model using ImageNet and Synethetic Data]() 
+- [RoBERTa model on FAIRseq]()
+- [Wave2vec model on FAIRseq]()
+
+#### 5. Initialize the shared persistent disk (Optional)
+---
+Modify [values file](values.env) and set the *__shared persistent disk__* and *__gcs training dataset__* parameters. Initialize the shared persistent disk using the command below.
+
+```
+gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize,_DISK=true
+```
+
+#### *5a. What happens when you initialize the shared persistent disk* 
+
+Initializing the shared persistent  disk, creates a shared persistent disk and seeds it with read only training using data from a GCS bucket specified by the `GCS_DATASET="gs://xxxxx/dataset/*` [variable](values.env) . This shared persistent disk is then mounted to all the GCE instances that are created in step 6
+
+You also have the option of running a [data prepation script](env_setup/data_prep_script.sh) on the data before it is seeded to the shared persistent disk. 
 
 
 #### 6. Destroy the enviroment 
@@ -141,6 +152,8 @@ In order to delete the shared persistant disk run the command below
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_DISK=true
 ``` 
 
+#### *6b. Destroying GCS buckets*
+
 In order to delete the GCS buckets, navigate to the GCS in the [Google Cloud Console](https://console.cloud.google.com/storage?_ga=2.77017180.85729593.1591821429-1948326961.1590547304) and delete the buckets titled 
 
 - your_project_id*-dataset 
@@ -148,7 +161,6 @@ In order to delete the GCS buckets, navigate to the GCS in the [Google Cloud Con
 
 
 
-#### *6b. Destroying GCS buckets*
 
 # Updating the environment 
 
