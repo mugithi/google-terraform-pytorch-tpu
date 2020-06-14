@@ -34,6 +34,16 @@ locals {
     email  = "default"
     scopes = "${var.service_account_scopes}"
   }
+  additional_disks  = [
+  { 
+    source = var.shared_pd_disk_name
+    auto_delete  = "false"
+    boot         = "false"
+    mode         = "READ_ONLY"
+    device_name  = "shared-pd"
+    },
+ ]
+
 }
 
 ##  Initalize Backend
@@ -51,7 +61,7 @@ data "google_compute_default_service_account" "default" {
 
 # Supporting module pull the GCE MIG MODULE to be used in Main.tf file
 module "gce-mig" {
-  source = "git::https://github.com/mugithi/terraform-google-vm?ref=v1.5.1"
+  source = "git::https://github.com/mugithi/terraform-google-vm?ref=v1.4.4"
 }
 
 ## Create SLAVE MIG TEMPLATE
@@ -69,15 +79,8 @@ module "mig_slave_template" {
   disk_size_gb  = var.disk_size_gb
   disk_type = "pd-ssd"
   access_config = var.access_config
-  additional_disks  = [
-  { 
-    source = var.shared_pd_disk_name
-    auto_delete  = "false"
-    boot         = "false"
-    mode         = "READ_ONLY"
-    device_name  = "shared-pd"
-  }
-]
+  additional_disks = "${var.shared_pd_disk_create ? local.additional_disks : [] }"
+
 }
 
 ## Create SLAVE
