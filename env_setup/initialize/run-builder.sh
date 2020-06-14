@@ -11,8 +11,8 @@ mkdir /builder/home/.ssh/ && touch /builder/home/.ssh/google_compute_known_hosts
 
 ${GCLOUD} config set compute/zone ${ZONE}
 
-${GCLOUD} compute scp --compress --recurse  --force-key-file-overwrite --strict-host-key-checking=no \
-       $(pwd)/values.env $(pwd)/values.env.auto $(pwd)/env_setup/scripts $(pwd)/models ${USERNAME}@${INSTANCE_NAME}:/tmp/
+${GCLOUD} compute scp --compress --recurse --force-key-file-overwrite --strict-host-key-checking=no \
+       $(pwd)/values.env $(pwd)/values.env.auto $(pwd)/env_setup/scripts/* $(pwd)/models/* ${USERNAME}@${INSTANCE_NAME}:/tmp/
 
 ## ability to an orbitary number of commands formated as COMMAND1, COMMAND2 in remote-builder
 for ((i=1; i<20; i++))

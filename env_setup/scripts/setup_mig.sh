@@ -13,14 +13,14 @@
 #* See the License for the specific language governing permissions and
 # * limitations under the License.
 # 
+# setups NFS share and optional donwloads docker containers 
 
-# set -xe
 # Set Variables
 
 PROJECT_ID=
 ENV_BUILD_NAME=
 
-sudo gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/values.env /tmp/ 
+sudo gsutil cp gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/values.env /tmp/
 
 source /tmp/values.env
 
@@ -34,9 +34,9 @@ sudo mount ${SHARED_NFS_IP}:/${SHARED_FS} $MOUNT_POINT/nfs_share
 echo "${SHARED_NFS_IP}:/${SHARED_FS} $MOUNT_POINT/nfs_share nfs      defaults    0       0" | sudo tee -a /etc/fstab  
 sudo chmod go+rw $MOUNT_POINT/nfs_share
 
-## Update shared pd mountpoint 
-mkdir -p $MOUNT_POINT/shared_pd
-mount -o discard,defaults /dev/disk/by-id/google-shared-pd ${MOUNT_POINT}/shared_pd
+## Download models to the NFS share
+mkdir -p $MOUNT_POINT/nfs_share/models/
+sudo gsutil cp -r  gs://${PROJECT_ID}-${ENV_BUILD_NAME}-tf-backend/workspace/models/* $MOUNT_POINT/nfs_share/models/
 
 ## Download Docker Containers 
 #docker pull gcr.io/tpu-pytorch/xla:nightly_3.6

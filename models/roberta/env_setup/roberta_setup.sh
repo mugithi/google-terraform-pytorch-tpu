@@ -22,7 +22,7 @@ MIG=$MACHINE_TYPE-$ENV_BUILD_NAME-mig
 ##### Variables 
 
 ## ENV SETUP GITHUB REPO 
-ENV_SETUP_REPO=' https://github.com/mugithi/google-terraform-pytorch-tpu.git'
+ENV_SETUP_REPO='https://github.com/mugithi/google-terraform-pytorch-tpu.git'
 ENV_SETUP_BRANCH='master'
 
 ## MODEL CODE REPO 

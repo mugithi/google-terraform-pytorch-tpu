@@ -34,21 +34,19 @@ steps:
             -var="ports=$${PORTS}" \
             -var="source_ranges=$${SOURCE_RANGES}" \
             -var="tags=$${TAGS}"  
-  # - id: remote-builder-seed-disk
-  #   name: gcr.io/$PROJECT_ID/remote-builder
-  #   timeout: 4000s 
-  #   waitFor: 
-  #   - terraform-google-disk-seed 
-  #   env:
-  #     ## Use this script to parepare the data
-  #     - COMMAND1=bash -xe  /tmp/scripts/data_prep_script.sh
-  #     ## Upload the data to GCS - DO NOT MODIFY
-  #     - COMMAND2=bash -xe  /tmp/scripts/seed_shared_disk_pd.sh
+  - id: remote-builder-seed-disk
+    name: gcr.io/$PROJECT_ID/remote-builder
+    timeout: 4000s 
+    waitFor: 
+    - terraform-google-disk-seed 
+    env:
+      # Data prepare and seed disk
+      - COMMAND1=bash -xe /tmp/models/roberta/env_setup/data_prep_seed_shared_disk_pd.sh
     
   - id: terraform-google-disk-cleanup
     name: gcr.io/$PROJECT_ID/terraform:0.12.16
-    # waitFor: 
-    #   - remote-builder-seed-disk 
+    waitFor: 
+      - remote-builder-seed-disk 
     entrypoint: 'sh'
     args: 
     - '-c'

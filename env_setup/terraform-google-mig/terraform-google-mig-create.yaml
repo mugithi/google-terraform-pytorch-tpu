@@ -8,7 +8,7 @@ steps:
   - |
      # set -xe 
      source values.env
-     gsutil rsync -u -P /workspace/  gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/ 
+     gsutil rsync -u -P -r -m /workspace/ gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace/ 
      echo -e "$${GREEN} Synced gcs bucket gs://$${PROJECT_ID}-$${ENV_BUILD_NAME}-tf-backend/workspace with /workpace $${NC}"
 - id: terraform-google-mig
   name: gcr.io/$PROJECT_ID/terraform:0.12.16
