@@ -114,7 +114,7 @@ Running this command creates Filestore, Cloud TPU and Managed Instance Group usi
 
 After initialzing the environment, you can bigin training your PyTorch models on Cloud TPU. The following example models are made avaiable for you to start with as part of this repo.
 
-- [Test model using ImageNet and Synethetic Data](models/test) 
+- [Test model using ImageNet and Synethetic Data](models/tests) 
 - [RoBERTa model on FAIRseq](models/roberta) 
 - [COMMING SOON: Wave2vec model on FAIRseq]()
 
