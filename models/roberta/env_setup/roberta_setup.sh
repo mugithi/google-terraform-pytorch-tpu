@@ -27,7 +27,7 @@ ENV_SETUP_BRANCH='master'
 
 ## MODEL CODE REPO 
 MODEL_CODE_REPO="https://github.com/taylanbil/fairseq.git"
-MODEL_CODE_BRANCH='synth-data-roberta'
+MODEL_CODE_BRANCH='roberta-tpu'
 
 ############################################################
 #####  Things that only run in one host ####################
