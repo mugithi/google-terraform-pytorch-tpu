@@ -43,7 +43,7 @@ bash -xe $MOUNT_POINT/nfs_share/models/roberta/env_setup/roberta_setup.sh
 - Download the FAIRseq repo into the path `$MOUNT_POINT/nfs_share/code`
 - Remote SSH into every instance in the Managed Instance Group and install libraries required for RoBERTa to run  
 
-### 3. Training  RoBERTa 
+## 3. Training  RoBERTa 
 ---
 
 Start the training by running this command 
@@ -59,7 +59,7 @@ nohup bash -xe $MOUNT_POINT/nfs_share/models/roberta/training/runme.sh &
     - Save the training log file under path /tmp/ of each managed group instance 
 
 
-### 4. Monitoring Training Progress 
+## 4. Monitoring Training Progress 
 ---
 
 You can monitor training progress by reviweing the training log file under the *`/tmp/`* directory 
