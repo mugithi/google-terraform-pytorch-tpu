@@ -10,7 +10,7 @@ This script uses the preloaded imagenet model using synthetic data
 
 ```bash
 source /tmp/values.env
-bash -xe $MOUNT_POINT/nfs_share/models/tests/runme.sh
+bash -xe $MOUNT_POINT/nfs_share/models/tests/training/runme.sh
 ```
 
 
