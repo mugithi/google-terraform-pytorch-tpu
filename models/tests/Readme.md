@@ -18,7 +18,7 @@ bash -xe $MOUNT_POINT/nfs_share/models/tests/training/runme.sh
 
 - Set the conda enviroment to *`torch-xla-nightly`*
 - Kick off a *`torch_xla.distributed.xla_dis`* distributed training using all the instances in the managed instance group with the following options
-    - Use `/usr/share/torch-xla-nightly/pytorch/xla/test/test_train_imagenet.py` test imagenet script 
+    - Use `/usr/share/torch-xla-nightly/pytorch/xla/test/test_train_mp_imagenet.py` test imagenet script 
     - Use fake data 
 
 #### 2. Monitoring Expected output 
