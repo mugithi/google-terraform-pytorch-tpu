@@ -14,7 +14,7 @@ bash -xe $MOUNT_POINT/nfs_share/models/tests/training/runme.sh
 ```
 
 
-#### 1a. This [script](/models/tests/training/runme.sh#L28) will do the following*
+#### 1a. This [script](/models/tests/training/runme.sh#L28) will do the following
 
 - Set the conda enviroment to [`torch-xla-nightly`](/models/tests/training/runme.sh#L23)
 - Kick off [`torch_xla.distributed.xla_dis`](/models/tests/training/runme.sh#L28) distributed training using all the instances in the managed instance group with the following options
