@@ -30,7 +30,7 @@ DATABIN=$(seq 0 $nshards | xargs -I{} echo $data_path/shard{} | tr "\n" ":")
 # checkpoints_out=/tmp/checkpoints-roberta-$1
 checkpoints_out=$MOUNT_POINT/nfs_share/models/roberta/checkpoints-roberta-${ENV_BUILD_NAME}
 
-cd $MOUNT_POINT/nfs_share/code/
+cd $MOUNT_POINT/nfs_share/model_code/
 
 python -m torch_xla.distributed.xla_dist \
         --tpu=$TPU_POD_NAME \
