@@ -132,7 +132,7 @@ After initialzing the environment, you can bigin training your PyTorch models on
 
 #### 1. Initializing/Updating the shared persistent disk
 ---
-Modify [values file](values.env) and set the (shared persistent disk)[values.env#L43] and (gcs training dataset)[values.env#L12] parameters. Initialize the shared persistent disk using the command below.
+Modify [values file](values.env) and set the [*__shared persistent disk__*](values.env#L43) and [*__gcs training dataset__*](values.env#L12) parameters. Initialize the shared persistent disk using the command below.
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true
@@ -154,7 +154,6 @@ The update command `_BUILD_ACTION=update,_DISK=true` can be used to reload new t
 Please note that updates to the shared persistent disk will only take place if you change its changing the `SHARED_PD_DISK_SIZE="XXXX"` [variable](values.env). If you do not change the size of the persistent disk when running an update, you will see the error.
 
 `Step #1 - "terraform-google-disk": Step #0 - "terraform-google-disk-seed": Error: Error creating instance: googleapi: Error 400: The disk resource 'projects/xxxx' is already being used by 'projects/xxxx', resourceInUseByAnotherResource`
-
 
 #### 2. Updating Cloud TPU pod 
 ---
