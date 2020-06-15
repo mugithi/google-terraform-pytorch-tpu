@@ -22,12 +22,12 @@ MIG=$MACHINE_TYPE-$ENV_BUILD_NAME-mig
 ##### Variables 
 
 ## ENV SETUP GITHUB REPO 
-ENV_SETUP_REPO=' https://github.com/mugithi/google-terraform-pytorch-tpu.git'
-ENV_SETUP_BRANCH='master'
+ENV_SETUP_REPO=''
+ENV_SETUP_BRANCH=''
 
 ## MODEL CODE REPO 
-MODEL_CODE_REPO="https://github.com/taylanbil/fairseq.git"
-MODEL_CODE_BRANCH='synth-data-roberta'
+MODEL_CODE_REPO=''
+MODEL_CODE_BRANCH=''
 
 ############################################################
 #####  Things that only run in one host ####################
