@@ -144,7 +144,7 @@ When you run the `_BUILD_ACTION=update,_DISK=true` command,
 
 - A new persistant disk is created if non exists. If one exists, it is destroyed and new one is created
 - This disk is mounted to a temporary GCE instance that runs any data preparation as specified in the [data_prep_seed_shared_disk_pd.sh](env_setup/data_prep_seed_shared_disk_pd.sh#L36) 
-- The new disk is formated in ext4 and mounted it in path specified in the `$MOUNT_POINT/shared_pd` as specified in the mount point  [variable](values.env#10) file
+- The new disk is formated in ext4 and mounted it in path specified in the `$MOUNT_POINT/shared_pd` as specified in the mount point  [variable](values.env#L10) file
 - Mounts the new shared persistent to the managed instance group as read only volume. 
 
 The update command `_BUILD_ACTION=update,_DISK=true` can be used to reload new training data into the shared persistent disk. 
@@ -166,13 +166,13 @@ gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=up
 
 When this comamnd is run, a new Cloud TPU is created created or existing one is updated.
 
-The update command can be used to upgrade from a v3-8 to a v3-128 by changing the `TPU_ACCELERATOR_TYPE="v3-32"` [variable](values.env#23) or Cloud TPU PyTorch version from torch-1.5 to torch nightly by changing cloud `TPU_PYTORCH_VERSION="pytorch-1.5"`  [variable](values.env#24). 
+The update command can be used to upgrade from a v3-8 to a v3-128 by changing the `TPU_ACCELERATOR_TYPE="v3-32"` [variable](values.env#L23) or Cloud TPU PyTorch version from torch-1.5 to torch nightly by changing cloud `TPU_PYTORCH_VERSION="pytorch-1.5"`  [variable](values.env#L24). 
 
 The update command can also be used to recreate the Cloud TPU after destroying it using the `gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_TPU=true` command.
 
 #### *2b. Modifying the Cloud TPU runtime*
 
-If you specify a specific GCE torch-nightly version using the `GCE_IMAGE_VERSION="20200427"` [variable](values.env#29), cloud build will configure the Cloud TPU runtime to match the MIG GCE image version. If no value is called out in the `GCE_IMAGE_VERSION=""` [variable](values.env#29) , the latest nightly version is used.
+If you specify a specific GCE torch-nightly version using the `GCE_IMAGE_VERSION="20200427"` [variable](values.env#L29), cloud build will configure the Cloud TPU runtime to match the MIG GCE image version. If no value is called out in the `GCE_IMAGE_VERSION=""` [variable](values.env#L29) , the latest nightly version is used.
 
 Please note that updating the Cloud TPU pod does not modify the MIG. In order to change both the Cloud TPU and MIG, they both need to be explicity included in the cloud build substitation as follows `_BUILD_ACTION=update,_TPU=true,_MIG=true`
 
@@ -195,11 +195,11 @@ gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=up
 #### *4a. What happens when you update the MIG*
 When this comamnd is run, a new MIG is created created or existing one is updated.
 
-The update command can be used to change the number of VMs in the MIG by changing the `TPU_ACCELERATOR_TYPE="v3-32"` [variable](values.env#23) or size of the shared persistent disk that stores the training data by changing the `SHARED_PD_DISK_SIZ='1024'` [variable](values.env#45)
+The update command can be used to change the number of VMs in the MIG by changing the `TPU_ACCELERATOR_TYPE="v3-32"` [variable](values.env#L23) or size of the shared persistent disk that stores the training data by changing the `SHARED_PD_DISK_SIZ='1024'` [variable](values.env#L45)
 
 #### *4b. Modifying the GCE Image version*
 
-If you specify a specific GCE torch-nightly using the `GCE_IMAGE_VERSION="20200427"` [variable](values.env#29) and set the pytorch version in the  `TPU_PYTORCH_VERSION="pytorch-1.5"` [variable](values.env#24), cloudbuild will provision a MIG using the torch-nightly specified GCE_IMAGE version. In all other cases, cloud build will use the latest nightly versionn.
+If you specify a specific GCE torch-nightly using the `GCE_IMAGE_VERSION="20200427"` [variable](values.env#L29) and set the pytorch version in the  `TPU_PYTORCH_VERSION="pytorch-1.5"` [variable](values.env#L24), cloudbuild will provision a MIG using the torch-nightly specified GCE_IMAGE version. In all other cases, cloud build will use the latest nightly versionn.
 
 Please note that updating the Cloud TPU enviroment does not modify the MIG size. In order to change both the Cloud TPU and MIG, they both need to be explicity included in the cloud build substitation as follows `_BUILD_ACTION=update,_TPU=true,_MIG=true`
 
