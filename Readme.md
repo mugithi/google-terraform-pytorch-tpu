@@ -103,10 +103,19 @@ Modify [values file](values.env) and set the *__cloud TPU__*, *__managed instanc
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=create
 ``` 
-
 #### *4a. What happens when you build create the enviroment*
 
 Running this command creates Filestore, Cloud TPU and Managed Instance Group using values in the [variable](values.env) file. 
+
+
+#### *4b. Troubleshooting Creating the Shared Enviroment*
+
+Please note that if the `SHARED_PD_DISK_ATTACH` [variable](values.env#L44) is set to `true` and the Shared persistant disk is not initialized, you will see the error **resourceNotFound**. 
+
+`Step #5 - "terraform-google-mig": Step #1 - "terraform-google-mig": Error: Error creating InstanceGroupManager: googleapi: Error 404: The resource 'projects/pytorch-tpu-cb-test/zones/europe-west4-a/disks/pd-ssd-2055-20
+200430' was not found, notFound`
+
+In order to resolve this error, change the `SHARED_PD_DISK_ATTACH` [variable](values.env#L44) to `false` or create the Shared Persistant Disk using the command `_BUILD_ACTION=create,_DISK=true`
 
 
 # Training
@@ -121,19 +130,30 @@ After initialzing the environment, you can bigin training your PyTorch models on
 
 # Updating the environment 
 
-#### 1. Initializing the shared persistent disk
+#### 1. Initializing/Updating the shared persistent disk
 ---
-Modify [values file](values.env) and set the *__shared persistent disk__* and *__gcs training dataset__* parameters. Initialize the shared persistent disk using the command below.
+Modify [values file](values.env) and set the (*__shared persistent disk__*)[values.env#L43] and (*__gcs training dataset__*)[values.env#L12] parameters. Initialize the shared persistent disk using the command below.
 
 ```
-gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=initialize,_DISK=true
+gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true
 ```
 
-#### *1a. What happens when you initialize the shared persistent disk* 
+#### *1a. What happens when you initialize/Update the shared persistent disk* 
 
-Initializing the shared persistent  disk, creates a shared persistent disk and seeds it with read only training using data from a GCS bucket specified by the `GCS_DATASET="gs://xxxxx/dataset/*` [variable](values.env) . This shared persistent disk is then mounted to all the GCE instances that are created in step 6
+When you run the `_BUILD_ACTION=update,_DISK=true` command,
 
-You also have the option of running a [data prepation script](env_setup/data_prep_script.sh) on the data before it is seeded to the shared persistent disk. 
+- A new persistant disk is created if non exists. If one exists, it is destroyed and new one is created
+- This disk is mounted to a temporary GCE instance that runs any data preparation as specified in the [data_prep_seed_shared_disk_pd.sh](env_setup/data_prep_seed_shared_disk_pd.sh#L36) 
+- The new disk is formated in ext4 and mounted it in path specified in the `$MOUNT_POINT/shared_pd` as specified in the mount point  [variable](values.env#10) file
+- Mounts the new shared persistent to the managed instance group as read only volume. 
+
+The update command `_BUILD_ACTION=update,_DISK=true` can be used to reload new training data into the shared persistent disk. 
+
+#### *3c. Troubleshooting Shared persistent Disk*
+
+Please note that updates to the shared persistent disk will only take place if you change its changing the `SHARED_PD_DISK_SIZE="XXXX"` [variable](values.env). If you do not change the size of the persistent disk when running an update, you will see the error.
+
+`Step #1 - "terraform-google-disk": Step #0 - "terraform-google-disk-seed": Error: Error creating instance: googleapi: Error 400: The disk resource 'projects/xxxx' is already being used by 'projects/xxxx', resourceInUseByAnotherResource`
 
 
 #### 2. Updating Cloud TPU pod 
@@ -164,21 +184,7 @@ Please note that updating the Cloud TPU pod does not modify the MIG. In order to
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true
 ``` 
 
-#### *3a. What happens when you update the Shared persistent Disk*
 
-When you run this command, 
-- The existing shared persistent disk is destroyed and a new one is created. 
-- This disk is mounted to a temporary GCE instance that runs any data preparation as specified in the [data preparation script](env_setup/scripts/data_prep_script.sh). 
-- Formats new disk in ext4 and mounts it in path specified in the mount point `$MOUNT_POINT/shared_pd` as specified in the [variable](values.env) file
-- Mounts the new shared persistent to the managed instance group as read only volume. 
-
-The update command can be used to reload new training data into the shared persistent disk. 
-
-#### *3c. Troubleshooting Shared persistent Disk*
-
-Please note that updates to the shared persistent disk will only take place if you change its changing the `SHARED_PD_DISK_SIZE="XXXX"` [variable](values.env). If you do not change the size of the persistent disk when running an update, you will see the error.
-
-`Step #1 - "terraform-google-disk": Step #0 - "terraform-google-disk-seed": Error: Error creating instance: googleapi: Error 400: The disk resource 'projects/xxxx' is already being used by 'projects/xxxx', resourceInUseByAnotherResource`
 
 #### 4. Updating the Managed Instance Group MIG
 ---
