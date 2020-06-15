@@ -1,5 +1,7 @@
 # Testing the enviroment 
 
+Deploy the enviroment using the instructions in the [getting started guide](/Readme.md/#getting-started)
+
 Upon the deployment of the Cloud TPU enviroment using the Cloudbuild/Terraform automation tools, the enviroment comes preloaded with scripts test the enviroment. 
 
 This script uses the preloaded imagenet model using synthetic data 
