@@ -1,6 +1,6 @@
 # Training on RoBERTa
 
-Deploy the enviroment using the instructions in the [getting started guide](#getting-started)
+Deploy the enviroment using the instructions in the [getting started guide](/google-terraform-pytorch-tpu#getting-started)
 
 Upon the deployment of the Cloud TPU enviroment using the Cloudbuild/Terraform automation tools, the enviroment comes preloaded with scripts to quickly enable you to start training a RoBERTa model
 
