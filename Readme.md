@@ -132,7 +132,7 @@ After initialzing the environment, you can bigin training your PyTorch models on
 
 #### 1. Initializing/Updating the shared persistent disk
 ---
-Modify [values file](values.env) and set the (*__shared persistent disk__*)[values.env#L43] and (*__gcs training dataset__*)[values.env#L12] parameters. Initialize the shared persistent disk using the command below.
+Modify [values file](values.env) and set the (shared persistent disk)[values.env#L43] and (gcs training dataset)[values.env#L12] parameters. Initialize the shared persistent disk using the command below.
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true
