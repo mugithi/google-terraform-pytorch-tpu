@@ -22,7 +22,7 @@ steps:
   - '-c'
   - |
     # create this resource if TPU, MIG is not specified
-    if [[ ${_BUILD_ACTION} == "initialize" && ${_TPU} == "default" && ${_MIG} == "default" && ${_DISK} == "true" ]] 
+    if [[ ${_BUILD_ACTION} == "update" && ${_TPU} == "default" && ${_MIG} == "default" && ${_DISK} == "true" ]] 
     then
       gcloud builds submit --config=./env_setup/terraform-google-disk/terraform-google-disk.yaml 
       wait

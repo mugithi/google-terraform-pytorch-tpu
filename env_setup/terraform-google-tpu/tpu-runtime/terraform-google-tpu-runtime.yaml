@@ -40,7 +40,7 @@ steps:
     - terraform-google-tpu-version 
     env:
       ## Set the TPU runtime
-      - COMMAND1=bash -xe  /tmp/scripts/change_tpu_runtime.sh
+      - COMMAND1=bash -xe  /tmp/change_tpu_runtime.sh
 
   - id: tpu-runtime-cleanup
     name: gcr.io/$PROJECT_ID/terraform:0.12.16
