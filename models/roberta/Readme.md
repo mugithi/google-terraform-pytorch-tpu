@@ -21,7 +21,7 @@ gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=up
 
 Updating the shared persistent  disk, creates a shared persistent disk and seeds it with read only training using data from a GCS bucket specified by the `GCS_DATASET="gs://xxxxx/dataset/*` [variable](values.env#L18) . This shared persistent disk is then mounted to all the GCE instances that are created in step 6
 
-You also have the option of adding a running a data prepation step to the [data_prep_seed_shared_disk_pd.sh](env_setup/data_prep_seed_shared_disk_pd.sh#L36) script before copying the data to the shared persistant disk.
+You also have the option of adding a running a data prepation step to the [data_prep_seed_shared_disk_pd.sh](models/roberta/env_setup/data_prep_seed_shared_disk_pd.sh#L36) script before copying the data to the shared persistant disk.
 
 
 ## 2. Configuring the Cloud TPU enviroment to train RoBERTa 
