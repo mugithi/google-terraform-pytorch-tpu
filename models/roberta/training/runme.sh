@@ -36,7 +36,7 @@ python -m torch_xla.distributed.xla_dist \
         --tpu=$TPU_POD_NAME \
         --conda-env=torch-xla-nightly\
         --env XLA_USE_BF16=1 \
-        -- python $MOUNT_POINT/nfs_share/code/train.py \
+        -- python $MOUNT_POINT/nfs_share/model_code/train.py \
         $DATABIN \
         --save-dir $checkpoints_out \
         --arch roberta_large \
