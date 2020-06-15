@@ -204,8 +204,6 @@ If you specify a specific GCE torch-nightly using the `GCE_IMAGE_VERSION="202004
 Please note that updating the Cloud TPU enviroment does not modify the MIG size. In order to change both the Cloud TPU and MIG, they both need to be explicity included in the cloud build substitation as follows `_BUILD_ACTION=update,_TPU=true,_MIG=true`
 
 # Destroy the enviroment 
-
-# 1.Destroy the enviroment 
 ---
 
 ```
