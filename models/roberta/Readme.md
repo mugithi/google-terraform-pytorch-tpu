@@ -11,7 +11,9 @@ There are three steps that need to be completed to start training.
 
 #### 1. Updating/Initializing the shared persistent disk
 
-Modify [values file](values.env) and set the *__shared persistent disk__* and *__gcs training dataset__* parameters. Update the shared persistent disk using the command below.
+Modify [values file](values.env) and set the [*__shared persistent disk__*](values.env#L43) and [*__gcs training dataset__*](values.env#L12) parameters. 
+
+Initialize the shared persistent disk using the command below.
 
 ```
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true
@@ -19,7 +21,7 @@ gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=up
 
 #### *1a. What happens when you initialize/update the shared persistent disk* 
 
-Updating the shared persistent  disk, creates a shared persistent disk and seeds it with read only training using data from a GCS bucket specified by the `GCS_DATASET="gs://xxxxx/dataset/*` [variable](values.env#L18) . This shared persistent disk is then mounted to all the GCE instances that are created in step 6
+Updating the shared persistent  disk, creates a shared persistent disk and seeds it with read only training using data from a GCS bucket specified by the `GCS_DATASET="gs://xxxxx/dataset/*` [variable](values.env#L18). This shared persistent disk is then mounted to all the GCE Instances
 
 You also have the option of adding a running a data prepation step to the [data_prep_seed_shared_disk_pd.sh](models/roberta/env_setup/data_prep_seed_shared_disk_pd.sh#L36) script before copying the data to the shared persistant disk.
 
