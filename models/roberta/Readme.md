@@ -11,7 +11,7 @@ There are three steps that need to be completed to start training.
 
 #### 1. Updating/Initializing the shared persistent disk
 
-Modify [values file](values.env) and set the [*__shared persistent disk__*](values.env#L43) and [*__gcs training dataset__*](values.env#L12) parameters. 
+Modify [values file](values.env) and set the [*__shared persistent disk__*](./values.env#L43) and [*__gcs training dataset__*](./values.env#L12) parameters. 
 
 Initialize the shared persistent disk using the command below.
 
