@@ -11,9 +11,9 @@ There are three steps that need to be completed to start training.
 
 #### 1. Updating/Initializing the shared persistent disk
 
-Modify [values file](values.env) and set the [`shared persistent disk`](/values.env#L43) and [`gcs training dataset`](/values.env#L12) parameters. 
+Modify values file and set the [`shared persistent disk`](/values.env#L43) and [`gcs training dataset`](/values.env#L12) parameters. 
 
-Modify the [`SHARED_PD_DISK_ATTACH=false`](/values.env#L44) variable and set it to **`true`**
+Modify [`SHARED_PD_DISK_ATTACH=false`](/values.env#L44) variable and set it to **`true`**
 
 Initialize the shared persistent disk using the command below.
 
@@ -23,7 +23,7 @@ gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=up
 
 #### *1a. What happens when you initialize/update the shared persistent disk* 
 
-Updating the shared persistent  disk, creates a shared persistent disk and seeds it with read only training using data from a GCS bucket specified by the [`GCS_DATASET="gs://xxxxx/dataset/*`](values.env#L18) variable. This shared persistent disk is then mounted to all the GCE Instances
+Updating the shared persistent  disk, creates a shared persistent disk and seeds it with read only training using data from a GCS bucket specified by the [`GCS_DATASET="gs://xxxxx/dataset/*`](/values.env#L18) variable. This shared persistent disk is then mounted to all the GCE Instances
 
 You also have the option of adding a running a data prepation step to the [data_prep_seed_shared_disk_pd.sh](/models/roberta/env_setup/data_prep_seed_shared_disk_pd.sh#L36) script before copying the data to the shared persistant disk.
 
@@ -35,12 +35,12 @@ Use the `roberta_setup_script` to prepare the enviroment for training
 
 ```
 source /tmp/values.env
-nohup bash -xe $MOUNT_POINT/nfs_share/models/roberta/env_setup/roberta_setup.sh
+bash -xe $MOUNT_POINT/nfs_share/models/roberta/env_setup/roberta_setup.sh
 ```
 
 #### 2a. This script will do the following
 - From the Managed Instance Group machine you are currently logged in, create a path `$MOUNT_POINT/nfs_share/code` if it does not exist 
-- Download the FAIRseq repo into the path *`$MOUNT_POINT/nfs_share/code`
+- Download the FAIRseq repo into the path `$MOUNT_POINT/nfs_share/code`
 - Remote SSH into every instance in the Managed Instance Group and install libraries required for RoBERTa to run  
 
 ### 3. Training  RoBERTa 
@@ -49,7 +49,7 @@ nohup bash -xe $MOUNT_POINT/nfs_share/models/roberta/env_setup/roberta_setup.sh
 Start the training by running this command 
 
 ```
-bash -xe $MOUNT_POINT/nfs_share/models/roberta/training/runme.sh &
+nohup bash -xe $MOUNT_POINT/nfs_share/models/roberta/training/runme.sh &
 ```
 
 #### 3b. This script will do the following

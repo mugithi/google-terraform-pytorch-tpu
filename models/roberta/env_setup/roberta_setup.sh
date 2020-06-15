@@ -37,7 +37,7 @@ MODEL_CODE_BRANCH='synth-data-roberta'
 sudo chown -R $USER:$USER $MOUNT_POINT/nfs_share/
 
 
-# Clone the Enviroment SETUP code to the NFS share, for example for RoBERTa 
+# Clone the Enviroment setup code to the NFS share, for example for RoBERTa 
 if [[ -d $MOUNT_POINT/nfs_share/env ]]
 then 
     rm -rf $MOUNT_POINT/nfs_share/env
