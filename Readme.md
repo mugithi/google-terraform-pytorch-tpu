@@ -183,8 +183,6 @@ Please note that updating the Cloud TPU pod does not modify the MIG. In order to
 gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true
 ``` 
 
-
-
 #### 4. Updating the Managed Instance Group MIG
 ---
 

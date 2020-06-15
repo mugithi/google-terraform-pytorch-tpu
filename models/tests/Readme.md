@@ -6,7 +6,7 @@ Upon the deployment of the Cloud TPU enviroment using the Cloudbuild/Terraform a
 
 This script uses the preloaded imagenet model using synthetic data 
 
-#### Running the test 
+#### 1. Running the test 
 
 ```bash
 source /tmp/values.env
@@ -14,10 +14,10 @@ bash -xe $MOUNT_POINT/nfs_share/models/tests/training/runme.sh
 ```
 
 
-#### 1. This script will do the following
+#### 1a. This [script](/models/tests/training/runme.sh#L28) will do the following*
 
-- Set the conda enviroment to *`torch-xla-nightly`*
-- Kick off a *`torch_xla.distributed.xla_dis`* distributed training using all the instances in the managed instance group with the following options
+- Set the conda enviroment to [`torch-xla-nightly`](/models/tests/training/runme.sh#L23)
+- Kick off [`torch_xla.distributed.xla_dis`](/models/tests/training/runme.sh#L28) distributed training using all the instances in the managed instance group with the following options
     - Use `/usr/share/torch-xla-nightly/pytorch/xla/test/test_train_mp_imagenet.py` test imagenet script 
     - Use fake data 
 
