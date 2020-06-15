@@ -1,5 +1,7 @@
 # Training on RoBERTa
 
+Deploy the enviroment using the instructions in the [getting started guide](#getting-started)
+
 Upon the deployment of the Cloud TPU enviroment using the Cloudbuild/Terraform automation tools, the enviroment comes preloaded with scripts to quickly enable you to start training a RoBERTa model
 
 There are three steps that need to be completed to start training. 
