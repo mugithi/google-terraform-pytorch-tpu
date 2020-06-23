@@ -23,7 +23,7 @@ MIG=$MACHINE_TYPE-$ENV_BUILD_NAME-mig
 
 ## ENV SETUP GITHUB REPO 
 ENV_SETUP_REPO='https://github.com/mugithi/google-terraform-pytorch-tpu.git'
-ENV_SETUP_BRANCH='wav2vec'
+ENV_SETUP_BRANCH='wave2vec'
 
 ## MODEL CODE REPO 
 MODEL_CODE_REPO="https://github.com/ultrons/fairseq.git"
