@@ -44,7 +44,7 @@ then
 fi
 
 mkdir -p $MOUNT_POINT/nfs_share/env
-chmod go+rw $MOUNT_POINT/nfs_share/env
+sudo chmod go+rw $MOUNT_POINT/nfs_share/env
 cd $MOUNT_POINT/nfs_share/env
 git clone $ENV_SETUP_REPO . 
 git fetch 
@@ -67,9 +67,8 @@ git checkout $MODEL_CODE_BRANCH
 ## Finish the data prep 
 source /anaconda3/etc/profile.d/conda.sh && \
       conda activate torch-xla-nightly 
-sudo apt-get install libsndfile1
-
-python fairseq/scripts/wav2vec_manifest.py ${MOUNT_POINT}/shared_pd/source/ --dest ${MOUNT_POINT}/nfs_share/model_code --ext wav
+pip install pysoundfile
+python $MOUNT_POINT/nfs_share/model_code/examples/wav2vec/wav2vec_manifest.py ${MOUNT_POINT}/shared_pd/source/ --dest ${MOUNT_POINT}/nfs_share/model_code/ --ext wav
 
 ############################################################
 #####  Things that only on all the hosts ###################
@@ -83,7 +82,7 @@ source /anaconda3/etc/profile.d/conda.sh && \
 conda activate torch-xla-nightly && \
 pip install --editable . && \
 pip install pyarrow && \
-sudo apt-get install libsndfile1 -y
+pip install pysoundfile
 "
 
 for instance in $(gcloud --project=${PROJECT_ID} \
