@@ -66,9 +66,6 @@ curl -L http://www.openslr.org/resources/12/train-clean-100.tar.gz | tar zxv
 # Run the data preperation script
 python ~/model_code/examples/wav2vec/wav2vec_manifest.py ${MOUNT_POINT}/shared_pd/source/LibriSpeech --dest ${MOUNT_POINT}/shared_pd/source/LibriSpeech
 
-# Push final data to GCS bucket, a copy of the data is left in the shared_pd that will be later mouned to all the instances 
-gsutil -m cp -r ${MOUNT_POINT}/shared_pd/source/ gs://${PROJECT_ID}-${ENV_BUILD_NAME}-dataset
-
 ######################################### End of Data Prep Scrpit #######################################
 #########################################################################################################
 
