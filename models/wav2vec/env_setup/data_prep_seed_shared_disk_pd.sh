@@ -21,7 +21,7 @@ then
     sudo mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/disk/by-id/google-shared-pd && \
     sudo mkdir -p ${MOUNT_POINT}/shared_pd && \
     sudo mount -o discard,defaults /dev/disk/by-id/google-shared-pd ${MOUNT_POINT}/shared_pd && \
-    sudo chmod a+w ${MOUNT_POINT}/shared_pd
+    sudo chmod a+rwx ${MOUNT_POINT}/shared_pd
 else 
     echo -e "${RED}/dev/disk/by-id/google-shared-pd already exist${NC}"
 fi 
@@ -35,19 +35,39 @@ fi
 
 #########################################################################################################
 ######################################## Data Prep Script ############################################### 
+# links to datataset source here: http://www.openslr.org/12
 
-## link docs here: http://www.openslr.org/12
-## download LibriSpeech and tar to shared PD 
-
-SOURCE=dev-clean
 mkdir -p ${MOUNT_POINT}/shared_pd/source 
+MODEL_CODE_REPO="https://github.com/ultrons/fairseq.git"
+MODEL_CODE_BRANCH='fairseq-dev'
 
+## Clone the MODEL code to pull down the data preparation script  
+mkdir -p ~/model_code
+cd model_code
+git clone $MODEL_CODE_REPO .
+git fetch
+git checkout $MODEL_CODE_BRANCH
+
+### Prepare the data
+# setup the python environment
+source /anaconda3/etc/profile.d/conda.sh
+conda activate torch-xla-nightly 
+
+# Install dependancies 
+sudo apt-get install -y  libsndfile1
+pip install pysoundfile
+
+# Download the data 
 cd ${MOUNT_POINT}/shared_pd/source
-wget http://www.openslr.org/resources/12/$SOURCE.tar.gz
-tar -xvf $SOURCE.tar.gz 
+curl -L http://www.openslr.org/resources/12/dev-clean.tar.gz | tar xzv
+curl -L http://www.openslr.org/resources/12/test-clean.tar.gz | tar zxv 
+curl -L http://www.openslr.org/resources/12/train-clean-100.tar.gz | tar zxv
 
-cd ${MOUNT_POINT}/shared_pd/target  
-sudo gsutil -m cp -r ${MOUNT_POINT}/shared_pd/source gs://${PROJECT_ID}-${ENV_BUILD_NAME}-dataset
+# Run the data preperation script
+python ~/model_code/examples/wav2vec/wav2vec_manifest.py ${MOUNT_POINT}/shared_pd/source/LibriSpeech --dest ${MOUNT_POINT}/shared_pd/source/LibriSpeech
+
+# Push final data to GCS bucket, a copy of the data is left in the shared_pd that will be later mouned to all the instances 
+gsutil -m cp -r ${MOUNT_POINT}/shared_pd/source/ gs://${PROJECT_ID}-${ENV_BUILD_NAME}-dataset
 
 ######################################### End of Data Prep Scrpit #######################################
 #########################################################################################################

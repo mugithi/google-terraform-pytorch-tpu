@@ -1,8 +1,8 @@
-# Training on RoBERTa
+# Training on Wav2vec
 
 Deploy the enviroment using the instructions in the [getting started guide](/Readme.md/#getting-started)
 
-Upon the deployment of the Cloud TPU enviroment using the Cloudbuild/Terraform automation tools, the enviroment comes preloaded with scripts to quickly enable you to start training a RoBERTa model
+Upon the deployment of the Cloud TPU enviroment using the Cloudbuild/Terraform automation tools, the enviroment comes preloaded with scripts to quickly enable you to start training a Wav2vec model
 
 There are three steps that need to be completed to start training. 
 
@@ -25,31 +25,31 @@ gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=up
 
 Updating the shared persistent  disk, creates a shared persistent disk and seeds it with read only training using data from a GCS bucket specified by the [`GCS_DATASET="gs://xxxxx/dataset/*`](/values.env#L18) variable. This shared persistent disk is then mounted to all the GCE Instances
 
-You also have the option of adding a running a data prepation step to the [data_prep_seed_shared_disk_pd.sh](/models/roberta/env_setup/data_prep_seed_shared_disk_pd.sh#L36) script before copying the data to the shared persistant disk.
+This also runs [`wav2vec_manifest.py`](/models/wav2vec/env_setup/data_prep_seed_shared_disk_pd.sh#L67) to prepare the data in the data preparation the [data_prep_seed_shared_disk_pd.sh](/models/wav2vec/env_setup/data_prep_seed_shared_disk_pd.sh#L37-L72) script before copying the data the GCS bucket.
 
 
-## 2. Configuring the Cloud TPU enviroment to train RoBERTa 
+## 2. Configuring the Cloud TPU enviroment to train Wav2vec 
 ---
 
-Use the `roberta_setup_script` to prepare the enviroment for training 
+Use the `wav2vec_setup_script` to prepare the enviroment for training 
 
 ```
 source /tmp/values.env
-bash -xe $MOUNT_POINT/nfs_share/models/roberta/env_setup/roberta_setup.sh
+bash -xe $MOUNT_POINT/nfs_share/models/Wav2vec/env_setup/Wav2vec_setup.sh
 ```
 
 #### 2a. This script will do the following
 - From the Managed Instance Group machine you are currently logged in, create a path `$MOUNT_POINT/nfs_share/code` if it does not exist 
 - Download the FAIRseq repo into the path `$MOUNT_POINT/nfs_share/code`
-- Remote SSH into every instance in the Managed Instance Group and install libraries required for RoBERTa to run  
+- Remote SSH into every instance in the Managed Instance Group and install libraries required for Wav2vec to run  
 
-## 3. Training  RoBERTa 
+## 3. Training  Wav2vec 
 ---
 
 Start the training by running this command 
 
 ```
-nohup bash -xe $MOUNT_POINT/nfs_share/models/roberta/training/runme.sh &
+nohup bash -xe $MOUNT_POINT/nfs_share/models/Wav2vec/training/runme.sh &
 ```
 
 #### 3b. This script will do the following
@@ -65,6 +65,6 @@ nohup bash -xe $MOUNT_POINT/nfs_share/models/roberta/training/runme.sh &
 You can monitor training progress by reviweing the training log file under the *`/tmp/`* directory 
 
 ```
-tail -f /tmp/*roberta-podrun*
+tail -f /tmp/*Wav2vec-podrun*
 ````
 

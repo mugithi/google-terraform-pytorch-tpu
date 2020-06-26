@@ -125,7 +125,7 @@ After initialzing the environment, you can bigin training your PyTorch models on
 
 - [Test model using ImageNet and Synethetic Data](models/tests) 
 - [RoBERTa model on FAIRseq](models/roberta) 
-- [COMMING SOON: Wave2vec model on FAIRseq]()
+- [COMMING SOON: wav2vec model on FAIRseq]()
 
 
 # Updating the environment 
