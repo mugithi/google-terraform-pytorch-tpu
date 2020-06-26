@@ -38,16 +38,19 @@ git checkout $MODEL_CODE_BRANCH
 ############################################################
 
 # Model specific dependancies 
+# mkdir ~/data && \
+# gsutil -m cp -r gs://${PROJECT_ID}-${ENV_BUILD_NAME}-dataset ~/data && \
 
 COMMAND="
-sudo chmod a+rw -R $MOUNT_POINT/nfs_share/ && \
 cd '$MOUNT_POINT'/nfs_share/model_code && \
 source /anaconda3/etc/profile.d/conda.sh && \
 conda activate torch-xla-nightly && \
 pip install pyarrow && \
 pip install --editable . && \
 sudo apt-get install -y  libsndfile1 && \
+sudo chmod a+rw -R $MOUNT_POINT/nfs_share/ && \
 pip install pysoundfile
+
 "
 
 for instance in $(gcloud --project=${PROJECT_ID} \
