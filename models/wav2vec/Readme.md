@@ -33,7 +33,7 @@ Once the instances come up, ssh into them and use the `wav2vec_setup_script` to 
 
 ```
 source /tmp/values.env
-bash -xe $MOUNT_POINT/nfs_share/models/wav2vec/env_setup/Wav2vec_setup.sh
+bash -xe $MOUNT_POINT/nfs_share/models/wav2vec/env_setup/wav2vec_setup.sh
 ```
 
 #### 2a. This script will do the following
