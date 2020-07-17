@@ -14,7 +14,6 @@ This module does the following
 4. Create a shared persistent disk (PD) that is used to host the dataset used for training
 5. Allows the user to specificy a script to prepare the data before loading it to the shared persistant disk
 
-
 # Build Commands
 
 |Build Action |Cloud Build Command|
@@ -29,7 +28,6 @@ This module does the following
 | Destroy the MIG | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_MIG=true](https://github.com/mugithi/google-terraform-pytorch-tpu#3-updating-the-managed-instance-group-mig)* |
 | Update shared persistent disk | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=update,_DISK=true,_MIG=true](https://github.com/mugithi/google-terraform-pytorch-tpu#2-updating-the-shared-persistent-disk)* |
 | Destroy shared persistent disk | *[gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=destroy,_DISK=true](https://github.com/mugithi/google-terraform-pytorch-tpu#2-updating-the-shared-persistent-disk)* |
-
 
 # Deployment Architecture Diagram
 ![Terraform Cloud TPU deployment Architecture](docs/pytorch_gce_instances.png "Deployment Architecture Diagram")
@@ -69,7 +67,6 @@ gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_E
 gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$CB_SA_EMAIL  --role='roles/tpu.admin'
 ```
 
-
 #### 3. Initialize the training environment 
 ---
 
@@ -94,7 +91,6 @@ Each version of the environment is tracked using the variable `ENV_BUILD_NAME` u
 
 It is recomended that you keep seperate versions of the cloned cloud build repo for each environment to easily allow to easily version your scripts and [variable](values.env) file. 
 
-
 #### 4. Create the enviroment 
 ---
 
@@ -107,7 +103,6 @@ gcloud builds submit --config=cloudbuild.yaml . --substitutions _BUILD_ACTION=cr
 
 Running this command creates Filestore, Cloud TPU and Managed Instance Group using values in the [variable](values.env) file. 
 
-
 #### *4b. Troubleshooting Creating the Shared Enviroment*
 
 Please note that if the `SHARED_PD_DISK_ATTACH` [variable](values.env#L44) is set to `true` and the Shared persistant disk is not initialized, you will see the error **resourceNotFound**. 
@@ -117,7 +112,6 @@ Please note that if the `SHARED_PD_DISK_ATTACH` [variable](values.env#L44) is se
 
 In order to resolve this error, change the `SHARED_PD_DISK_ATTACH` [variable](values.env#L44) to `false` or create the Shared Persistant Disk using the command `_BUILD_ACTION=create,_DISK=true`
 
-
 # Training
 ---
 
@@ -125,8 +119,7 @@ After initialzing the environment, you can bigin training your PyTorch models on
 
 - [Test model using ImageNet and Synethetic Data](models/tests) 
 - [RoBERTa model on FAIRseq](models/roberta) 
-- [COMMING SOON: wav2vec model on FAIRseq]()
-
+- [wav2vec model on FAIRseq](models/wav2vec)
 
 # Updating the environment 
 
