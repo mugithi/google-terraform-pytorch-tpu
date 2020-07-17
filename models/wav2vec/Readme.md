@@ -60,9 +60,9 @@ nohup bash -xe $MOUNT_POINT/nfs_share/models/wav2vec/training/runme.sh &
 ## 4. Monitoring Training Progress 
 ---
 
-You can monitor training progress by reviweing the training log file under the *`/tmp/`* directory 
+You can monitor training progress by reviweing the nohup file 
 
 ```
-tail -f /tmp/*wav2vec-podrun*
+tail -f nohup
 ````
 
