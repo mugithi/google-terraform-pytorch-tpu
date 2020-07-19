@@ -50,7 +50,7 @@ python -m torch_xla.distributed.xla_dist \
         --vq-vars 320 \
         --vq-temp '(2,0.5,0.999995)' \
         --prediction-steps 12 \
-        --warmup-updates 1000 \
+        --warmup-updates 500 \
         --vq-type gumbel \
         --vq-groups 2 --vq-depth 2 \
         --log-compression \
@@ -58,9 +58,8 @@ python -m torch_xla.distributed.xla_dist \
         --criterion binary_cross_entropy \
         --num-negatives 10 \
         --max-sample-size 150000 \
-        --max-tokens 300000 --cross-sample-negatives 0 --update-freq 1 --seed 2 --skip-invalid-size-inputs-valid-test \
+        --max-tokens 450000 --cross-sample-negatives 0 --update-freq 1 --seed 2 --skip-invalid-size-inputs-valid-test \
         --skip-invalid-size-inputs-valid-test \
         --log-interval 20 \
         --num-batch-buckets 3 \
         --log-format simple 
-
