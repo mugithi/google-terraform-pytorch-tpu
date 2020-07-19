@@ -61,4 +61,6 @@ python -m torch_xla.distributed.xla_dist \
         --max-tokens 300000 --cross-sample-negatives 0 --update-freq 1 --seed 2 --skip-invalid-size-inputs-valid-test \
         --skip-invalid-size-inputs-valid-test \
         --log-interval 20 \
+        --num-batch-buckets 3 \
         --log-format simple 
+
