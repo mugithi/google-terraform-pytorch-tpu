@@ -4,7 +4,7 @@ Deploy the enviroment using the instructions in the [getting started guide](/Rea
 
 Upon the deployment of the Cloud TPU enviroment using the Cloudbuild/Terraform automation tools, the enviroment comes preloaded with scripts test the enviroment. 
 
-This script uses the preloaded imagenet model using synthetic data 
+This script trains the resnet50 model using synthetic data 
 
 #### 1. Running the test 
 
