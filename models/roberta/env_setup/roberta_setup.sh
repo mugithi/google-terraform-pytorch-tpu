@@ -50,7 +50,6 @@ git clone $ENV_SETUP_REPO .
 git fetch 
 git checkout $ENV_SETUP_BRANCH 
 
-
 ## Clone the MODEL code to the NFS share, for example fairseq  
 if [[ -d $MOUNT_POINT/nfs_share/model_code ]]
 then 
@@ -63,10 +62,10 @@ git clone $MODEL_CODE_REPO .
 cd $MOUNT_POINT/nfs_share/model_code
 git fetch
 git checkout $MODEL_CODE_BRANCH
-
+chown -R $USER:$USER $MOUNT_POINT/nfs_share/model_code
 
 ############################################################
-#####  Things that only on all the hosts ###################
+#####  Things that on all the hosts ###################
 ############################################################
 
 # Model specific dependancies 
