@@ -24,7 +24,7 @@ TPU_POD_NAME=${ENV_BUILD_NAME}-tpu
 source /anaconda3/etc/profile.d/conda.sh
 conda activate torch-xla-nightly
 
-# Run the test Script using imagenet and synthetic data
+# Run the imagenet test script and synthetic data
 cd /usr/share/torch-xla-nightly/pytorch/xla/test/
 python -m torch_xla.distributed.xla_dist \
         --tpu=$TPU_POD_NAME \
